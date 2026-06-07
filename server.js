@@ -12,9 +12,32 @@ connectDB();
 
 const PORT = process.env.PORT || 5000;
 
-// adding test routes
+// adding routes
+
+// GET routes- 
+// Test get route
 app.get('/' , (req, res) => {
     res.json({message : 'PrepSense API live'});
 });
+// health check route
+app.get('/api/health', (req,res) =>{
+    res.json({ status: 'OK' });
+});
+
+// POST Routes
+// questions route
+app.post('/api/questions', (req,res) =>{
+    res.json({message: 'Questions endpoint'});
+});
+// answer route
+app.post('/api/answers', (req,res) =>{
+    res.json({message:'Answers endpoint'});
+});
+// sessions route
+app.post('/api/sessions', (req,res) =>{
+    res.json({message:'Sessions endpoint'});
+});
+
+
 // server is running on PORT : 5000
 app.listen(PORT, () => console.log(`Server is running on port http://localhost:${PORT}`));
