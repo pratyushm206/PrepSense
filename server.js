@@ -34,10 +34,7 @@ app.post('/api/answers', (req,res) =>{
     res.json({message:'Answers endpoint'});
 });
 // sessions route
-app.post('/api/sessions', (req,res) =>{
-    res.json({message:'Sessions endpoint'});
-});
-
+app.use('/api/sessions', require('./routes/sessions'));
 
 // server is running on PORT : 5000
 app.listen(PORT, () => console.log(`Server is running on port http://localhost:${PORT}`));
