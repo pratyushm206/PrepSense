@@ -1,9 +1,15 @@
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { validationResult } = require('express-validator');
 
 const registerUser = async (req, res, next) => {
     try{
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+          return res.status(400).json({ success: false, errors: errors.array() });
+        }
+
         const {name, email, password} = req.body;
         // prevents duplicate accounts and matches the Guide's consistent response shape (success/message).
         const existingUser = await User.findOne({ email });
@@ -63,4 +69,17 @@ const loginUser = async (req, res, next) => {
   }
 };
 
-module.exports = { registerUser, loginUser };
+const getMe = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.userId).select('-password');
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    res.status(200).json({ success: true, data: user });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { registerUser, loginUser, getMe };

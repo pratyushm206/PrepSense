@@ -1,12 +1,20 @@
-// Express Router — a mini-app that handles a specific group of routes.
 const express = require('express');
 const router = express.Router();
 
-// this is the routing layer — maps the URL
-const { registerUser, loginUser } = require('../controllers/authController');
+const { registerUser, loginUser, getMe } = require('../controllers/authController');
+const protect = require('../middleware/auth');
+const { body, validationResult } = require('express-validator');
 
-router.post('/register', registerUser);
+router.post(
+  '/register',
+  [
+    body('email').isEmail().withMessage('Please provide a valid email'),
+    body('password').isLength({ min: 8 }).withMessage('Password must be at least 8 characters')
+  ],
+  registerUser
+);
+
 router.post('/login', loginUser);
+router.get('/me', protect, getMe);
 
-// Export
 module.exports = router;
