@@ -14,7 +14,15 @@ router.post(
   registerUser
 );
 
-router.post('/login', loginUser);
+router.post(
+  '/login',
+  [
+    body('email').isEmail().withMessage('Please provide a valid email'),
+    body('password').notEmpty().withMessage('Password is required')
+  ],
+  loginUser
+);
+
 router.get('/me', protect, getMe);
 
 module.exports = router;

@@ -6,6 +6,7 @@ require('dotenv').config();
 const connectDB = require('./config/db');
 const express = require('express');
 const app = express();
+const errorHandler = require('./middleware/errorHandler');
 
 app.use(express.json());
 connectDB();
@@ -36,6 +37,7 @@ app.post('/api/answers', (req,res) =>{
 // sessions route
 app.use('/api/sessions', require('./routes/sessions'));
 app.use('/api/auth', require('./routes/auth'));
+app.use(errorHandler);
 
 // server is running on PORT : 5000
 app.listen(PORT, () => console.log(`Server is running on port http://localhost:${PORT}`));
