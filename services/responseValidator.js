@@ -1,0 +1,50 @@
+/**
+ * Parses and sanitizes Gemini's raw question response.
+ *
+ * NOTE: `requested` reflects the number of items that survived JSON.parse —
+ * NOT the `count` originally requested from Gemini. If Gemini itself
+ * underdelivers (e.g. asked for 5, returned 3), that gap is invisible here.
+ * Tracking the true requested/generated/delivered pipeline is deferred —
+ * thread `count` through as a param if/when that distinction matters.
+ */
+
+function validateQuestions(rawText) {
+  let parsed;
+  try {
+    parsed = JSON.parse(rawText);
+  } catch (err) {
+    throw new Error('Failed to parse Gemini response as JSON');
+  }
+
+  if (!Array.isArray(parsed)) {
+    throw new Error('Expected an array of questions');
+  }
+
+  const ALLOWED_TOPICS = [
+    'arrays', 'strings', 'trees', 'graphs', 'dynamic programming',
+    'OS', 'DBMS', 'networks', 'system design', 'behavioral'
+  ];
+
+  const requiredFields = ['id', 'question', 'topic', 'difficulty', 'expectedKeyPoints'];
+
+  const valid = parsed.filter(item => {
+    const hasAllFields = requiredFields.every(field => item[field] !== undefined);
+    const keyPointsIsArray = Array.isArray(item.expectedKeyPoints);
+    const topicIsAllowed = ALLOWED_TOPICS.includes(item.topic);
+    const idIsNumber = typeof item.id === 'number';
+
+    return hasAllFields && keyPointsIsArray && topicIsAllowed && idIsNumber;
+  });
+
+  if (valid.length < parsed.length) {
+    console.warn(`Validation: ${parsed.length - valid.length} malformed question(s) filtered out`);
+  }
+
+  return {
+    questions: valid,
+    requested: parsed.length,
+    delivered: valid.length
+  };
+}
+
+module.exports = { validateQuestions };
