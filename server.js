@@ -26,17 +26,9 @@ app.get('/api/health', (req,res) =>{
 });
 
 // POST Routes
-// questions route
-app.post('/api/questions', (req,res) =>{
-    res.json({message: 'Questions endpoint'});
-});
-// answer route
-app.post('/api/answers', (req,res) =>{
-    res.json({message:'Answers endpoint'});
-});
-// sessions route
 app.use('/api/sessions', require('./routes/sessions'));
 app.use('/api/auth', require('./routes/auth'));
+app.use('/api/questions', require('./routes/questions'));
 app.use(errorHandler);
 
 // server is running on PORT : 5000

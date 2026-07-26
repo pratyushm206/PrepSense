@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const protect = require('../middleware/auth');
-const { createSession } = require('../controllers/sessionController');
+const { generate } = require('../controllers/questionController');
 
-router.post('/', protect, createSession);
+router.post('/generate', protect, generate);
 
 module.exports = router;

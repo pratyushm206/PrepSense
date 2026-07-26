@@ -1,4 +1,10 @@
+const { TOPICS, DIFFICULTIES } = require('../config/constants');
+
 function buildQuestionPrompt(company, role, difficulty, count) {
+  if (!DIFFICULTIES.includes(difficulty)) {
+    throw new Error(`Invalid difficulty: "${difficulty}". Must be one of: ${DIFFICULTIES.join(', ')}`);
+  }
+
   return `You are generating technical interview questions for a candidate preparing for a "${role}" role at "${company}".
 
 Generate exactly ${count} interview questions at "${difficulty}" difficulty level.
@@ -9,7 +15,7 @@ Each object in the array must follow this exact structure:
 {
   "id": <number, sequential starting from 1>,
   "question": "<the interview question text>",
-  "topic": "<one of: arrays, strings, trees, graphs, dynamic programming, OS, DBMS, networks, system design, behavioral>",
+  "topic": "<one of: ${TOPICS.join(', ')}>",
   "difficulty": "${difficulty}",
   "expectedKeyPoints": ["<key point 1>", "<key point 2>", "<key point 3>"]
 }

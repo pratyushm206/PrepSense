@@ -8,6 +8,8 @@
  * thread `count` through as a param if/when that distinction matters.
  */
 
+const { TOPICS } = require('../config/constants');
+
 function validateQuestions(rawText) {
   let parsed;
   try {
@@ -20,17 +22,13 @@ function validateQuestions(rawText) {
     throw new Error('Expected an array of questions');
   }
 
-  const ALLOWED_TOPICS = [
-    'arrays', 'strings', 'trees', 'graphs', 'dynamic programming',
-    'OS', 'DBMS', 'networks', 'system design', 'behavioral'
-  ];
-
+  
   const requiredFields = ['id', 'question', 'topic', 'difficulty', 'expectedKeyPoints'];
 
   const valid = parsed.filter(item => {
     const hasAllFields = requiredFields.every(field => item[field] !== undefined);
     const keyPointsIsArray = Array.isArray(item.expectedKeyPoints);
-    const topicIsAllowed = ALLOWED_TOPICS.includes(item.topic);
+    const topicIsAllowed = TOPICS.includes(item.topic);
     const idIsNumber = typeof item.id === 'number';
 
     return hasAllFields && keyPointsIsArray && topicIsAllowed && idIsNumber;
