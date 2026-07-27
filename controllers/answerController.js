@@ -22,8 +22,17 @@ const evaluate = async (req, res, next) => {
     }
 
     const prompt = buildEvalPrompt(question.question, answerText, question.expectedKeyPoints);
-    const rawText = await generateEvaluation(prompt);
-    const evaluation = validateEvaluation(rawText);
+
+    let evaluation;
+    try {
+      const rawText = await generateEvaluation(prompt);
+      evaluation = validateEvaluation(rawText);
+    } catch (validationErr) {
+      console.warn('Evaluation validation failed, retrying with stricter prompt:', validationErr.message);
+      const strictPrompt = prompt + '\n\nYour previous response was invalid. You MUST return only valid JSON with no other text.';
+      const retryRawText = await generateEvaluation(strictPrompt);
+      evaluation = validateEvaluation(retryRawText);
+    }
 
     session.answers.push({
       questionId,

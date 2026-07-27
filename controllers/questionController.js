@@ -17,13 +17,22 @@ const generate = async (req, res, next) => {
     }
 
     const prompt = buildQuestionPrompt(company, role, difficulty, count);
-    const rawText = await generateQuestions(prompt);
-    const { questions, requested, delivered } = validateQuestions(rawText);
 
-    session.questions = questions;
+    let result;
+    try {
+      const rawText = await generateQuestions(prompt);
+      result = validateQuestions(rawText);
+    } catch (validationErr) {
+      console.warn('Question validation failed, retrying with stricter prompt:', validationErr.message);
+      const strictPrompt = prompt + '\n\nYour previous response was invalid. You MUST return only valid JSON with no other text.';
+      const retryRawText = await generateQuestions(strictPrompt);
+      result = validateQuestions(retryRawText);
+    }
+
+    session.questions = result.questions;
     await session.save();
 
-    res.status(200).json({ success: true, data: { questions, requested, delivered } });
+    res.status(200).json({ success: true, data: result });
   } catch (error) {
     next(error);
   }
