@@ -10,4 +10,12 @@ async function generateQuestions(prompt) {
   return response.text;
 }
 
-module.exports = { generateQuestions };
+async function generateEvaluation(prompt) {
+  const response = await ai.models.generateContent({
+    model: 'gemini-2.5-flash',
+    contents: prompt
+  });
+  return response.text;
+}
+
+module.exports = { generateQuestions, generateEvaluation };

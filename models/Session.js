@@ -1,6 +1,6 @@
 // import mongoose
 const mongoose = require('mongoose');
-const { TOPICS, DIFFICULTIES } = require('../config/constants');
+const { TOPICS, DIFFICULTIES, VERDICTS } = require('../config/constants');
 // Defining schema
 const SessionSchema = new mongoose.Schema({
     userId: {
@@ -40,12 +40,39 @@ const SessionSchema = new mongoose.Schema({
             default: []
         }
     }],
-    answers: [{    //this is an array of objects, each with its own structure.
-        questionId: Number,
-        text: String,
-        score: Number,
-        feedback: String
+    
+    answers: [{
+        questionId: {
+            type: Number,
+            required: true
+        },
+        text: {
+            type: String,
+            required: true
+        },
+        score: {
+            type: Number,
+            required: true
+        },
+        strengths: {
+            type: [String],
+            default: []
+        },
+        improvements: {
+            type: [String],
+            default: []
+        },
+        missedPoints: {
+            type: [String],
+            default: []
+        },
+        verdict: {
+            type: String,
+            enum: VERDICTS,
+            required: true
+        }
     }],
+
     overallScore: {
         type: Number,
         default: 0

@@ -8,7 +8,7 @@
  * thread `count` through as a param if/when that distinction matters.
  */
 
-const { TOPICS } = require('../config/constants');
+const { TOPICS, VERDICTS } = require('../config/constants');
 
 function validateQuestions(rawText) {
   let parsed;
@@ -45,4 +45,30 @@ function validateQuestions(rawText) {
   };
 }
 
-module.exports = { validateQuestions };
+function validateEvaluation(rawText) {
+  let parsed;
+  try {
+    parsed = JSON.parse(rawText);
+  } catch (err) {
+    throw new Error('Failed to parse Gemini evaluation response as JSON');
+  }
+
+  const requiredFields = ['score', 'strengths', 'improvements', 'missedPoints', 'verdict'];
+  const hasAllFields = requiredFields.every(field => parsed[field] !== undefined);
+
+  if (!hasAllFields) {
+    throw new Error('Gemini evaluation response missing required fields');
+  }
+
+  const scoreIsValid = typeof parsed.score === 'number' && parsed.score >= 0 && parsed.score <= 100;
+  const arraysAreValid = ['strengths', 'improvements', 'missedPoints'].every(f => Array.isArray(parsed[f]));
+  const verdictIsValid = VERDICTS.includes(parsed.verdict);
+
+  if (!scoreIsValid || !arraysAreValid || !verdictIsValid) {
+    throw new Error('Gemini evaluation response failed field validation');
+  }
+
+  return parsed;
+}
+
+module.exports = { validateQuestions, validateEvaluation };

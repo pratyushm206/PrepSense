@@ -5,4 +5,6 @@ const TOPICS = [
 
 const DIFFICULTIES = ['easy', 'medium', 'hard'];
 
-module.exports = { TOPICS, DIFFICULTIES };
+const VERDICTS = ['good', 'average', 'poor'];
+
+module.exports = { TOPICS, DIFFICULTIES, VERDICTS };

@@ -1,4 +1,4 @@
-const { TOPICS, DIFFICULTIES } = require('../config/constants');
+const { TOPICS, DIFFICULTIES, VERDICTS } = require('../config/constants');
 
 function buildQuestionPrompt(company, role, difficulty, count) {
   if (!DIFFICULTIES.includes(difficulty)) {
@@ -23,4 +23,27 @@ Each object in the array must follow this exact structure:
 Return only valid JSON. No markdown. No explanation.`;
 }
 
-module.exports = { buildQuestionPrompt };
+function buildEvalPrompt(question, userAnswer, expectedKeyPoints) {
+  return `You are evaluating a candidate's answer to a technical interview question.
+
+Question: "${question}"
+
+Candidate's Answer: "${userAnswer}"
+
+Expected key points the answer should cover: ${expectedKeyPoints.join('; ')}
+
+Evaluate the answer and return ONLY a valid JSON object, no markdown, no explanation, no code fences. The response must start with { and end with }.
+
+The object must follow this exact structure:
+{
+  "score": <number 0-100>,
+  "strengths": ["<specific thing the candidate did well>"],
+  "improvements": ["<specific thing to improve>"],
+  "missedPoints": ["<expected key point the answer did not cover>"],
+  "verdict": "<one of: ${VERDICTS.join(', ')}>"
+}
+
+Return only valid JSON. No markdown. No explanation.`;
+}
+
+module.exports = { buildQuestionPrompt, buildEvalPrompt };

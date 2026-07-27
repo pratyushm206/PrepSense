@@ -26,6 +26,7 @@ app.get('/api/health', (req,res) =>{
 });
 
 // POST Routes
+app.use('/api/answers', require('./routes/answers'));
 app.use('/api/sessions', require('./routes/sessions'));
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/questions', require('./routes/questions'));
