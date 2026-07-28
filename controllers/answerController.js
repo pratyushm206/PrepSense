@@ -2,6 +2,7 @@ const { buildEvalPrompt } = require('../services/promptBuilder');
 const { generateEvaluation } = require('../services/geminiService');
 const { validateEvaluation } = require('../services/responseValidator');
 const Session = require('../models/Session');
+const { getTopicScores } = require('../services/scoringEngine');
 
 const evaluate = async (req, res, next) => {
   try {
@@ -43,6 +44,11 @@ const evaluate = async (req, res, next) => {
       missedPoints: evaluation.missedPoints,
       verdict: evaluation.verdict
     });
+    
+    const latestScores = getTopicScores([session]).map(t => t.avgScore);
+    session.overallScore = latestScores.length > 0
+      ? Math.round(latestScores.reduce((a, b) => a + b, 0) / latestScores.length)
+      : 0;
     await session.save();
 
     res.status(200).json({ success: true, data: evaluation });

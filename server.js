@@ -31,6 +31,7 @@ app.use('/api/sessions', require('./routes/sessions'));
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/questions', require('./routes/questions'));
 app.use(errorHandler);
+app.use('/api/analytics', require('./routes/analytics'));
 
 // server is running on PORT : 5000
 app.listen(PORT, () => console.log(`Server is running on port http://localhost:${PORT}`));
