@@ -82,6 +82,8 @@ const SessionSchema = new mongoose.Schema({
         default: Date.now
     }
 });
+SessionSchema.index({ userId: 1 });
+SessionSchema.index({ company: 1 });
 
 const Session = mongoose.model('Session', SessionSchema);
 

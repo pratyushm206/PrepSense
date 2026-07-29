@@ -2,6 +2,7 @@ const { buildQuestionPrompt } = require('../services/promptBuilder');
 const { generateQuestions } = require('../services/geminiService');
 const { validateQuestions } = require('../services/responseValidator');
 const Session = require('../models/Session');
+const Cache = require('../models/Cache');
 
 const generate = async (req, res, next) => {
   try {
@@ -18,15 +19,23 @@ const generate = async (req, res, next) => {
 
     const prompt = buildQuestionPrompt(company, role, difficulty, count);
 
+    const cacheKey = `questions:${company}:${role}:${difficulty}`;
+    const cached = await Cache.findOne({ key: cacheKey });
+
     let result;
-    try {
-      const rawText = await generateQuestions(prompt);
-      result = validateQuestions(rawText);
-    } catch (validationErr) {
-      console.warn('Question validation failed, retrying with stricter prompt:', validationErr.message);
-      const strictPrompt = prompt + '\n\nYour previous response was invalid. You MUST return only valid JSON with no other text.';
-      const retryRawText = await generateQuestions(strictPrompt);
-      result = validateQuestions(retryRawText);
+    if (cached) {
+      result = cached.data;
+    } else {
+      try {
+        const rawText = await generateQuestions(prompt);
+        result = validateQuestions(rawText);
+      } catch (validationErr) {
+        console.warn('Question validation failed, retrying with stricter prompt:', validationErr.message);
+        const strictPrompt = prompt + '\n\nYour previous response was invalid. You MUST return only valid JSON with no other text.';
+        const retryRawText = await generateQuestions(strictPrompt);
+        result = validateQuestions(retryRawText);
+      }
+      await Cache.create({ key: cacheKey, data: result });
     }
 
     session.questions = result.questions;

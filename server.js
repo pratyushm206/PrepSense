@@ -8,6 +8,19 @@ const express = require('express');
 const app = express();
 const errorHandler = require('./middleware/errorHandler');
 
+const helmet = require('helmet');
+const cors = require('cors');
+const rateLimit = require('express-rate-limit');
+
+app.use(helmet());
+app.use(cors());
+
+const aiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: { success: false, message: 'Too many AI requests, please try again later' }
+});
+
 app.use(express.json());
 connectDB();
 
@@ -30,8 +43,9 @@ app.use('/api/answers', require('./routes/answers'));
 app.use('/api/sessions', require('./routes/sessions'));
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/questions', require('./routes/questions'));
-app.use(errorHandler);
 app.use('/api/analytics', require('./routes/analytics'));
+app.use('/api/companies', require('./routes/companies'));
+app.use(errorHandler);
 
 // server is running on PORT : 5000
 app.listen(PORT, () => console.log(`Server is running on port http://localhost:${PORT}`));
