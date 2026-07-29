@@ -10,16 +10,9 @@ const errorHandler = require('./middleware/errorHandler');
 
 const helmet = require('helmet');
 const cors = require('cors');
-const rateLimit = require('express-rate-limit');
-
 app.use(helmet());
 app.use(cors());
 
-const aiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 10,
-  message: { success: false, message: 'Too many AI requests, please try again later' }
-});
 
 app.use(express.json());
 connectDB();
