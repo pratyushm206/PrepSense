@@ -19,7 +19,9 @@ const generate = async (req, res, next) => {
 
     const prompt = buildQuestionPrompt(company, role, difficulty, count);
 
-    const cacheKey = `questions:${company}:${role}:${difficulty}`;
+    // count is part of the key — a cached batch of 3 must never be served
+    // to a request asking for 5, even if company/role/difficulty match.
+    const cacheKey = `questions:${company}:${role}:${difficulty}:${count}`;
     const cached = await Cache.findOne({ key: cacheKey });
 
     let result;
