@@ -1,5 +1,5 @@
 const Session = require('../models/Session');
-const { getTopicScores, calculateReadiness } = require('../services/scoringEngine');
+const { getTopicScores, calculateReadiness, getTopicTrends } = require('../services/scoringEngine');
 
 const getOverview = async (req, res, next) => {
   try {
@@ -13,7 +13,13 @@ const getOverview = async (req, res, next) => {
       });
     }
 
-    const topicBreakdown = getTopicScores(scoredSessions);
+    const topicScores = getTopicScores(scoredSessions);
+    const topicTrends = getTopicTrends(scoredSessions);
+    const topicBreakdown = topicScores.map(t => ({
+      ...t,
+      trend: topicTrends[t.topic] || 'stable'
+    }));
+
     const readinessScore = calculateReadiness(scoredSessions);
 
     const weakAreas = [...topicBreakdown].sort((a, b) => a.avgScore - b.avgScore).slice(0, 3);

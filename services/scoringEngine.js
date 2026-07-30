@@ -78,6 +78,60 @@ function detectTrend(scoreHistory) {
   return 'stable';
 }
 
+// Per-topic trend across sessions, using the same first-half-vs-second-half
+// comparison as detectTrend, but on a chronological per-topic score history
+// instead of a single flat session-score array.
+//
+// Sorts sessions by completedAt itself rather than trusting the caller to —
+// this is a pure function that gets unit-tested directly, and correctness
+// here should not depend on the DB query upstream remembering to sort.
+//
+// For each session, a topic's score is the average of that session's
+// normalized answers on that topic (mirrors calculateSessionScore's
+// per-session flattening, just scoped to one topic instead of the whole
+// session). One data point per topic per session, in chronological order.
+//
+// Returns a topic -> trend map (not an array) so the controller can do an
+// O(1) lookup per topic when merging into topicBreakdown, instead of
+// .find()-ing through an array for every topic.
+function getTopicTrends(sessions) {
+  const sortedSessions = [...sessions].sort(
+    (a, b) => new Date(a.completedAt) - new Date(b.completedAt)
+  );
+
+  const topicHistories = new Map();
+
+  sortedSessions.forEach(session => {
+    const latestAnswers = getLatestAnswersPerQuestion(session.answers || []);
+    const sessionTopicTotals = new Map();
+
+    latestAnswers.forEach(answer => {
+      const question = (session.questions || []).find(q => q.id === answer.questionId);
+      if (!question) return;
+
+      const normalized = normalizeScore(answer.score, question.difficulty);
+
+      if (!sessionTopicTotals.has(question.topic)) {
+        sessionTopicTotals.set(question.topic, { sum: 0, count: 0 });
+      }
+      const entry = sessionTopicTotals.get(question.topic);
+      entry.sum += normalized;
+      entry.count += 1;
+    });
+
+    sessionTopicTotals.forEach(({ sum, count }, topic) => {
+      if (!topicHistories.has(topic)) topicHistories.set(topic, []);
+      topicHistories.get(topic).push(Math.round(sum / count));
+    });
+  });
+
+  const trends = {};
+  topicHistories.forEach((history, topic) => {
+    trends[topic] = detectTrend(history);
+  });
+  return trends;
+}
+
 function calculateReadiness(userSessions, targetCompany) {
   const scoredSessions = userSessions.filter(s => (s.answers || []).length > 0);
   if (scoredSessions.length === 0) return 0;
@@ -103,4 +157,11 @@ function calculateReadiness(userSessions, targetCompany) {
   return Math.max(0, Math.min(100, Math.round(readiness)));
 }
 
-module.exports = { normalizeScore, getTopicScores, detectTrend, calculateReadiness, calculateSessionScore };
+module.exports = {
+  normalizeScore,
+  getTopicScores,
+  detectTrend,
+  getTopicTrends,
+  calculateReadiness,
+  calculateSessionScore
+};
