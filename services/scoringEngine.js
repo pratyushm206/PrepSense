@@ -46,6 +46,21 @@ function getTopicScores(sessions) {
   return result.sort((a, b) => b.avgScore - a.avgScore);
 }
 
+// Flat average of this session's answers, normalized by question difficulty.
+// This is "how the user did in this session" — answer-weighted, NOT topic-weighted.
+// Topic-weighting belongs in getTopicScores/calculateReadiness, not here.
+function calculateSessionScore(session) {
+  const latestAnswers = getLatestAnswersPerQuestion(session.answers || []);
+  if (latestAnswers.length === 0) return 0;
+
+  const normalizedScores = latestAnswers.map(answer => {
+    const question = (session.questions || []).find(q => q.id === answer.questionId);
+    return question ? normalizeScore(answer.score, question.difficulty) : answer.score;
+  });
+
+  return Math.round(normalizedScores.reduce((a, b) => a + b, 0) / normalizedScores.length);
+}
+
 function detectTrend(scoreHistory) {
   if (scoreHistory.length < 2) return 'stable';
 
@@ -67,14 +82,7 @@ function calculateReadiness(userSessions, targetCompany) {
   const scoredSessions = userSessions.filter(s => (s.answers || []).length > 0);
   if (scoredSessions.length === 0) return 0;
 
-  const sessionAvgScores = scoredSessions.map(session => {
-    const latestAnswers = getLatestAnswersPerQuestion(session.answers);
-    const normalizedScores = latestAnswers.map(answer => {
-      const question = (session.questions || []).find(q => q.id === answer.questionId);
-      return question ? normalizeScore(answer.score, question.difficulty) : answer.score;
-    });
-    return normalizedScores.reduce((a, b) => a + b, 0) / normalizedScores.length;
-  });
+  const sessionAvgScores = scoredSessions.map(session => calculateSessionScore(session));
 
   const recentFive = sessionAvgScores.slice(-5);
   const recentWeight = recentFive.reduce((a, b) => a + b, 0) / recentFive.length;
@@ -95,4 +103,4 @@ function calculateReadiness(userSessions, targetCompany) {
   return Math.max(0, Math.min(100, Math.round(readiness)));
 }
 
-module.exports = { normalizeScore, getTopicScores, detectTrend, calculateReadiness };
+module.exports = { normalizeScore, getTopicScores, detectTrend, calculateReadiness, calculateSessionScore };
