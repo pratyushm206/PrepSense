@@ -40,7 +40,7 @@ const SessionSchema = new mongoose.Schema({
             default: []
         }
     }],
-    
+
     answers: [{
         questionId: {
             type: Number,
@@ -70,6 +70,10 @@ const SessionSchema = new mongoose.Schema({
             type: String,
             enum: VERDICTS,
             required: true
+        },
+        isLatest: {
+            type: Boolean,
+            default: true
         }
     }],
 

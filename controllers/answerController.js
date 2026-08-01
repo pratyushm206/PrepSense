@@ -35,6 +35,13 @@ const evaluate = async (req, res, next) => {
       evaluation = validateEvaluation(retryRawText);
     }
 
+    // Mark any prior attempts on this question as no-longer-latest before
+    // pushing the new one. This preserves retry history (Option B) instead
+    // of overwriting it — analytics/scoring only ever reads isLatest:true.
+    session.answers.forEach(a => {
+      if (a.questionId === questionId) a.isLatest = false;
+    });
+
     session.answers.push({
       questionId,
       text: answerText,
@@ -42,9 +49,10 @@ const evaluate = async (req, res, next) => {
       strengths: evaluation.strengths,
       improvements: evaluation.improvements,
       missedPoints: evaluation.missedPoints,
-      verdict: evaluation.verdict
+      verdict: evaluation.verdict,
+      isLatest: true
     });
-    
+
     session.overallScore = calculateSessionScore(session);
     await session.save();
 

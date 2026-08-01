@@ -8,9 +8,16 @@ function normalizeScore(rawScore, questionDifficulty) {
   return Math.min(100, Math.round(scaled));
 }
 
+// Filters to isLatest !== false (not === true) on purpose: legacy answer
+// subdocuments written before this field existed have isLatest === undefined.
+// undefined !== false evaluates true, so pre-migration data stays counted
+// instead of silently vanishing from every aggregation the moment this ships.
+// Falls back to last-in-array-wins as a tie-breaker in the (should-not-happen)
+// case where more than one entry per questionId is marked latest.
 function getLatestAnswersPerQuestion(answers) {
+  const relevant = (answers || []).filter(a => a.isLatest !== false);
   const latestByQuestionId = new Map();
-  for (const answer of answers) {
+  for (const answer of relevant) {
     latestByQuestionId.set(answer.questionId, answer);
   }
   return Array.from(latestByQuestionId.values());
@@ -46,9 +53,6 @@ function getTopicScores(sessions) {
   return result.sort((a, b) => b.avgScore - a.avgScore);
 }
 
-// Flat average of this session's answers, normalized by question difficulty.
-// This is "how the user did in this session" — answer-weighted, NOT topic-weighted.
-// Topic-weighting belongs in getTopicScores/calculateReadiness, not here.
 function calculateSessionScore(session) {
   const latestAnswers = getLatestAnswersPerQuestion(session.answers || []);
   if (latestAnswers.length === 0) return 0;
@@ -78,22 +82,6 @@ function detectTrend(scoreHistory) {
   return 'stable';
 }
 
-// Per-topic trend across sessions, using the same first-half-vs-second-half
-// comparison as detectTrend, but on a chronological per-topic score history
-// instead of a single flat session-score array.
-//
-// Sorts sessions by completedAt itself rather than trusting the caller to —
-// this is a pure function that gets unit-tested directly, and correctness
-// here should not depend on the DB query upstream remembering to sort.
-//
-// For each session, a topic's score is the average of that session's
-// normalized answers on that topic (mirrors calculateSessionScore's
-// per-session flattening, just scoped to one topic instead of the whole
-// session). One data point per topic per session, in chronological order.
-//
-// Returns a topic -> trend map (not an array) so the controller can do an
-// O(1) lookup per topic when merging into topicBreakdown, instead of
-// .find()-ing through an array for every topic.
 function getTopicTrends(sessions) {
   const sortedSessions = [...sessions].sort(
     (a, b) => new Date(a.completedAt) - new Date(b.completedAt)
