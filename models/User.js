@@ -1,13 +1,11 @@
 // import mongoose
 const mongoose = require('mongoose');
 
-// define the schema. 
-// A schema is the blueprint — it tells MongoDB exactly what a user document looks like.
 const UserSchema = new mongoose.Schema({
 
     name : {
         type : String,
-        required : true //means MongoDB will reject any user document that doesn't have a name.
+        required : true
     },
 
     email : {
@@ -16,15 +14,20 @@ const UserSchema = new mongoose.Schema({
         required : true
     },
 
-    password : {  //This will store the hashed password, never the plain text. 
+    password : {
         type : String,
         required : true,
         minlength : 8
     },
 
     targetCompanies : {
-        type : [String], // means an array of strings — a user can target multiple companies. 
+        type : [String],
         default : []
+    },
+
+    isAdmin : {
+        type : Boolean,
+        default : false
     },
 
     createdAt : {
