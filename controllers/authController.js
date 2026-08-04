@@ -10,7 +10,7 @@ const registerUser = async (req, res, next) => {
           return res.status(400).json({ success: false, errors: errors.array() });
         }
 
-        const {name, email, password} = req.body;
+        const {name, email, password, targetCompanies = []} = req.body;
         // prevents duplicate accounts and matches the Guide's consistent response shape (success/message).
         const existingUser = await User.findOne({ email });
         if (existingUser) {
@@ -24,7 +24,8 @@ const registerUser = async (req, res, next) => {
         const user = await User.create({
             name,
             email,
-            password: hashedPassword
+            password: hashedPassword,
+            targetCompanies
         });
 
         // sign a JWT for the new user
@@ -35,7 +36,7 @@ const registerUser = async (req, res, next) => {
         res.status(201).json({
             success: true,
             token,
-            data: { id: user._id, name: user.name, email: user.email }
+            data: { id: user._id, name: user.name, email: user.email, targetCompanies: user.targetCompanies }
         });
     } catch(error){
         next(error);

@@ -1,9 +1,13 @@
 const Session = require('../models/Session');
+const User = require('../models/User');
 const { getTopicScores, calculateReadiness, getTopicTrends } = require('../services/scoringEngine');
 
 const getOverview = async (req, res, next) => {
   try {
-    const sessions = await Session.find({ userId: req.user.userId });
+    const [sessions, user] = await Promise.all([
+      Session.find({ userId: req.user.userId }),
+      User.findById(req.user.userId).select('targetCompanies')
+    ]);
     const scoredSessions = sessions.filter(s => (s.answers || []).length > 0);
 
     if (scoredSessions.length === 0) {
@@ -20,7 +24,8 @@ const getOverview = async (req, res, next) => {
       trend: topicTrends[t.topic] || 'stable'
     }));
 
-    const readinessScore = calculateReadiness(scoredSessions);
+    const targetCompany = req.query.targetCompany || user?.targetCompanies?.[0];
+    const readinessScore = calculateReadiness(scoredSessions, targetCompany);
 
     const weakAreas = [...topicBreakdown].sort((a, b) => a.avgScore - b.avgScore).slice(0, 3);
     const strongAreas = [...topicBreakdown].sort((a, b) => b.avgScore - a.avgScore).slice(0, 3);

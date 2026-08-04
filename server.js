@@ -15,7 +15,6 @@ app.use(cors());
 
 
 app.use(express.json());
-connectDB();
 
 const PORT = process.env.PORT || 5000;
 
@@ -38,7 +37,13 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/questions', require('./routes/questions'));
 app.use('/api/analytics', require('./routes/analytics'));
 app.use('/api/companies', require('./routes/companies'));
+app.use('/api/admin', require('./routes/admin'));
+app.use('/api/recommendations', require('./routes/recommendations'));
 app.use(errorHandler);
 
-// server is running on PORT : 5000
-app.listen(PORT, () => console.log(`Server is running on port http://localhost:${PORT}`));
+const startServer = async () => {
+    await connectDB();
+    app.listen(PORT, () => console.log(`Server is running on port http://localhost:${PORT}`));
+};
+
+startServer();

@@ -124,7 +124,11 @@ function calculateReadiness(userSessions, targetCompany) {
   const scoredSessions = userSessions.filter(s => (s.answers || []).length > 0);
   if (scoredSessions.length === 0) return 0;
 
-  const sessionAvgScores = scoredSessions.map(session => calculateSessionScore(session));
+  const sortedSessions = [...scoredSessions].sort(
+    (a, b) => new Date(a.completedAt) - new Date(b.completedAt)
+  );
+
+  const sessionAvgScores = sortedSessions.map(session => calculateSessionScore(session));
 
   const recentFive = sessionAvgScores.slice(-5);
   const recentWeight = recentFive.reduce((a, b) => a + b, 0) / recentFive.length;
