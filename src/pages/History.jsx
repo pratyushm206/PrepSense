@@ -45,25 +45,81 @@ export default function History() {
 
   return (
     <section className="page-stack">
-      <div className="section-heading">
+      <div className="page-head">
         <div>
-          <p className="eyebrow">History</p>
-          <h1>Your practice archive</h1>
+          <p className="eyebrow">Archive</p>
+          <h1>Your practice log.</h1>
+        </div>
+        <div className="filter-row" aria-label="Session filters">
+          <span className="filter-chip active">All</span>
+          <span className="filter-chip">Completed</span>
+          <span className="filter-chip">Incomplete</span>
         </div>
       </div>
 
-      <div className="history-list">
+      <div className="session-list">
         {sessions.map(session => (
-          <Link className="history-row" to={`/history/${session._id}`} key={session._id}>
-            <div>
-              <strong>{session.company}</strong>
-              <span>{session.role}</span>
+          <Link className="session" to={`/history/${session._id}`} key={session._id}>
+            <div className={`score-badge ${getScoreClass(session.overallScore)}`}>
+              {session.overallScore > 0 ? session.overallScore : '-'}
             </div>
-            <span>{new Date(session.completedAt).toLocaleDateString()}</span>
-            <strong>{session.overallScore || 0}</strong>
+            <div className="s-main">
+              <div className="s-company">{session.company}</div>
+              <div className="s-role">{getSessionMeta(session)}</div>
+            </div>
+            <div className="s-tags">
+              {getTopicTags(session).length > 0 ? (
+                getTopicTags(session).map(topic => <span className="tag" key={topic}>{topic}</span>)
+              ) : (
+                <span className="tag tag-flag">evaluation failed</span>
+              )}
+            </div>
+            <div className="s-date">{formatDate(session.completedAt)}</div>
+            <div className="s-arrow">-&gt;</div>
           </Link>
         ))}
       </div>
+
+      {sessions.some(session => session.overallScore === 0) && (
+        <div className="empty-hint">
+          <span className="dot" />
+          Zero-score sessions are shown separately so evaluation-pipeline results do not read like genuine interview scores.
+        </div>
+      )}
     </section>
   );
+}
+
+function getScoreClass(score) {
+  if (!score) return 'score-zero';
+  if (score >= 70) return 'score-good';
+  if (score >= 40) return 'score-warn';
+  return 'score-bad';
+}
+
+function getSessionMeta(session) {
+  const firstQuestion = session.questions?.[0];
+  const difficulty = firstQuestion?.difficulty || 'Medium';
+  const count = session.questions?.length || 0;
+  const label = count === 1 ? 'question' : 'questions';
+  return `${session.role} · ${capitalize(difficulty)} · ${count} ${label}`;
+}
+
+function getTopicTags(session) {
+  if (!session.overallScore) return [];
+  const topics = session.questions?.map(question => question.topic).filter(Boolean) || [];
+  return [...new Set(topics)].slice(0, 2);
+}
+
+function formatDate(value) {
+  if (!value) return '';
+  return new Intl.DateTimeFormat('en-GB', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  }).format(new Date(value));
+}
+
+function capitalize(value) {
+  return String(value).charAt(0).toUpperCase() + String(value).slice(1);
 }

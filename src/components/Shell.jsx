@@ -13,7 +13,10 @@ export default function Shell() {
   return (
     <div className="app-shell">
       <header className="topbar">
-        <NavLink to="/dashboard" className="brand">PrepSense</NavLink>
+        <NavLink to="/dashboard" className="brand" aria-label="PrepSense dashboard">
+          <span className="brand-mark">P</span>
+          <span className="brand-name">PrepSense</span>
+        </NavLink>
         <nav className="nav-links" aria-label="Primary navigation">
           <NavLink to="/dashboard">Dashboard</NavLink>
           <NavLink to="/interview/new">Practice</NavLink>
