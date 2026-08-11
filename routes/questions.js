@@ -3,7 +3,7 @@ const router = express.Router();
 const protect = require('../middleware/auth');
 const { generate } = require('../controllers/questionController');
 
-const rateLimit = require('express-rate-limit'); const aiLimiter = rateLimit({ windowMs: 15*60*1000, max: 10 });
+const aiLimiter = require('../middleware/rateLimiter');
 router.post('/generate', protect, aiLimiter, generate);
 
 module.exports = router;
