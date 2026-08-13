@@ -21,6 +21,7 @@ export default function Shell() {
           <NavLink to="/dashboard">Dashboard</NavLink>
           <NavLink to="/interview/new">Practice</NavLink>
           <NavLink to="/history">History</NavLink>
+          <NavLink to="/recommendations">Recommendations</NavLink>
         </nav>
         <div className="user-actions">
           <span>{user?.name || user?.email}</span>

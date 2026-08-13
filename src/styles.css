@@ -557,6 +557,16 @@ h2 {
   background: var(--teal-dim);
 }
 
+.status-label.priority-high {
+  color: var(--red);
+  background: var(--red-dim);
+}
+
+.status-label.priority-medium {
+  color: var(--amber);
+  background: var(--amber-dim);
+}
+
 .trend.stable,
 .verdict.average,
 .tag {
@@ -628,6 +638,37 @@ h2 {
   text-align: right;
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.85rem;
+}
+
+.recommendation-item {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.recommendation-main {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.recommendation-main strong {
+  font-size: 0.95rem;
+}
+
+.recommendation-main span,
+.recommendation-count {
+  color: var(--text-faint);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.recommendation-meta {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .topic-row,
@@ -1185,7 +1226,12 @@ h2 {
   }
 
   .topic-row,
-  .history-row {
+  .history-row,
+  .recommendation-item {
     grid-template-columns: 1fr;
+  }
+
+  .recommendation-meta {
+    justify-content: flex-start;
   }
 }

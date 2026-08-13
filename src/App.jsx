@@ -7,6 +7,7 @@ import HistoryDetail from './pages/HistoryDetail.jsx';
 import Interview from './pages/Interview.jsx';
 import InterviewSetup from './pages/InterviewSetup.jsx';
 import Login from './pages/Login.jsx';
+import Recommendations from './pages/Recommendations.jsx';
 import Register from './pages/Register.jsx';
 import Summary from './pages/Summary.jsx';
 
@@ -24,6 +25,7 @@ export default function App() {
           <Route path="/interview/:sessionId/summary" element={<Summary />} />
           <Route path="/history" element={<History />} />
           <Route path="/history/:sessionId" element={<HistoryDetail />} />
+          <Route path="/recommendations" element={<Recommendations />} />
         </Route>
       </Route>
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
