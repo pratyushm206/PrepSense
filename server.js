@@ -7,7 +7,7 @@ const connectDB = require('./config/db');
 const express = require('express');
 const app = express();
 const errorHandler = require('./middleware/errorHandler');
-
+const path = require('path');
 const helmet = require('helmet');
 const cors = require('cors');
 app.use(helmet());
@@ -21,10 +21,6 @@ const PORT = process.env.PORT || 5000;
 // adding routes
 
 // GET routes- 
-// Test get route
-app.get('/' , (req, res) => {
-    res.json({message : 'PrepSense API live'});
-});
 // health check route
 app.get('/api/health', (req,res) =>{
     res.json({ status: 'OK' });
@@ -39,6 +35,12 @@ app.use('/api/analytics', require('./routes/analytics'));
 app.use('/api/companies', require('./routes/companies'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/recommendations', require('./routes/recommendations'));
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, 'dist')));
+  app.get(/^\/(?!api).*/, (req, res) => {
+    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+  });
+}
 app.use(errorHandler);
 
 const startServer = async () => {
