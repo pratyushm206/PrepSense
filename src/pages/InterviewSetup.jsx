@@ -1,7 +1,14 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiRequest } from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
+
+const CATEGORIES = [
+  { value: 'dsa', label: 'DSA' },
+  { value: 'system_design', label: 'System design' },
+  { value: 'core', label: 'Core subjects' },
+  { value: 'behavioral', label: 'Behavioral' }
+];
 
 export default function InterviewSetup() {
   const { token } = useAuth();
@@ -9,12 +16,51 @@ export default function InterviewSetup() {
   const [values, setValues] = useState({
     company: '',
     role: '',
+    category: '',
     difficulty: 'medium',
     count: 5
   });
   const [errors, setErrors] = useState({});
   const [formError, setFormError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [readout, setReadout] = useState({
+    sessionsThisWeek: '—',
+    readinessScore: '—',
+    recommendedFocus: '—'
+  });
+  const [readoutLoading, setReadoutLoading] = useState(true);
+  const [readoutError, setReadoutError] = useState('');
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadReadout() {
+      try {
+        const [sessions, overview, recommendations] = await Promise.all([
+          apiRequest('/api/sessions', { token }),
+          apiRequest('/api/analytics/overview', { token }),
+          apiRequest('/api/recommendations', { token })
+        ]);
+
+        if (!cancelled) {
+          setReadout({
+            sessionsThisWeek: getSessionsThisWeek(sessions),
+            readinessScore: overview.readinessScore ?? '—',
+            recommendedFocus: getRecommendedFocus(recommendations)
+          });
+        }
+      } catch (err) {
+        if (!cancelled) setReadoutError(err.message);
+      } finally {
+        if (!cancelled) setReadoutLoading(false);
+      }
+    }
+
+    loadReadout();
+    return () => {
+      cancelled = true;
+    };
+  }, [token]);
 
   function updateField(event) {
     setValues({ ...values, [event.target.name]: event.target.value });
@@ -30,6 +76,7 @@ export default function InterviewSetup() {
     const nextErrors = {};
     if (!values.company.trim()) nextErrors.company = 'Company is required.';
     if (!values.role.trim()) nextErrors.role = 'Role is required.';
+    if (!values.category) nextErrors.category = 'Pick what you want to practice.';
     setErrors(nextErrors);
     return Object.keys(nextErrors).length === 0;
   }
@@ -57,6 +104,7 @@ export default function InterviewSetup() {
           sessionId: session._id,
           company: values.company.trim(),
           role: values.role.trim(),
+          category: values.category,
           difficulty: values.difficulty,
           count: Number(values.count)
         }
@@ -80,10 +128,19 @@ export default function InterviewSetup() {
             Every round is generated fresh for the company and role you pick - no repeats, no cached questions from someone else's run.
           </p>
         </div>
-        <div className="readout-strip">
-          <div className="readout"><span className="readout-val">2</span><span className="readout-label">Sessions this week</span></div>
-          <div className="readout"><span className="readout-val">54</span><span className="readout-label">Current readiness</span></div>
-          <div className="readout"><span className="readout-val">arrays</span><span className="readout-label">Recommended focus</span></div>
+        <div className="readout-strip" aria-label={readoutError || undefined}>
+          <div className="readout">
+            <span className="readout-val">{readoutLoading ? '...' : readout.sessionsThisWeek}</span>
+            <span className="readout-label">Sessions this week</span>
+          </div>
+          <div className="readout">
+            <span className="readout-val">{readoutLoading ? '...' : readout.readinessScore}</span>
+            <span className="readout-label">Current readiness</span>
+          </div>
+          <div className="readout">
+            <span className="readout-val">{readoutLoading ? '...' : readout.recommendedFocus}</span>
+            <span className="readout-label">Recommended focus</span>
+          </div>
         </div>
       </div>
 
@@ -99,6 +156,22 @@ export default function InterviewSetup() {
           <input name="role" value={values.role} onChange={updateField} placeholder="Software Engineer Intern" />
           {errors.role && <span className="field-error">{errors.role}</span>}
         </label>
+        <div className="field">
+          <span className="field-label">What do you want to practice?</span>
+          <div className="chip-row" role="group" aria-label="Category">
+            {CATEGORIES.map(option => (
+              <button
+                className={`chip ${values.category === option.value ? 'selected' : ''}`}
+                type="button"
+                onClick={() => setChoice('category', option.value)}
+                key={option.value}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+          {errors.category && <span className="field-error">{errors.category}</span>}
+        </div>
         <div className="field">
           <span className="field-label">Difficulty</span>
           <div className="chip-row" role="group" aria-label="Difficulty">
@@ -136,4 +209,18 @@ export default function InterviewSetup() {
       </form>
     </section>
   );
+}
+
+function getSessionsThisWeek(sessions) {
+  const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+
+  return sessions.filter(session => {
+    const sessionDate = session.completedAt || session.createdAt;
+    if (!sessionDate) return false;
+    return new Date(sessionDate).getTime() >= sevenDaysAgo;
+  }).length;
+}
+
+function getRecommendedFocus(data) {
+  return data.recommendations?.[0]?.topic || data.weakTopics?.[0]?.topic || '—';
 }

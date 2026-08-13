@@ -25,6 +25,31 @@ const SessionSchema = new mongoose.Schema({
             type: String,
             required: true
         },
+        problemStatement: {
+            type: String,
+            default: ''
+        },
+        examples: [{
+            input: { type: String, required: true },
+            output: { type: String, required: true },
+            explanation: { type: String, default: '' }
+        }],
+        glossary: [{
+            term: { type: String, required: true },
+            meaning: { type: String, required: true }
+        }],
+        inputFormat: {
+            type: String,
+            default: ''
+        },
+        outputFormat: {
+            type: String,
+            default: ''
+        },
+        constraints: {
+            type: [String],
+            default: []
+        },
         topic: {
             type: String,
             enum: TOPICS,

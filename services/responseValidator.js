@@ -8,9 +8,9 @@
  * thread `count` through as a param if/when that distinction matters.
  */
 
-const { TOPICS, VERDICTS } = require('../config/constants');
+const { VERDICTS, CATEGORIES } = require('../config/constants');
 
-function validateQuestions(rawText) {
+function validateQuestions(rawText, category) {
   let parsed;
   try {
     parsed = JSON.parse(rawText);
@@ -22,16 +22,53 @@ function validateQuestions(rawText) {
     throw new Error('Expected an array of questions');
   }
 
-  
-  const requiredFields = ['id', 'question', 'topic', 'difficulty', 'expectedKeyPoints'];
+  const categoryConfig = CATEGORIES[category];
+  if (!categoryConfig) {
+    throw new Error(`Invalid category: "${category}". Must be one of: ${Object.keys(CATEGORIES).join(', ')}`);
+  }
+  const allowedTopics = categoryConfig.topics;
+
+  const baseFields = ['id', 'question', 'topic', 'difficulty', 'expectedKeyPoints'];
+
+  const validateDsaShape = item => {
+    if (typeof item.problemStatement !== 'string' || !item.problemStatement.trim()) return false;
+
+    if (!Array.isArray(item.examples) || item.examples.length === 0) return false;
+    const expectedExampleCount = item.difficulty === 'easy' ? 1 : 2;
+    if (item.examples.length !== expectedExampleCount) return false;
+    const examplesValid = item.examples.every(ex =>
+      typeof ex.input === 'string' && ex.input.trim() &&
+      typeof ex.output === 'string' && ex.output.trim() &&
+      typeof ex.explanation === 'string'
+    );
+    if (!examplesValid) return false;
+
+    if (!Array.isArray(item.glossary)) return false;
+    const glossaryValid = item.glossary.every(g =>
+      typeof g.term === 'string' && g.term.trim() &&
+      typeof g.meaning === 'string' && g.meaning.trim()
+    );
+    if (!glossaryValid) return false;
+
+    if (typeof item.inputFormat !== 'string' || !item.inputFormat.trim()) return false;
+    if (typeof item.outputFormat !== 'string' || !item.outputFormat.trim()) return false;
+
+    if (!Array.isArray(item.constraints) || item.constraints.length === 0) return false;
+
+    return true;
+  };
 
   const valid = parsed.filter(item => {
-    const hasAllFields = requiredFields.every(field => item[field] !== undefined);
+    const hasBaseFields = baseFields.every(field => item[field] !== undefined);
     const keyPointsIsArray = Array.isArray(item.expectedKeyPoints);
-    const topicIsAllowed = TOPICS.includes(item.topic);
+    const topicIsAllowed = allowedTopics.includes(item.topic);
     const idIsNumber = typeof item.id === 'number';
 
-    return hasAllFields && keyPointsIsArray && topicIsAllowed && idIsNumber;
+    if (!hasBaseFields || !keyPointsIsArray || !topicIsAllowed || !idIsNumber) return false;
+
+    if (category === 'dsa') return validateDsaShape(item);
+
+    return true;
   });
 
   if (valid.length < parsed.length) {
