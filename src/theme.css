@@ -1,0 +1,25 @@
+:root {
+  --bg: #f6f5f2;
+  --bg-card: #ffffff;
+  --bg-section-alt: #f1f0ec;
+  --border: #e4e2dc;
+  --text: #14161a;
+  --text-dim: #5c6068;
+
+  --cat-dsa: #2f4fd4;
+  --cat-systemdesign: #7c5cfa;
+  --cat-corecs: #c98a15;
+  --cat-behavioral: #0f9e82;
+
+  --status-good: #0f9e82;
+  --status-warn: #c98a15;
+  --status-bad: #d13a55;
+
+  --gradient-start: #2f4fd4;
+  --gradient-end: #14c99f;
+
+  --accent: var(--cat-behavioral);
+  --teal: var(--status-good);
+  --amber: var(--status-warn);
+  --red: var(--status-bad);
+}
