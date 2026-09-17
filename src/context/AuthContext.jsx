@@ -56,7 +56,18 @@ export function AuthProvider({ children }) {
     });
     storeToken(data.token);
     setToken(data.token);
-    setUser({ id: data.id, name: data.name, email: data.email });
+    const currentUser = await apiRequest('/api/auth/me', { token: data.token });
+    setUser(currentUser);
+  }
+
+  async function updateProfile(details) {
+    const currentUser = await apiRequest('/api/auth/me', {
+      method: 'PATCH',
+      body: details,
+      token
+    });
+    setUser(currentUser);
+    return currentUser;
   }
 
   function logout() {
@@ -72,6 +83,7 @@ export function AuthProvider({ children }) {
     isAuthenticated: Boolean(token && user),
     login,
     register,
+    updateProfile,
     logout
   }), [token, user, authLoading]);
 

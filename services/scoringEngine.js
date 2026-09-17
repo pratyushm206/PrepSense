@@ -15,7 +15,9 @@ function normalizeScore(rawScore, questionDifficulty) {
 // Falls back to last-in-array-wins as a tie-breaker in the (should-not-happen)
 // case where more than one entry per questionId is marked latest.
 function getLatestAnswersPerQuestion(answers) {
-  const relevant = (answers || []).filter(a => a.isLatest !== false);
+  const relevant = (answers || []).filter(a =>
+    a.isLatest !== false && a.evaluationStatus !== 'failed'
+  );
   const latestByQuestionId = new Map();
   for (const answer of relevant) {
     latestByQuestionId.set(answer.questionId, answer);

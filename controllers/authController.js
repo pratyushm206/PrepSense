@@ -63,6 +63,10 @@ const loginUser = async (req, res, next) => {
       return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
 
+    if (user.isActive === false) {
+      return res.status(401).json({ success: false, message: 'This account has been deactivated' });
+    }
+
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
     res.status(200).json({
@@ -88,4 +92,91 @@ const getMe = async (req, res, next) => {
   }
 };
 
-module.exports = { registerUser, loginUser, getMe };
+const updateMe = async (req, res, next) => {
+  try {
+    const { name, targetCompanies } = req.body;
+    const updates = {};
+
+    if (typeof name === 'string' && name.trim()) {
+      updates.name = name.trim();
+    }
+
+    if (targetCompanies !== undefined) {
+      if (!Array.isArray(targetCompanies) || targetCompanies.some(company => typeof company !== 'string')) {
+        return res.status(400).json({
+          success: false,
+          message: 'targetCompanies must be an array of strings'
+        });
+      }
+      updates.targetCompanies = targetCompanies.map(company => company.trim()).filter(Boolean);
+    }
+
+    const user = await User.findByIdAndUpdate(req.user.userId, updates, {
+      new: true,
+      runValidators: true
+    }).select('-password');
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    res.status(200).json({ success: true, data: user });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const updatePassword = async (req, res, next) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'currentPassword and newPassword are required'
+      });
+    }
+    if (newPassword.length < 8) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password must be at least 8 characters'
+      });
+    }
+
+    const user = await User.findById(req.user.userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ success: false, message: 'Current password is incorrect' });
+    }
+
+    user.password = await bcrypt.hash(newPassword, 10);
+    await user.save();
+
+    res.status(200).json({ success: true, data: { message: 'Password updated' } });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const deactivateMe = async (req, res, next) => {
+  try {
+    const user = await User.findByIdAndUpdate(
+      req.user.userId,
+      { isActive: false },
+      { new: true }
+    ).select('-password');
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    res.status(200).json({ success: true, data: { message: 'Account deactivated' } });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { registerUser, loginUser, getMe, updateMe, updatePassword, deactivateMe };

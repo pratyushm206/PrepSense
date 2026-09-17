@@ -10,6 +10,8 @@ export default function Summary() {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [shareLink, setShareLink] = useState('');
+  const [sharing, setSharing] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -36,6 +38,23 @@ export default function Summary() {
   if (loading) return <LoadingState message="Building your session summary..." />;
   if (error || !session) return <ErrorState message={error || 'Session not found.'} />;
 
+  async function handleShare() {
+    try {
+      setSharing(true);
+      const data = await apiRequest(`/api/sessions/${sessionId}/share`, {
+        method: 'POST',
+        token
+      });
+      const nextLink = `${window.location.origin}${data.path}`;
+      setShareLink(nextLink);
+      await navigator.clipboard?.writeText(nextLink);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSharing(false);
+    }
+  }
+
   return (
     <section className="page-stack">
       <div className="summary-hero">
@@ -45,10 +64,19 @@ export default function Summary() {
           <p>{session.role} - {latestAnswers.length} answered questions</p>
         </div>
         <div className="action-row">
+          <button className="button secondary" type="button" onClick={handleShare} disabled={sharing}>
+            {sharing ? 'Creating link...' : 'Share report'}
+          </button>
           <Link className="button secondary" to="/interview/new">Try again</Link>
           <Link className="button primary" to="/dashboard">Back to dashboard</Link>
         </div>
       </div>
+      {shareLink && (
+        <div className="share-strip">
+          <span>Share link copied</span>
+          <a href={shareLink} target="_blank" rel="noreferrer">{shareLink}</a>
+        </div>
+      )}
 
       <section className="question-breakdown">
         {session.questions.map(question => {

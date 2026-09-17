@@ -10,7 +10,7 @@
 
 const { VERDICTS, CATEGORIES } = require('../config/constants');
 
-function validateQuestions(rawText, category) {
+function validateQuestions(rawText, category, options = {}) {
   let parsed;
   try {
     parsed = JSON.parse(rawText);
@@ -27,8 +27,11 @@ function validateQuestions(rawText, category) {
     throw new Error(`Invalid category: "${category}". Must be one of: ${Object.keys(CATEGORIES).join(', ')}`);
   }
   const allowedTopics = categoryConfig.topics;
+  const format = options.format || 'subjective';
 
-  const baseFields = ['id', 'question', 'topic', 'difficulty', 'expectedKeyPoints'];
+  const baseFields = format === 'mcq'
+    ? ['id', 'question', 'topic', 'difficulty', 'options', 'correctOptionIndex', 'explanation']
+    : ['id', 'question', 'topic', 'difficulty', 'expectedKeyPoints'];
 
   const validateDsaShape = item => {
     if (typeof item.problemStatement !== 'string' || !item.problemStatement.trim()) return false;
@@ -60,11 +63,26 @@ function validateQuestions(rawText, category) {
 
   const valid = parsed.filter(item => {
     const hasBaseFields = baseFields.every(field => item[field] !== undefined);
-    const keyPointsIsArray = Array.isArray(item.expectedKeyPoints);
     const topicIsAllowed = allowedTopics.includes(item.topic);
     const idIsNumber = typeof item.id === 'number';
+    if (!hasBaseFields || !topicIsAllowed || !idIsNumber) return false;
 
-    if (!hasBaseFields || !keyPointsIsArray || !topicIsAllowed || !idIsNumber) return false;
+    if (format === 'mcq') {
+      if (!Array.isArray(item.options) || item.options.length !== 4) return false;
+      const optionsValid = item.options.every(option => typeof option === 'string' && option.trim());
+      if (!optionsValid) return false;
+      const uniqueOptions = new Set(item.options.map(option => option.trim()));
+      if (uniqueOptions.size !== 4) return false;
+      const indexValid = Number.isInteger(item.correctOptionIndex)
+        && item.correctOptionIndex >= 0
+        && item.correctOptionIndex <= 3;
+      if (!indexValid) return false;
+      if (typeof item.explanation !== 'string' || !item.explanation.trim()) return false;
+      return true;
+    }
+
+    const keyPointsIsArray = Array.isArray(item.expectedKeyPoints);
+    if (!keyPointsIsArray) return false;
 
     if (category === 'dsa') return validateDsaShape(item);
 

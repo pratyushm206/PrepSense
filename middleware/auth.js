@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const User = require('../models/User');
 
 const protect = async (req, res, next) => {
   try {
@@ -10,9 +11,17 @@ const protect = async (req, res, next) => {
 
     const token = authHeader.split(' ')[1];
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const user = await User.findById(decoded.userId).select('isActive');
+    if (!user || user.isActive === false) {
+      return res.status(401).json({
+        success: false,
+        message: 'This account has been deactivated'
+      });
+    }
+
     req.user = decoded;
     next();
-
   } catch (error) {
     return res.status(401).json({ success: false, message: 'Invalid or expired token' });
   }

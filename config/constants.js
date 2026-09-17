@@ -14,4 +14,8 @@ const DIFFICULTIES = ['easy', 'medium', 'hard'];
 
 const VERDICTS = ['good', 'average', 'poor'];
 
-module.exports = { TOPICS, DIFFICULTIES, VERDICTS };
+const QUESTION_TYPES = ['behavioral', 'mcq', 'dsa-mcq', 'dsa-subjective'];
+
+const SESSION_MODES = ['mcq', 'subjective', 'mixed'];
+
+module.exports = { TOPICS, DIFFICULTIES, VERDICTS, CATEGORIES, QUESTION_TYPES, SESSION_MODES };

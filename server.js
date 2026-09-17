@@ -35,6 +35,8 @@ app.use('/api/analytics', require('./routes/analytics'));
 app.use('/api/companies', require('./routes/companies'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/recommendations', require('./routes/recommendations'));
+app.use('/api/leaderboard', require('./routes/leaderboard'));
+app.get('/api/public/report/:token', require('./controllers/sessionController').getPublicReport);
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, 'dist')));
   app.get(/^\/(?!api).*/, (req, res) => {

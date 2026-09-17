@@ -1,4 +1,4 @@
-const { TOPICS, DIFFICULTIES, VERDICTS, CATEGORIES } = require('../config/constants');
+const { DIFFICULTIES, VERDICTS, CATEGORIES } = require('../config/constants');
 
 function buildQuestionPrompt(company, role, difficulty, count, category) {
     if (!DIFFICULTIES.includes(difficulty)) {
@@ -68,4 +68,96 @@ function buildQuestionPrompt(company, role, difficulty, count, category) {
   Return only valid JSON. No markdown. No explanation.`;
   }
 
-module.exports = { buildQuestionPrompt, buildEvalPrompt };
+function buildEvalPrompt(question, userAnswer, expectedKeyPoints) {
+  return `You are evaluating a candidate's answer to a technical interview question.
+
+Question: "${question}"
+
+Candidate's Answer: "${userAnswer}"
+
+Expected key points the answer should cover: ${expectedKeyPoints.join('; ')}
+
+Evaluate the answer and return ONLY a valid JSON object, no markdown, no explanation, no code fences. The response must start with { and end with }.
+
+The object must follow this exact structure:
+{
+  "score": <number 0-100>,
+  "strengths": ["<specific thing the candidate did well>"],
+  "improvements": ["<specific thing to improve>"],
+  "missedPoints": ["<expected key point the answer did not cover>"],
+  "verdict": "<one of: ${VERDICTS.join(', ')}>"
+}
+
+  Return only valid JSON. No markdown. No explanation.`;
+}
+
+function buildMCQPrompt(company, role, difficulty, count, category) {
+  if (!DIFFICULTIES.includes(difficulty)) {
+    throw new Error(`Invalid difficulty: "${difficulty}". Must be one of: ${DIFFICULTIES.join(', ')}`);
+  }
+
+  const categoryConfig = CATEGORIES[category];
+  if (!categoryConfig) {
+    throw new Error(`Invalid category: "${category}". Must be one of: ${Object.keys(CATEGORIES).join(', ')}`);
+  }
+
+  const allowedTopics = categoryConfig.topics;
+
+  return `You are generating multiple-choice interview questions for a candidate preparing for a "${role}" role at "${company}".
+
+Generate exactly ${count} MCQ questions at "${difficulty}" difficulty, using only these topics: ${allowedTopics.join(', ')}.
+
+Return ONLY a valid JSON array. No markdown, no code fences, no explanation text before or after. The response must start with [ and end with ].
+
+Each object must follow this exact structure:
+{
+  "id": <number, sequential starting from 1>,
+  "question": "<the stem of the multiple-choice question>",
+  "topic": "<one of: ${allowedTopics.join(', ')}>",
+  "difficulty": "${difficulty}",
+  "options": ["<option A>", "<option B>", "<option C>", "<option D>"],
+  "correctOptionIndex": <integer 0-3 matching the correct entry in options>,
+  "explanation": "<1-3 sentences explaining why that option is correct>"
+}
+
+Rules:
+- options MUST contain exactly 4 distinct, non-empty strings.
+- correctOptionIndex MUST be an integer 0, 1, 2, or 3.
+- Distractors must be plausible. Do not make the correct answer obvious by length alone.
+
+Return only valid JSON. No markdown. No explanation.`;
+}
+
+function buildDsaMCQPrompt(company, role, difficulty, count) {
+  if (!DIFFICULTIES.includes(difficulty)) {
+    throw new Error(`Invalid difficulty: "${difficulty}". Must be one of: ${DIFFICULTIES.join(', ')}`);
+  }
+
+  const allowedTopics = CATEGORIES.dsa.topics;
+
+  return `You are generating DSA multiple-choice questions for a candidate preparing for a "${role}" role at "${company}".
+
+Generate exactly ${count} DSA MCQ questions at "${difficulty}" difficulty, using only these topics: ${allowedTopics.join(', ')}.
+These are knowledge/complexity/pattern questions, NOT full coding problems. Do not include a problemStatement, examples, or constraints.
+
+Return ONLY a valid JSON array. No markdown, no code fences, no explanation text before or after. The response must start with [ and end with ].
+
+Each object must follow this exact structure:
+{
+  "id": <number, sequential starting from 1>,
+  "question": "<the stem, e.g. 'What is the time complexity of Dijkstra with a binary heap?'>",
+  "topic": "<one of: ${allowedTopics.join(', ')}>",
+  "difficulty": "${difficulty}",
+  "options": ["<option A>", "<option B>", "<option C>", "<option D>"],
+  "correctOptionIndex": <integer 0-3 matching the correct entry in options>,
+  "explanation": "<1-3 sentences explaining why that option is correct>"
+}
+
+Rules:
+- options MUST contain exactly 4 distinct, non-empty strings.
+- correctOptionIndex MUST be an integer 0, 1, 2, or 3.
+
+Return only valid JSON. No markdown. No explanation.`;
+}
+
+module.exports = { buildQuestionPrompt, buildEvalPrompt, buildMCQPrompt, buildDsaMCQPrompt };

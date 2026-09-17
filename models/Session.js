@@ -1,118 +1,155 @@
-// import mongoose
 const mongoose = require('mongoose');
-const { TOPICS, DIFFICULTIES, VERDICTS } = require('../config/constants');
-// Defining schema
+const { TOPICS, DIFFICULTIES, VERDICTS, QUESTION_TYPES, SESSION_MODES } = require('../config/constants');
+
 const SessionSchema = new mongoose.Schema({
-    userId: {
+  userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true
-    },
-    company: {
+  },
+  company: {
     type: String,
     required: true
+  },
+  role: {
+    type: String,
+    required: true
+  },
+  mode: {
+    type: String,
+    enum: SESSION_MODES,
+    default: 'subjective'
+  },
+  config: {
+    mcqCount: { type: Number, default: 0 },
+    subjectiveCount: { type: Number, default: 0 }
+  },
+  shareToken: {
+    type: String,
+    default: null
+  },
+  questions: [{
+    id: {
+      type: Number,
+      required: true
     },
-    role: {
-        type: String,
-        required: true
+    type: {
+      type: String,
+      enum: QUESTION_TYPES,
+      default: 'behavioral'
     },
-    questions: [{
-        id: {
-            type: Number,
-            required: true
-        },
-        question: {
-            type: String,
-            required: true
-        },
-        problemStatement: {
-            type: String,
-            default: ''
-        },
-        examples: [{
-            input: { type: String, required: true },
-            output: { type: String, required: true },
-            explanation: { type: String, default: '' }
-        }],
-        glossary: [{
-            term: { type: String, required: true },
-            meaning: { type: String, required: true }
-        }],
-        inputFormat: {
-            type: String,
-            default: ''
-        },
-        outputFormat: {
-            type: String,
-            default: ''
-        },
-        constraints: {
-            type: [String],
-            default: []
-        },
-        topic: {
-            type: String,
-            enum: TOPICS,
-            required: true
-        },
-        difficulty: {
-            type: String,
-            enum: DIFFICULTIES,
-            required: true
-        },
-        expectedKeyPoints: {
-            type: [String],
-            default: []
-        }
+    question: {
+      type: String,
+      required: true
+    },
+    problemStatement: {
+      type: String,
+      default: ''
+    },
+    examples: [{
+      input: { type: String, required: true },
+      output: { type: String, required: true },
+      explanation: { type: String, default: '' }
     }],
-
-    answers: [{
-        questionId: {
-            type: Number,
-            required: true
-        },
-        text: {
-            type: String,
-            required: true
-        },
-        score: {
-            type: Number,
-            required: true
-        },
-        strengths: {
-            type: [String],
-            default: []
-        },
-        improvements: {
-            type: [String],
-            default: []
-        },
-        missedPoints: {
-            type: [String],
-            default: []
-        },
-        verdict: {
-            type: String,
-            enum: VERDICTS,
-            required: true
-        },
-        isLatest: {
-            type: Boolean,
-            default: true
-        }
+    glossary: [{
+      term: { type: String, required: true },
+      meaning: { type: String, required: true }
     }],
-
-    overallScore: {
-        type: Number,
-        default: 0
+    inputFormat: {
+      type: String,
+      default: ''
     },
-    completedAt: {
-        type: Date,
-        default: Date.now
+    outputFormat: {
+      type: String,
+      default: ''
+    },
+    constraints: {
+      type: [String],
+      default: []
+    },
+    options: {
+      type: [String],
+      default: []
+    },
+    correctOptionIndex: {
+      type: Number,
+      default: null
+    },
+    explanation: {
+      type: String,
+      default: ''
+    },
+    topic: {
+      type: String,
+      enum: TOPICS,
+      required: true
+    },
+    difficulty: {
+      type: String,
+      enum: DIFFICULTIES,
+      required: true
+    },
+    expectedKeyPoints: {
+      type: [String],
+      default: []
     }
+  }],
+  answers: [{
+    questionId: {
+      type: Number,
+      required: true
+    },
+    text: {
+      type: String,
+      required: true
+    },
+    score: {
+      type: Number,
+      default: 0
+    },
+    strengths: {
+      type: [String],
+      default: []
+    },
+    improvements: {
+      type: [String],
+      default: []
+    },
+    missedPoints: {
+      type: [String],
+      default: []
+    },
+    verdict: {
+      type: String,
+      enum: VERDICTS
+    },
+    evaluationStatus: {
+      type: String,
+      enum: ['success', 'failed', 'pending'],
+      default: 'success'
+    },
+    failureReason: {
+      type: String,
+      default: ''
+    },
+    isLatest: {
+      type: Boolean,
+      default: true
+    }
+  }],
+  overallScore: {
+    type: Number,
+    default: 0
+  },
+  completedAt: {
+    type: Date,
+    default: Date.now
+  }
 });
+
 SessionSchema.index({ userId: 1 });
 SessionSchema.index({ company: 1 });
+SessionSchema.index({ shareToken: 1 }, { unique: true, sparse: true });
 
 const Session = mongoose.model('Session', SessionSchema);
 
