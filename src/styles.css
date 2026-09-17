@@ -2,7 +2,7 @@
 @import './theme.css';
 
 :root {
-  color-scheme: light;
+  color-scheme: dark;
   --surface: var(--bg-card);
   --surface2: color-mix(in srgb, var(--bg-card) 72%, var(--bg));
   --surface3: color-mix(in srgb, var(--border) 56%, var(--bg-card));
@@ -25,6 +25,10 @@
   --radius: 14px;
   --shadow: 0 18px 50px color-mix(in srgb, var(--cat-behavioral) 8%, transparent);
   font-family: 'Manrope', sans-serif;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
 }
 
 * {
@@ -289,6 +293,37 @@ h2 {
   box-shadow: 0 24px 44px -30px color-mix(in srgb, var(--cat-behavioral) 42%, transparent);
 }
 
+.panel:has(.status-label.weak),
+.breakdown:has(.verdict.average) {
+  box-shadow: 0 18px 36px -30px color-mix(in srgb, var(--status-warn) 28%, transparent);
+}
+
+.panel:has(.status-label.weak):hover,
+.breakdown:has(.verdict.average):hover {
+  border-color: var(--status-warn);
+  box-shadow: 0 24px 44px -30px color-mix(in srgb, var(--status-warn) 42%, transparent);
+}
+
+.panel:has(.status-label.strong),
+.breakdown:has(.verdict.good) {
+  box-shadow: 0 18px 36px -30px color-mix(in srgb, var(--status-good) 28%, transparent);
+}
+
+.panel:has(.status-label.strong):hover,
+.breakdown:has(.verdict.good):hover {
+  border-color: var(--status-good);
+  box-shadow: 0 24px 44px -30px color-mix(in srgb, var(--status-good) 42%, transparent);
+}
+
+.breakdown:has(.verdict.poor) {
+  box-shadow: 0 18px 36px -30px color-mix(in srgb, var(--status-bad) 28%, transparent);
+}
+
+.breakdown:has(.verdict.poor):hover {
+  border-color: var(--status-bad);
+  box-shadow: 0 24px 44px -30px color-mix(in srgb, var(--status-bad) 42%, transparent);
+}
+
 .auth-layout,
 .center-screen {
   min-height: 100vh;
@@ -366,7 +401,7 @@ h2 {
 
 .button.primary {
   background: var(--cat-behavioral);
-  color: var(--text);
+  color: var(--accent-contrast);
 }
 
 .button.primary:hover {
@@ -416,6 +451,15 @@ h2 {
   background: var(--bg-card);
   color: var(--text);
   cursor: pointer;
+  box-shadow: 0 12px 24px -20px color-mix(in srgb, var(--cat-behavioral) 28%, transparent);
+  transition: transform 0.15s ease, border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.theme-toggle:hover {
+  transform: translateY(-2px);
+  border-color: var(--cat-behavioral);
+  background: color-mix(in srgb, var(--cat-behavioral) 10%, var(--bg-card));
+  box-shadow: 0 18px 32px -22px color-mix(in srgb, var(--cat-behavioral) 46%, transparent);
 }
 
 .theme-toggle svg {
@@ -918,6 +962,11 @@ h2 {
 .trend.declining,
 .verdict.poor {
   color: var(--text);
+  background: var(--red-dim);
+  box-shadow: 0 8px 18px -16px color-mix(in srgb, var(--status-bad) 44%, transparent);
+}
+
+.status-label.weak {
   background: var(--amber-dim);
   box-shadow: 0 8px 18px -16px color-mix(in srgb, var(--status-warn) 44%, transparent);
 }
@@ -965,6 +1014,64 @@ h2 {
   border-bottom: 1px solid var(--border);
   min-height: 46px;
   padding: 0.75rem 0;
+}
+
+.topic-row,
+.mini-item,
+.recommendation-item {
+  border-left: 3px solid transparent;
+  border-radius: 10px;
+  padding-left: 0.8rem;
+  transition: transform 0.15s ease, border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.topic-row:has(.trend.improving),
+.mini-item:has(.score-good),
+.recommendation-item:has(.score-good) {
+  border-left-color: var(--status-good);
+  background: color-mix(in srgb, var(--status-good) 4%, transparent);
+  box-shadow: 0 12px 24px -22px color-mix(in srgb, var(--status-good) 28%, transparent);
+}
+
+.topic-row:has(.trend.stable),
+.mini-item:has(.score-warn),
+.recommendation-item:has(.score-warn) {
+  border-left-color: var(--status-warn);
+  background: color-mix(in srgb, var(--status-warn) 4%, transparent);
+  box-shadow: 0 12px 24px -22px color-mix(in srgb, var(--status-warn) 28%, transparent);
+}
+
+.topic-row:has(.trend.declining),
+.mini-item:has(.score-bad),
+.recommendation-item:has(.score-bad) {
+  border-left-color: var(--status-bad);
+  background: color-mix(in srgb, var(--status-bad) 4%, transparent);
+  box-shadow: 0 12px 24px -22px color-mix(in srgb, var(--status-bad) 28%, transparent);
+}
+
+.topic-row:hover,
+.mini-item:hover,
+.recommendation-item:hover {
+  transform: translateY(-2px);
+  border-left-color: var(--status-warn);
+  background: color-mix(in srgb, var(--status-warn) 8%, transparent);
+  box-shadow: 0 18px 30px -24px color-mix(in srgb, var(--status-warn) 38%, transparent);
+}
+
+.topic-row:has(.trend.improving):hover,
+.mini-item:has(.score-good):hover,
+.recommendation-item:has(.score-good):hover {
+  border-left-color: var(--status-good);
+  background: color-mix(in srgb, var(--status-good) 8%, transparent);
+  box-shadow: 0 18px 30px -24px color-mix(in srgb, var(--status-good) 38%, transparent);
+}
+
+.topic-row:has(.trend.declining):hover,
+.mini-item:has(.score-bad):hover,
+.recommendation-item:has(.score-bad):hover {
+  border-left-color: var(--status-bad);
+  background: color-mix(in srgb, var(--status-bad) 8%, transparent);
+  box-shadow: 0 18px 30px -24px color-mix(in srgb, var(--status-bad) 38%, transparent);
 }
 
 .mini-item:last-child,
@@ -1156,6 +1263,7 @@ h2 {
 
 .chip {
   --chip-accent: var(--cat-behavioral);
+  --chip-text-accent: var(--cat-behavioral-text);
   --chip-tint: color-mix(in srgb, var(--chip-accent) 4%, var(--bg-card));
   --chip-selected: color-mix(in srgb, var(--chip-accent) 12%, var(--bg-card));
   border: 1px solid var(--border2);
@@ -1174,18 +1282,22 @@ h2 {
 
 .field .chip-row[aria-label='Category'] .chip:nth-child(1) {
   --chip-accent: var(--cat-dsa);
+  --chip-text-accent: var(--cat-dsa-text);
 }
 
 .field .chip-row[aria-label='Category'] .chip:nth-child(2) {
   --chip-accent: var(--cat-systemdesign);
+  --chip-text-accent: var(--cat-systemdesign-text);
 }
 
 .field .chip-row[aria-label='Category'] .chip:nth-child(3) {
   --chip-accent: var(--cat-corecs);
+  --chip-text-accent: var(--cat-corecs-text);
 }
 
 .field .chip-row[aria-label='Category'] .chip:nth-child(4) {
   --chip-accent: var(--cat-behavioral);
+  --chip-text-accent: var(--cat-behavioral-text);
 }
 
 .chip:hover {
@@ -1198,7 +1310,7 @@ h2 {
 .chip.selected {
   background: var(--chip-selected);
   border-color: var(--chip-accent);
-  color: var(--text);
+  color: var(--chip-text-accent);
 }
 
 .gen-btn {
@@ -1623,7 +1735,7 @@ h2 {
 
 .progress-list button.active {
   background: var(--teal);
-  color: var(--text);
+  color: var(--accent-contrast);
 }
 
 .interview-panel {
@@ -1917,7 +2029,7 @@ h2 {
 .landing-btn-primary {
   background: var(--cat-behavioral);
   border-color: var(--cat-behavioral);
-  color: var(--text);
+  color: var(--accent-contrast);
 }
 
 .landing-btn-primary:hover {
@@ -2137,7 +2249,7 @@ h2 {
 
 .landing-steps li:hover .landing-step-index {
   background: var(--cat-behavioral);
-  color: var(--text);
+  color: var(--accent-contrast);
   transform: scale(1.04);
 }
 
