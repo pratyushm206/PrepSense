@@ -165,6 +165,8 @@ function GaugeHero({ score, firstName, sessionCount, topicCount }) {
 }
 
 function TopicList({ title, topics, tone }) {
+  const emptyMessage = tone === 'weak' ? 'No weak topics yet' : 'No strong topics yet';
+
   return (
     <section className="panel depth-panel">
       <div className="section-heading">
@@ -172,23 +174,29 @@ function TopicList({ title, topics, tone }) {
         <span className={`status-label ${tone}`}>{tone === 'weak' ? 'Needs work' : 'Keep sharp'}</span>
       </div>
       <div className="mini-list">
-        {topics.map(topic => (
-          <div className="mini-item interactive-row" key={topic.topic}>
-            <span>{topic.topic}</span>
-            <div className="topic-score-wrap">
-              <div className="topic-bar">
-                <div
-                  className="topic-bar-fill"
-                  style={{
-                    width: `${Math.max(0, Math.min(100, topic.avgScore))}%`,
-                    background: getScoreColor(topic.avgScore)
-                  }}
-                />
-              </div>
-              <strong style={{ color: getScoreColor(topic.avgScore) }}>{topic.avgScore}</strong>
-            </div>
+        {topics.length === 0 ? (
+          <div className="mini-item">
+            <span>{emptyMessage}</span>
           </div>
-        ))}
+        ) : (
+          topics.map(topic => (
+            <div className="mini-item interactive-row" key={topic.topic}>
+              <span>{topic.topic}</span>
+              <div className="topic-score-wrap">
+                <div className="topic-bar">
+                  <div
+                    className="topic-bar-fill"
+                    style={{
+                      width: `${Math.max(0, Math.min(100, topic.avgScore))}%`,
+                      background: getScoreColor(topic.avgScore)
+                    }}
+                  />
+                </div>
+                <strong style={{ color: getScoreColor(topic.avgScore) }}>{topic.avgScore}</strong>
+              </div>
+            </div>
+          ))
+        )}
       </div>
     </section>
   );

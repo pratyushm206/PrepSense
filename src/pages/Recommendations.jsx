@@ -122,7 +122,7 @@ function TopicPanel({ title, topics, tone }) {
       <div className="mini-list">
         {topics.length === 0 ? (
           <div className="mini-item">
-            <span>No scored topics yet</span>
+            <span>No weak topics yet</span>
           </div>
         ) : (
           topics.map(topic => (

@@ -1,5 +1,6 @@
 const Session = require('../models/Session');
 const User = require('../models/User');
+const { WEAK_TOPIC_SCORE_THRESHOLD } = require('../config/constants');
 const {
   getTopicScores,
   calculateReadiness,
@@ -44,8 +45,14 @@ const getOverview = async (req, res, next) => {
     const targetCompany = req.query.targetCompany || user?.targetCompanies?.[0];
     const readinessScore = calculateReadiness(scoredSessions, targetCompany);
 
-    const weakAreas = [...topicBreakdown].sort((a, b) => a.avgScore - b.avgScore).slice(0, 3);
-    const strongAreas = [...topicBreakdown].sort((a, b) => b.avgScore - a.avgScore).slice(0, 3);
+    const weakAreas = [...topicBreakdown]
+      .filter(topic => topic.avgScore < WEAK_TOPIC_SCORE_THRESHOLD)
+      .sort((a, b) => a.avgScore - b.avgScore)
+      .slice(0, 3);
+    const strongAreas = [...topicBreakdown]
+      .filter(topic => topic.avgScore >= 75)
+      .sort((a, b) => b.avgScore - a.avgScore)
+      .slice(0, 3);
 
     res.status(200).json({
       success: true,
