@@ -42,7 +42,7 @@ export default function Recommendations() {
         <div>
           <p className="eyebrow">Study plan</p>
           <h1>What to focus on next.</h1>
-          <p className="lead">Built from your weak topics and what your target company actually asks.</p>
+          <p className="lead">Built from your weak topics and patterns in PrepSense practice data.</p>
         </div>
         {data?.targetCompany && (
           <span className="filter-chip active">{data.targetCompany}</span>

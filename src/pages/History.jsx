@@ -46,7 +46,7 @@ export default function History() {
 
   const filteredSessions = sessions.filter(session => {
     if (filter === 'completed') return isCompletedSession(session);
-    if (filter === 'incomplete') return !isCompletedSession(session);
+    if (filter === 'needs-attention') return hasFailedEvaluation(session);
     return true;
   });
 
@@ -63,21 +63,21 @@ export default function History() {
             onClick={() => setFilter('all')}
             type="button"
           >
-            All
+            All ({sessions.length})
           </button>
           <button
             className={`filter-chip ${filter === 'completed' ? 'active' : ''}`}
             onClick={() => setFilter('completed')}
             type="button"
           >
-            Completed
+            Completed ({sessions.filter(isCompletedSession).length})
           </button>
           <button
-            className={`filter-chip ${filter === 'incomplete' ? 'active' : ''}`}
-            onClick={() => setFilter('incomplete')}
+            className={`filter-chip ${filter === 'needs-attention' ? 'active' : ''}`}
+            onClick={() => setFilter('needs-attention')}
             type="button"
           >
-            Incomplete
+            Needs attention ({sessions.filter(hasFailedEvaluation).length})
           </button>
         </div>
       </div>
@@ -93,18 +93,17 @@ export default function History() {
           {filteredSessions.map(session => (
           <Link className="session" to={`/history/${session._id}`} key={session._id}>
             <div className={`score-badge ${getScoreClass(session.overallScore)}`}>
-              {session.overallScore > 0 ? session.overallScore : '-'}
+              {getSessionScoreLabel(session)}
             </div>
             <div className="s-main">
               <div className="s-company">{session.company}</div>
               <div className="s-role">{getSessionMeta(session)}</div>
             </div>
             <div className="s-tags">
-              {getTopicTags(session).length > 0 ? (
-                getTopicTags(session).map(topic => <span className="tag" key={topic}>{topic}</span>)
-              ) : (
+              {hasFailedEvaluation(session) && (
                 <span className="tag tag-flag">evaluation failed</span>
               )}
+              {getTopicTags(session).map(topic => <span className="tag" key={topic}>{topic}</span>)}
             </div>
             <div className="s-date">{formatDate(session.completedAt)}</div>
             <div className="s-arrow">-&gt;</div>
@@ -113,10 +112,10 @@ export default function History() {
         </div>
       )}
 
-      {filteredSessions.some(session => session.overallScore === 0) && (
+      {filteredSessions.some(hasFailedEvaluation) && (
         <div className="empty-hint">
           <span className="dot" />
-          Zero-score sessions are shown separately so evaluation-pipeline results do not read like genuine interview scores.
+          Failed evaluations are shown separately so evaluation-pipeline results do not read like genuine interview scores.
         </div>
       )}
     </section>
@@ -124,10 +123,16 @@ export default function History() {
 }
 
 function getScoreClass(score) {
-  if (!score) return 'score-zero';
+  if (score === null || score === undefined) return 'score-zero';
   if (score >= 70) return 'score-good';
   if (score >= 40) return 'score-warn';
   return 'score-bad';
+}
+
+function getSessionScoreLabel(session) {
+  return session.overallScore === null || session.overallScore === undefined
+    ? '-'
+    : session.overallScore;
 }
 
 function isCompletedSession(session) {
@@ -140,6 +145,12 @@ function isCompletedSession(session) {
   return questionCount > 0 && latestAnswers.size >= questionCount;
 }
 
+function hasFailedEvaluation(session) {
+  return (session.answers || []).some(answer =>
+    answer.isLatest !== false && answer.evaluationStatus === 'failed'
+  );
+}
+
 function getSessionMeta(session) {
   const firstQuestion = session.questions?.[0];
   const difficulty = firstQuestion?.difficulty || 'Medium';
@@ -149,7 +160,6 @@ function getSessionMeta(session) {
 }
 
 function getTopicTags(session) {
-  if (!session.overallScore) return [];
   const topics = session.questions?.map(question => question.topic).filter(Boolean) || [];
   return [...new Set(topics)].slice(0, 2);
 }

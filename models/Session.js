@@ -121,7 +121,8 @@ const SessionSchema = new mongoose.Schema({
     },
     verdict: {
       type: String,
-      enum: VERDICTS
+      enum: [...VERDICTS, null],
+      default: null
     },
     evaluationStatus: {
       type: String,

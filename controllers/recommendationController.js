@@ -1,13 +1,22 @@
 const Session = require('../models/Session');
 const User = require('../models/User');
-const { getTopicScores } = require('../services/scoringEngine');
+const { WEAK_TOPIC_SCORE_THRESHOLD } = require('../config/constants');
+const { getTopicScores, hasLatestSuccessfulAnswer, normalizeTopic } = require('../services/scoringEngine');
 
 function getTopCompanyTopics(sessions) {
   const topicCounts = new Map();
 
+  const distinctTopics = new Set();
+
   sessions.forEach(session => {
     (session.questions || []).forEach(question => {
-      topicCounts.set(question.topic, (topicCounts.get(question.topic) || 0) + 1);
+      const topic = normalizeTopic(question.topic);
+      if (!topic) return;
+      const normalizedQuestion = String(question.question || '').trim().toLowerCase();
+      const key = `${session.company}:${topic}:${normalizedQuestion}`;
+      if (distinctTopics.has(key)) return;
+      distinctTopics.add(key);
+      topicCounts.set(topic, (topicCounts.get(topic) || 0) + 1);
     });
   });
 
@@ -22,49 +31,35 @@ const getRecommendations = async (req, res, next) => {
     const user = await User.findById(req.user.userId).select('targetCompanies');
     const targetCompany = req.query.company || user?.targetCompanies?.[0] || null;
 
-    const [userSessions, companySessions] = await Promise.all([
-      Session.find({ userId: req.user.userId, 'answers.0': { $exists: true } }),
+    const [allUserSessions, allCompanySessions] = await Promise.all([
+      Session.find({ userId: req.user.userId }),
       targetCompany
-        ? Session.find({ company: targetCompany, 'answers.0': { $exists: true } })
+        ? Session.find({ company: targetCompany })
         : Promise.resolve([])
     ]);
 
+    const userSessions = allUserSessions.filter(hasLatestSuccessfulAnswer);
+    const companySessions = allCompanySessions.filter(hasLatestSuccessfulAnswer);
+
     const weakTopics = getTopicScores(userSessions)
+      .filter(topicScore => topicScore.avgScore < WEAK_TOPIC_SCORE_THRESHOLD)
       .sort((a, b) => a.avgScore - b.avgScore)
       .slice(0, 3);
 
     const companyFocusTopics = getTopCompanyTopics(companySessions);
     const companyTopicSet = new Set(companyFocusTopics.map(t => t.topic));
-    const weakTopicSet = new Set(weakTopics.map(t => t.topic));
 
-    const recommendationsByTopic = new Map();
-
-    weakTopics.forEach(topicScore => {
-      recommendationsByTopic.set(topicScore.topic, {
+    const recommendations = weakTopics.map(topicScore => ({
         topic: topicScore.topic,
         priority: companyTopicSet.has(topicScore.topic) ? 'high' : 'medium',
         reason: companyTopicSet.has(topicScore.topic)
           ? 'Weak personal topic and common company practice area'
           : 'Weak personal topic',
         avgScore: topicScore.avgScore
-      });
-    });
-
-    companyFocusTopics.forEach(companyTopic => {
-      if (recommendationsByTopic.has(companyTopic.topic)) return;
-
-      recommendationsByTopic.set(companyTopic.topic, {
-        topic: companyTopic.topic,
-        priority: weakTopicSet.has(companyTopic.topic) ? 'high' : 'medium',
-        reason: 'Common company practice area',
-        companyQuestionCount: companyTopic.count
-      });
-    });
-
-    const recommendations = Array.from(recommendationsByTopic.values())
+      }))
       .sort((a, b) => {
         const priorityRank = { high: 0, medium: 1 };
-        return priorityRank[a.priority] - priorityRank[b.priority];
+        return priorityRank[a.priority] - priorityRank[b.priority] || a.avgScore - b.avgScore;
       })
       .slice(0, 5);
 

@@ -54,7 +54,7 @@ export default function PublicReport() {
               <div className="topic-row" key={topic.topic}>
                 <div>
                   <strong>{topic.topic}</strong>
-                  <span>{topic.count || 0} answers</span>
+                  <span>{topic.totalAttempted || 0} answers</span>
                 </div>
                 <div className="topic-score-wrap">
                   <span className="topic-bar">

@@ -25,6 +25,14 @@ function getLatestAnswersPerQuestion(answers) {
   return Array.from(latestByQuestionId.values());
 }
 
+function hasLatestSuccessfulAnswer(session) {
+  return getLatestAnswersPerQuestion(session.answers || []).length > 0;
+}
+
+function normalizeTopic(topic) {
+  return String(topic || '').trim().toLowerCase();
+}
+
 function getTopicScores(sessions) {
   const topicTotals = new Map();
 
@@ -37,10 +45,13 @@ function getTopicScores(sessions) {
 
       const normalized = normalizeScore(answer.score, question.difficulty);
 
-      if (!topicTotals.has(question.topic)) {
-        topicTotals.set(question.topic, { sum: 0, count: 0 });
+      const topic = normalizeTopic(question.topic);
+      if (!topic) return;
+
+      if (!topicTotals.has(topic)) {
+        topicTotals.set(topic, { sum: 0, count: 0 });
       }
-      const entry = topicTotals.get(question.topic);
+      const entry = topicTotals.get(topic);
       entry.sum += normalized;
       entry.count += 1;
     });
@@ -57,7 +68,7 @@ function getTopicScores(sessions) {
 
 function calculateSessionScore(session) {
   const latestAnswers = getLatestAnswersPerQuestion(session.answers || []);
-  if (latestAnswers.length === 0) return 0;
+  if (latestAnswers.length === 0) return null;
 
   const normalizedScores = latestAnswers.map(answer => {
     const question = (session.questions || []).find(q => q.id === answer.questionId);
@@ -101,10 +112,13 @@ function getTopicTrends(sessions) {
 
       const normalized = normalizeScore(answer.score, question.difficulty);
 
-      if (!sessionTopicTotals.has(question.topic)) {
-        sessionTopicTotals.set(question.topic, { sum: 0, count: 0 });
+      const topic = normalizeTopic(question.topic);
+      if (!topic) return;
+
+      if (!sessionTopicTotals.has(topic)) {
+        sessionTopicTotals.set(topic, { sum: 0, count: 0 });
       }
-      const entry = sessionTopicTotals.get(question.topic);
+      const entry = sessionTopicTotals.get(topic);
       entry.sum += normalized;
       entry.count += 1;
     });
@@ -123,7 +137,7 @@ function getTopicTrends(sessions) {
 }
 
 function calculateReadiness(userSessions, targetCompany) {
-  const scoredSessions = userSessions.filter(s => (s.answers || []).length > 0);
+  const scoredSessions = userSessions.filter(hasLatestSuccessfulAnswer);
   if (scoredSessions.length === 0) return 0;
 
   const sortedSessions = [...scoredSessions].sort(
@@ -154,6 +168,9 @@ function calculateReadiness(userSessions, targetCompany) {
 module.exports = {
   normalizeScore,
   getTopicScores,
+  getLatestAnswersPerQuestion,
+  hasLatestSuccessfulAnswer,
+  normalizeTopic,
   detectTrend,
   getTopicTrends,
   calculateReadiness,

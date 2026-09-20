@@ -1,18 +1,24 @@
 const Session = require('../models/Session');
+const { hasLatestSuccessfulAnswer, normalizeTopic } = require('../services/scoringEngine');
 
 const getInsights = async (req, res, next) => {
   try {
     const { name } = req.params;
 
-    const sessions = await Session.find({ company: name, 'answers.0': { $exists: true } });
+    const sessions = (await Session.find({ company: name })).filter(hasLatestSuccessfulAnswer);
 
     const topicCounts = new Map();
-    let totalQuestions = 0;
+    const distinctTopics = new Set();
 
     sessions.forEach(session => {
       session.questions.forEach(q => {
-        topicCounts.set(q.topic, (topicCounts.get(q.topic) || 0) + 1);
-        totalQuestions += 1;
+        const topic = normalizeTopic(q.topic);
+        if (!topic) return;
+        const normalizedQuestion = String(q.question || '').trim().toLowerCase();
+        const key = `${session.company}:${topic}:${normalizedQuestion}`;
+        if (distinctTopics.has(key)) return;
+        distinctTopics.add(key);
+        topicCounts.set(topic, (topicCounts.get(topic) || 0) + 1);
       });
     });
 
@@ -30,24 +36,4 @@ const getInsights = async (req, res, next) => {
   }
 };
 
-const getLeaderboard = async (req, res, next) => {
-  try {
-    const { name } = req.params;
-
-    const topSessions = await Session.find({ company: name, overallScore: { $gt: 0 } })
-      .populate('userId', 'name')
-      .sort({ overallScore: -1 })
-      .limit(10);
-
-    const leaderboard = topSessions.map(s => ({
-      name: s.userId ? s.userId.name : 'Unknown',
-      score: s.overallScore
-    }));
-
-    res.status(200).json({ success: true, data: leaderboard });
-  } catch (error) {
-    next(error);
-  }
-};
-
-module.exports = { getInsights, getLeaderboard };
+module.exports = { getInsights };

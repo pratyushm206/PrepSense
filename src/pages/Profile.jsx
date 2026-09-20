@@ -10,7 +10,7 @@ export default function Profile() {
   const [companies, setCompanies] = useState(user?.targetCompanies || []);
   const [companyDraft, setCompanyDraft] = useState('');
   const [passwords, setPasswords] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
-  const [sessions, setSessions] = useState([]);
+  const [overview, setOverview] = useState(null);
   const [saving, setSaving] = useState(false);
   const [changingPassword, setChangingPassword] = useState(false);
   const [deactivating, setDeactivating] = useState(false);
@@ -31,16 +31,16 @@ export default function Profile() {
   useEffect(() => {
     let cancelled = false;
 
-    async function loadSessions() {
+    async function loadOverview() {
       try {
-        const data = await apiRequest('/api/sessions', { token });
-        if (!cancelled) setSessions(Array.isArray(data) ? data : []);
+        const data = await apiRequest('/api/analytics/overview', { token });
+        if (!cancelled) setOverview(data);
       } catch {
-        if (!cancelled) setSessions([]);
+        if (!cancelled) setOverview(null);
       }
     }
 
-    loadSessions();
+    loadOverview();
     return () => {
       cancelled = true;
     };
@@ -145,7 +145,7 @@ export default function Profile() {
       <div className="grid three profile-stats">
         <article className="stat-orb">
           <span>Sessions</span>
-          <strong>{sessions.length}</strong>
+          <strong>{overview?.evaluatedSessionCount || 0}</strong>
         </article>
         <article className="stat-orb">
           <span>Target companies</span>

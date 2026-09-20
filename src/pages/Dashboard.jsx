@@ -7,7 +7,6 @@ import { EmptyState, ErrorState, LoadingState } from '../components/Status.jsx';
 export default function Dashboard() {
   const { token, user } = useAuth();
   const [overview, setOverview] = useState(null);
-  const [sessionCount, setSessionCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -16,13 +15,9 @@ export default function Dashboard() {
 
     async function loadOverview() {
       try {
-        const [data, sessions] = await Promise.all([
-          apiRequest('/api/analytics/overview', { token }),
-          apiRequest('/api/sessions', { token }).catch(() => [])
-        ]);
+        const data = await apiRequest('/api/analytics/overview', { token });
         if (!cancelled) {
           setOverview(data);
-          setSessionCount(Array.isArray(sessions) ? sessions.length : 0);
         }
       } catch (err) {
         if (!cancelled) setError(err.message);
@@ -48,7 +43,7 @@ export default function Dashboard() {
       <GaugeHero
         score={overview.readinessScore}
         firstName={firstName}
-        sessionCount={sessionCount}
+        sessionCount={overview.evaluatedSessionCount || 0}
         topicCount={overview.topicBreakdown?.length || 0}
       />
 

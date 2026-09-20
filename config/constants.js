@@ -18,4 +18,14 @@ const QUESTION_TYPES = ['behavioral', 'mcq', 'dsa-mcq', 'dsa-subjective'];
 
 const SESSION_MODES = ['mcq', 'subjective', 'mixed'];
 
-module.exports = { TOPICS, DIFFICULTIES, VERDICTS, CATEGORIES, QUESTION_TYPES, SESSION_MODES };
+const WEAK_TOPIC_SCORE_THRESHOLD = 60;
+
+module.exports = {
+  TOPICS,
+  DIFFICULTIES,
+  VERDICTS,
+  CATEGORIES,
+  QUESTION_TYPES,
+  SESSION_MODES,
+  WEAK_TOPIC_SCORE_THRESHOLD
+};

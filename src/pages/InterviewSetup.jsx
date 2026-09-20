@@ -36,15 +36,14 @@ export default function InterviewSetup() {
 
     async function loadReadout() {
       try {
-        const [sessions, overview, recommendations] = await Promise.all([
-          apiRequest('/api/sessions', { token }),
+        const [overview, recommendations] = await Promise.all([
           apiRequest('/api/analytics/overview', { token }),
           apiRequest('/api/recommendations', { token })
         ]);
 
         if (!cancelled) {
           setReadout({
-            sessionsThisWeek: getSessionsThisWeek(sessions),
+            sessionsThisWeek: overview.sessionsThisWeek ?? '—',
             readinessScore: overview.readinessScore ?? '—',
             recommendedFocus: getRecommendedFocus(recommendations)
           });
@@ -125,7 +124,7 @@ export default function InterviewSetup() {
           <p className="eyebrow">New round</p>
           <h1>Set the conditions,<br />then <span>go in cold.</span></h1>
           <p className="lead">
-            Every round is generated fresh for the company and role you pick - no repeats, no cached questions from someone else's run.
+            Question sets for the same company, role and difficulty may be reused to keep rounds fast.
           </p>
         </div>
         <div className="readout-strip" aria-label={readoutError || undefined}>
@@ -209,16 +208,6 @@ export default function InterviewSetup() {
       </form>
     </section>
   );
-}
-
-function getSessionsThisWeek(sessions) {
-  const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
-
-  return sessions.filter(session => {
-    const sessionDate = session.completedAt || session.createdAt;
-    if (!sessionDate) return false;
-    return new Date(sessionDate).getTime() >= sevenDaysAgo;
-  }).length;
 }
 
 function getRecommendedFocus(data) {

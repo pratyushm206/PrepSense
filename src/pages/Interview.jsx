@@ -155,7 +155,7 @@ export default function Interview() {
           <section className="result-panel">
             <div className="score-pill">
               <span>Score</span>
-              <strong>{result.score}</strong>
+              <strong>{result.score ?? '-'}</strong>
             </div>
             <span className={`verdict ${result.verdict}`}>{result.verdict}</span>
             <FeedbackList title="Strengths" items={result.strengths} />

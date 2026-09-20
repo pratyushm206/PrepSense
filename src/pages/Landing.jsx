@@ -200,7 +200,7 @@ export default function Landing() {
               <span className="landing-step-index">04</span>
               <div>
                 <h3>Practice what they test</h3>
-                <p>Recommendations cross-reference your weak topics with what that company actually asks.</p>
+                <p>Recommendations cross-reference your weak topics with patterns in PrepSense practice data.</p>
               </div>
             </li>
           </ol>

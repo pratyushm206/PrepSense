@@ -60,7 +60,7 @@ export default function Summary() {
       <div className="summary-hero">
         <div>
           <p className="eyebrow">{session.company} interview summary</p>
-          <h1>{session.overallScore || calculateLocalAverage(session, latestAnswers)}</h1>
+          <h1>{session.overallScore ?? calculateLocalAverage(session, latestAnswers)}</h1>
           <p>{session.role} - {latestAnswers.length} answered questions</p>
         </div>
         <div className="action-row">

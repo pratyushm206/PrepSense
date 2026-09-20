@@ -83,11 +83,11 @@ async function runEvaluation(session, question, answerText, selectedOptionIndex)
   } catch (error) {
     return {
       evaluation: {
-        score: 0,
+        score: null,
         strengths: [],
         improvements: [],
         missedPoints: [],
-        verdict: 'poor',
+        verdict: null,
         evaluationStatus: 'failed',
         failureReason: error.message || 'Evaluation failed'
       },

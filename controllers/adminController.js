@@ -1,19 +1,20 @@
 const User = require('../models/User');
 const Session = require('../models/Session');
-const { calculateReadiness } = require('../services/scoringEngine');
+const { calculateReadiness, hasLatestSuccessfulAnswer } = require('../services/scoringEngine');
 
 const getStats = async (req, res, next) => {
   try {
     const [totalUsers, totalSessions, answeredSessions] = await Promise.all([
       User.countDocuments(),
       Session.countDocuments(),
-      Session.find({ 'answers.0': { $exists: true } })
+      Session.find({})
     ]);
 
+    const evaluatedSessions = answeredSessions.filter(hasLatestSuccessfulAnswer);
     const companyCounts = new Map();
     const sessionsByUser = new Map();
 
-    answeredSessions.forEach(session => {
+    evaluatedSessions.forEach(session => {
       companyCounts.set(session.company, (companyCounts.get(session.company) || 0) + 1);
 
       const userKey = session.userId.toString();

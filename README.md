@@ -4,7 +4,7 @@
 
 ## What it does
 
-A student picks a target company, role, practice category (DSA, system design, core CS subjects, or behavioral), and difficulty. PrepSense generates fresh interview questions for that combination, scores each answer against expected key points, and rolls results into a persistent readiness score, topic-level trend tracking, and company-specific topic recommendations built from aggregated question data across all users.
+A student picks a target company, role, practice category (DSA, system design, core CS subjects, or behavioral), and difficulty. PrepSense generates or reuses recent validated question sets for that combination, scores each answer against expected key points, and rolls successful evaluations into a persistent readiness score, topic-level trend tracking, and recommendations built from the student's weak topics plus aggregated PrepSense practice data.
 
 ## Tech Stack
 
@@ -25,12 +25,12 @@ A student picks a target company, role, practice category (DSA, system design, c
 - AI question generation, scoped by company, role, difficulty, and practice **category**:
   - **DSA** questions return a full problem-statement schema — description, worked examples, a glossary for non-obvious terms, input/output format, and constraints — not just a one-line prompt
   - System design, core subjects (OS/DBMS/networks), and behavioral use a lighter question schema appropriate to those formats
-- Structured-output validation with retry-on-malformed-response, plus response caching keyed by company/role/difficulty/count/category
-- Answer evaluation against expected key points, with score, strengths, improvements, and verdict
+- Structured-output validation with retry-on-malformed-response, plus a 24-hour global response cache keyed by company/role/difficulty/count/category
+- Answer evaluation against expected key points, with score, strengths, improvements, and verdict; failed evaluations are tracked separately from real zero scores
 - Scoring engine: score normalization by difficulty, per-topic aggregation, a documented readiness-score formula, and trend detection across sessions
-- Analytics dashboard endpoint: readiness score, topic breakdown, weak/strong areas
-- Company insights + leaderboard: aggregated (anonymized) question and score data across all users for a given company
-- Recommendations engine: cross-references a user's weak topics against what their target company actually tests
+- Analytics dashboard endpoint: readiness score, evaluated session count, weekly evaluated sessions, topic breakdown, weak/strong areas
+- Company insights + leaderboard: aggregated PrepSense practice question patterns and masked score data for a given company
+- Recommendations engine: recommends only topics below the weak-score threshold, with higher priority when that weak topic also appears in company practice patterns
 - React frontend: auth flow, dashboard, interview flow, session history, practice setup with category/difficulty/question-count selection, recommendations page
 - Production static file serving (Express 5 regex routing, not the `'*'` wildcard that breaks on Express 5)
 
@@ -57,11 +57,25 @@ A student picks a target company, role, practice category (DSA, system design, c
 | GET | `/api/sessions/:id` | Yes | Get one session |
 | POST | `/api/questions/generate` | Yes | Generate questions for a session |
 | POST | `/api/answers/evaluate` | Yes | Evaluate a submitted answer |
-| GET | `/api/analytics/overview` | Yes | Readiness, topic breakdown, weak/strong areas |
+| GET | `/api/analytics/overview` | Yes | Readiness, evaluated session counts, topic breakdown, weak/strong areas |
 | GET | `/api/recommendations` | Yes | Personalized + company-matched topic recommendations |
 | GET | `/api/companies/:name/insights` | No | Aggregated topic/difficulty data for a company |
-| GET | `/api/companies/:name/leaderboard` | No | Anonymized top scores for a company |
+| GET | `/api/leaderboard/:company` | Yes | Masked top scores for a company |
 | GET | `/api/admin/stats` | Yes (admin) | Platform-wide stats |
+
+## Maintenance Scripts
+
+Failed evaluations used to be stored as score `0` and verdict `poor`. The backfill script is dry-run by default and prints the number of affected sessions and answers:
+
+```bash
+node scripts/backfillFailedScores.js
+```
+
+To write the fix after reviewing the dry-run output:
+
+```bash
+node scripts/backfillFailedScores.js --write
+```
 
 ## Run Locally
 

@@ -88,7 +88,7 @@ const getPublicReport = async (req, res, next) => {
     }
 
     const topicBreakdown = getTopicScores([session]);
-    const score = session.overallScore || calculateSessionScore(session);
+    const score = session.overallScore ?? calculateSessionScore(session);
 
     res.status(200).json({
       success: true,

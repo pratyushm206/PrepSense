@@ -1,6 +1,11 @@
 const Session = require('../models/Session');
 const User = require('../models/User');
-const { getTopicScores, calculateReadiness, getTopicTrends } = require('../services/scoringEngine');
+const {
+  getTopicScores,
+  calculateReadiness,
+  getTopicTrends,
+  hasLatestSuccessfulAnswer
+} = require('../services/scoringEngine');
 
 const getOverview = async (req, res, next) => {
   try {
@@ -8,12 +13,24 @@ const getOverview = async (req, res, next) => {
       Session.find({ userId: req.user.userId }),
       User.findById(req.user.userId).select('targetCompanies')
     ]);
-    const scoredSessions = sessions.filter(s => (s.answers || []).length > 0);
+    const scoredSessions = sessions.filter(hasLatestSuccessfulAnswer);
+    const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    const sessionsThisWeek = scoredSessions.filter(session => {
+      const sessionDate = session.completedAt || session.createdAt;
+      return sessionDate && new Date(sessionDate).getTime() >= sevenDaysAgo;
+    }).length;
 
     if (scoredSessions.length === 0) {
       return res.status(200).json({
         success: true,
-        data: { readinessScore: 0, topicBreakdown: [], weakAreas: [], strongAreas: [] }
+        data: {
+          readinessScore: 0,
+          evaluatedSessionCount: 0,
+          sessionsThisWeek,
+          topicBreakdown: [],
+          weakAreas: [],
+          strongAreas: []
+        }
       });
     }
 
@@ -32,7 +49,14 @@ const getOverview = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      data: { readinessScore, topicBreakdown, weakAreas, strongAreas }
+      data: {
+        readinessScore,
+        evaluatedSessionCount: scoredSessions.length,
+        sessionsThisWeek,
+        topicBreakdown,
+        weakAreas,
+        strongAreas
+      }
     });
   } catch (error) {
     next(error);
