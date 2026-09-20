@@ -38,7 +38,7 @@ export default function PublicReport() {
         <div className="summary-hero public-report-hero">
           <div>
             <p className="eyebrow">{report.company} readiness report</p>
-            <h1>{report.score}</h1>
+            <h1>{formatScore(report.score)}</h1>
             <p>{report.role} - {report.questionCount} questions - {formatDate(report.completedAt)}</p>
           </div>
           <Link className="button secondary" to="/">PrepSense</Link>
@@ -61,12 +61,12 @@ export default function PublicReport() {
                     <span
                       className="topic-bar-fill"
                       style={{
-                        width: `${Math.max(0, Math.min(100, topic.avgScore || 0))}%`,
+                        width: `${getScorePercent(topic.avgScore)}%`,
                         background: getScoreColor(topic.avgScore)
                       }}
                     />
                   </span>
-                  <strong>{topic.avgScore || 0}</strong>
+                  <strong>{formatScore(topic.avgScore)}</strong>
                 </div>
               </div>
             ))}
@@ -81,6 +81,15 @@ function getScoreColor(score = 0) {
   if (score >= 70) return 'var(--teal)';
   if (score >= 40) return 'var(--amber)';
   return 'var(--red)';
+}
+
+function getScorePercent(score) {
+  if (score === null || score === undefined) return 0;
+  return Math.max(0, Math.min(100, score));
+}
+
+function formatScore(score) {
+  return score === null || score === undefined ? '-' : score;
 }
 
 function formatDate(value) {

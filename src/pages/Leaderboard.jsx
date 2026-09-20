@@ -95,7 +95,7 @@ export default function Leaderboard() {
                 <strong>{entry.username || 'PrepSense user'}</strong>
                 <span>Best readiness score</span>
               </div>
-              <div className={`score-badge ${getScoreClass(entry.score)}`}>{entry.score}</div>
+              <div className={`score-badge ${getScoreClass(entry.score)}`}>{formatScore(entry.score)}</div>
             </article>
           ))}
         </div>
@@ -105,8 +105,12 @@ export default function Leaderboard() {
 }
 
 function getScoreClass(score) {
-  if (!score) return 'score-zero';
+  if (score === null || score === undefined) return 'score-zero';
   if (score >= 70) return 'score-good';
   if (score >= 40) return 'score-warn';
   return 'score-bad';
+}
+
+function formatScore(score) {
+  return score === null || score === undefined ? '-' : score;
 }

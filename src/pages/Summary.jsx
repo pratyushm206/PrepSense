@@ -60,7 +60,7 @@ export default function Summary() {
       <div className="summary-hero">
         <div>
           <p className="eyebrow">{session.company} interview summary</p>
-          <h1>{session.overallScore ?? calculateLocalAverage(session, latestAnswers)}</h1>
+          <h1>{formatScore(session.overallScore ?? calculateLocalAverage(latestAnswers))}</h1>
           <p>{session.role} - {latestAnswers.length} answered questions</p>
         </div>
         <div className="action-row">
@@ -86,7 +86,7 @@ export default function Summary() {
               <div className="question-meta">
                 <span className="tag">{question.topic}</span>
                 <span className="tag">{question.difficulty}</span>
-                {answer && <strong>{answer.score}/100</strong>}
+                {answer && <strong>{formatScore(answer.score)}/100</strong>}
               </div>
               <h2>{question.question}</h2>
               {answer ? (
@@ -119,10 +119,15 @@ function useLatestAnswers(session) {
   }, [session]);
 }
 
-function calculateLocalAverage(session, answers) {
-  if (!answers.length) return 0;
-  const total = answers.reduce((sum, answer) => sum + Number(answer.score || 0), 0);
-  return Math.round(total / answers.length);
+function calculateLocalAverage(answers) {
+  const scoredAnswers = answers.filter(answer => typeof answer.score === 'number');
+  if (!scoredAnswers.length) return null;
+  const total = scoredAnswers.reduce((sum, answer) => sum + Number(answer.score), 0);
+  return Math.round(total / scoredAnswers.length);
+}
+
+function formatScore(score) {
+  return score === null || score === undefined ? '-' : score;
 }
 
 function Feedback({ title, items = [] }) {

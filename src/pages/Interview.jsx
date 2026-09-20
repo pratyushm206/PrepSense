@@ -157,7 +157,9 @@ export default function Interview() {
               <span>Score</span>
               <strong>{result.score ?? '-'}</strong>
             </div>
-            <span className={`verdict ${result.verdict}`}>{result.verdict}</span>
+            <span className={`verdict ${result.verdict || 'pending'}`}>
+              {result.verdict || 'Not evaluated'}
+            </span>
             <FeedbackList title="Strengths" items={result.strengths} />
             <FeedbackList title="Improvements" items={result.improvements} />
             <FeedbackList title="Missed points" items={result.missedPoints} />
