@@ -9,6 +9,7 @@
     "dev:client": "vite",
     "dev:server": "nodemon server.js",
     "build": "vite build",
+    "test": "node --test",
     "preview": "vite preview"
   },
   "keywords": [],
