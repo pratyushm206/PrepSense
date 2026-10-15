@@ -17,7 +17,7 @@ router.post(
   '/register',
   authLimiter,
   [
-    body('email').isEmail().withMessage('Please provide a valid email'),
+    body('email').trim().customSanitizer(value => String(value || '').toLowerCase()).isEmail().withMessage('Please provide a valid email'),
     body('password').isLength({ min: 8 }).withMessage('Password must be at least 8 characters')
   ],
   registerUser
@@ -27,7 +27,7 @@ router.post(
   '/login',
   authLimiter,
   [
-    body('email').isEmail().withMessage('Please provide a valid email'),
+    body('email').trim().customSanitizer(value => String(value || '').toLowerCase()).isEmail().withMessage('Please provide a valid email'),
     body('password').notEmpty().withMessage('Password is required')
   ],
   loginUser

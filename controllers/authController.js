@@ -11,9 +11,10 @@ const registerUser = async (req, res, next) => {
           return res.status(400).json({ success: false, message: details[0].msg, errors: details });
         }
 
-        const {name, email, password, targetCompanies = []} = req.body;
+        const {name, password, targetCompanies = []} = req.body;
+        const email = String(req.body.email || '').trim().toLowerCase();
         // prevents duplicate accounts and matches the Guide's consistent response shape (success/message).
-        const existingUser = await User.findOne({ email });
+        const existingUser = await User.findOne({ email }).collation({ locale: 'en', strength: 2 });
         if (existingUser) {
             return res.status(400).json({ success: false, message: 'User already exists' });
         }
@@ -53,9 +54,10 @@ const loginUser = async (req, res, next) => {
       return res.status(400).json({ success: false, message: details[0].msg, errors: details });
     }
     
-    const { email, password } = req.body;
+    const { password } = req.body;
+    const email = String(req.body.email || '').trim().toLowerCase();
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).collation({ locale: 'en', strength: 2 });
     if (!user) {
       return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
@@ -83,7 +85,7 @@ const loginUser = async (req, res, next) => {
 
 const getMe = async (req, res, next) => {
   try {
-    const user = await User.findById(req.user.userId).select('-password');
+    const user = await User.findById(req.user.userId).select('-password').lean();
     if (!user) {
       return res.status(404).json({ success: false, message: 'User not found' });
     }
@@ -109,6 +111,9 @@ const updateMe = async (req, res, next) => {
           success: false,
           message: 'targetCompanies must be an array of strings'
         });
+      }
+      if (targetCompanies.some(company => company.trim().length > 80)) {
+        return res.status(400).json({ success: false, message: 'Company names must be 80 characters or fewer' });
       }
       updates.targetCompanies = targetCompanies.map(company => company.trim()).filter(Boolean);
     }

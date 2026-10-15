@@ -9,11 +9,19 @@ const SessionSchema = new mongoose.Schema({
   },
   company: {
     type: String,
-    required: true
+    required: true,
+    trim: true,
+    maxlength: 80
+  },
+  companyKey: {
+    type: String,
+    index: true
   },
   role: {
     type: String,
-    required: true
+    required: true,
+    trim: true,
+    maxlength: 80
   },
   mode: {
     type: String,
@@ -100,7 +108,8 @@ const SessionSchema = new mongoose.Schema({
     },
     text: {
       type: String,
-      required: true
+      required: true,
+      maxlength: 5000
     },
     score: {
       type: Number,
@@ -139,15 +148,20 @@ const SessionSchema = new mongoose.Schema({
   }],
   overallScore: {
     type: Number,
-    default: 0
+    default: null
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now
   },
   completedAt: {
     type: Date,
-    default: Date.now
+    default: null
   }
 });
 
 SessionSchema.index({ userId: 1 });
+SessionSchema.index({ userId: 1, completedAt: -1 });
 SessionSchema.index({ company: 1 });
 SessionSchema.index(
   { shareToken: 1 },

@@ -157,7 +157,10 @@ function calculateReadiness(userSessions, targetCompany) {
 
   let companyMatchBonus = 0;
   if (targetCompany) {
-    const companySessions = scoredSessions.filter(s => s.company === targetCompany);
+    const targetKey = String(targetCompany).trim().toLowerCase();
+    const companySessions = scoredSessions.filter(s =>
+      String(s.companyKey || s.company || '').trim().toLowerCase() === targetKey
+    );
     companyMatchBonus = companySessions.length > 0 ? 5 : 0;
   }
 
