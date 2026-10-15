@@ -25,8 +25,7 @@ const SessionSchema = new mongoose.Schema({
     subjectiveCount: { type: Number, default: 0 }
   },
   shareToken: {
-    type: String,
-    default: null
+    type: String
   },
   questions: [{
     id: {
@@ -150,7 +149,10 @@ const SessionSchema = new mongoose.Schema({
 
 SessionSchema.index({ userId: 1 });
 SessionSchema.index({ company: 1 });
-SessionSchema.index({ shareToken: 1 }, { unique: true, sparse: true });
+SessionSchema.index(
+  { shareToken: 1 },
+  { unique: true, partialFilterExpression: { shareToken: { $type: 'string' } } }
+);
 
 const Session = mongoose.model('Session', SessionSchema);
 
