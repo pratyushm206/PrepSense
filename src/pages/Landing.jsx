@@ -136,9 +136,9 @@ export default function Landing() {
           <h2 className="landing-section-title">Not a single-shot Q&amp;A tool.</h2>
           <p className="landing-copy">
             Pick a target company, role, practice category, and difficulty. PrepSense generates
-            fresh interview questions for that combination, scores each answer against expected key
-            points, and rolls results into readiness, topic trends, and company-specific
-            recommendations.
+            interview questions and may reuse the same set for 24 hours when another student starts
+            an identical round. It scores each answer against expected key points and tracks
+            readiness, topic trends, and company-specific recommendations.
           </p>
           <div className="landing-feature-grid">
             <article className="landing-feature">

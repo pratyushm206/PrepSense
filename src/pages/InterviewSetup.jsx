@@ -18,7 +18,10 @@ export default function InterviewSetup() {
     role: '',
     category: '',
     difficulty: 'medium',
-    count: 5
+    count: 5,
+    mode: 'subjective',
+    mcqCount: 5,
+    subjectiveCount: 2
   });
   const [errors, setErrors] = useState({});
   const [formError, setFormError] = useState('');
@@ -85,6 +88,7 @@ export default function InterviewSetup() {
     setFormError('');
     if (!validate()) return;
 
+    let sessionIdForCleanup = null;
     try {
       setLoading(true);
       const session = await apiRequest('/api/sessions', {
@@ -92,9 +96,15 @@ export default function InterviewSetup() {
         token,
         body: {
           company: values.company.trim(),
-          role: values.role.trim()
+          role: values.role.trim(),
+          mode: values.mode,
+          config: {
+            mcqCount: values.mode === 'subjective' ? 0 : Number(values.mcqCount),
+            subjectiveCount: values.mode === 'mcq' ? 0 : Number(values.subjectiveCount)
+          }
         }
       });
+      sessionIdForCleanup = session._id;
 
       await apiRequest('/api/questions/generate', {
         method: 'POST',
@@ -105,12 +115,18 @@ export default function InterviewSetup() {
           role: values.role.trim(),
           category: values.category,
           difficulty: values.difficulty,
-          count: Number(values.count)
+          mode: values.mode,
+          count: Number(values.count),
+          mcqCount: Number(values.mcqCount),
+          subjectiveCount: Number(values.subjectiveCount)
         }
       });
 
       navigate(`/interview/${session._id}`);
     } catch (error) {
+      if (sessionIdForCleanup) {
+        await apiRequest(`/api/sessions/${sessionIdForCleanup}/empty`, { method: 'DELETE', token }).catch(() => {});
+      }
       setFormError(error.message);
     } finally {
       setLoading(false);
@@ -124,7 +140,8 @@ export default function InterviewSetup() {
           <p className="eyebrow">New round</p>
           <h1>Set the conditions,<br />then <span>go in cold.</span></h1>
           <p className="lead">
-            Question sets for the same company, role and difficulty may be reused to keep rounds fast.
+            Subjective question sets with the same company, role, difficulty, count, and category are
+            shared and reused for up to 24 hours to keep rounds fast.
           </p>
         </div>
         <div className="readout-strip" aria-label={readoutError || undefined}>
@@ -147,12 +164,12 @@ export default function InterviewSetup() {
         {formError && <div className="field-error form-error">{formError}</div>}
         <label className="field">
           <span>Company</span>
-          <input name="company" value={values.company} onChange={updateField} placeholder="Microsoft" />
+          <input name="company" maxLength={80} value={values.company} onChange={updateField} placeholder="Microsoft" />
           {errors.company && <span className="field-error">{errors.company}</span>}
         </label>
         <label className="field">
           <span>Role</span>
-          <input name="role" value={values.role} onChange={updateField} placeholder="Software Engineer Intern" />
+          <input name="role" maxLength={80} value={values.role} onChange={updateField} placeholder="Software Engineer Intern" />
           {errors.role && <span className="field-error">{errors.role}</span>}
         </label>
         <div className="field">
@@ -162,6 +179,7 @@ export default function InterviewSetup() {
               <button
                 className={`chip ${values.category === option.value ? 'selected' : ''}`}
                 type="button"
+                aria-pressed={values.category === option.value}
                 onClick={() => setChoice('category', option.value)}
                 key={option.value}
               >
@@ -178,6 +196,7 @@ export default function InterviewSetup() {
               <button
                 className={`chip ${values.difficulty === option ? 'selected' : ''}`}
                 type="button"
+                aria-pressed={values.difficulty === option}
                 onClick={() => setChoice('difficulty', option)}
                 key={option}
               >
@@ -187,12 +206,39 @@ export default function InterviewSetup() {
           </div>
         </div>
         <div className="field">
+          <span className="field-label">Question mode</span>
+          <div className="chip-row" role="group" aria-label="Question mode">
+            {[
+              ['subjective', 'Written'],
+              ['mcq', 'Multiple choice'],
+              ['mixed', 'Mixed']
+            ].map(([value, label]) => (
+              <button
+                className={`chip ${values.mode === value ? 'selected' : ''}`}
+                type="button"
+                aria-pressed={values.mode === value}
+                onClick={() => setChoice('mode', value)}
+                key={value}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+        {values.mode === 'mixed' ? (
+          <>
+            <CountChoice label="Multiple-choice questions" name="mcqCount" value={values.mcqCount} onChange={setChoice} options={[2, 3, 5]} />
+            <CountChoice label="Written questions" name="subjectiveCount" value={values.subjectiveCount} onChange={setChoice} options={[1, 2, 3]} />
+          </>
+        ) : (
+        <div className="field">
           <span className="field-label">Questions</span>
           <div className="chip-row" role="group" aria-label="Questions">
             {[3, 5, 7].map(option => (
               <button
                 className={`chip ${Number(values.count) === option ? 'selected' : ''}`}
                 type="button"
+                aria-pressed={Number(values.count) === option}
                 onClick={() => setChoice('count', option)}
                 key={option}
               >
@@ -201,6 +247,7 @@ export default function InterviewSetup() {
             ))}
           </div>
         </div>
+        )}
         <button className="button primary gen-btn" type="submit" disabled={loading}>
           {loading ? 'Generating questions...' : <>Generate interview {'->'}</>}
         </button>
@@ -212,4 +259,25 @@ export default function InterviewSetup() {
 
 function getRecommendedFocus(data) {
   return data.recommendations?.[0]?.topic || data.weakTopics?.[0]?.topic || '—';
+}
+
+function CountChoice({ label, name, value, onChange, options }) {
+  return (
+    <div className="field">
+      <span className="field-label">{label}</span>
+      <div className="chip-row" role="group" aria-label={label}>
+        {options.map(option => (
+          <button
+            className={`chip ${Number(value) === option ? 'selected' : ''}`}
+            type="button"
+            aria-pressed={Number(value) === option}
+            onClick={() => onChange(name, option)}
+            key={option}
+          >
+            {option}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
 }

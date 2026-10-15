@@ -1,11 +1,8 @@
 /**
  * Parses and sanitizes Gemini's raw question response.
  *
- * NOTE: `requested` reflects the number of items that survived JSON.parse —
- * NOT the `count` originally requested from Gemini. If Gemini itself
- * underdelivers (e.g. asked for 5, returned 3), that gap is invisible here.
- * Tracking the true requested/generated/delivered pipeline is deferred —
- * thread `count` through as a param if/when that distinction matters.
+ * Returns requested and delivered counts separately so callers can top up
+ * partial model responses.
  */
 
 const { VERDICTS, CATEGORIES } = require('../config/constants');
@@ -13,7 +10,8 @@ const { VERDICTS, CATEGORIES } = require('../config/constants');
 function validateQuestions(rawText, category, options = {}) {
   let parsed;
   try {
-    parsed = JSON.parse(rawText);
+    const cleaned = String(rawText).trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '');
+    parsed = JSON.parse(cleaned);
   } catch (err) {
     throw new Error('Failed to parse Gemini response as JSON');
   }
@@ -36,9 +34,7 @@ function validateQuestions(rawText, category, options = {}) {
   const validateDsaShape = item => {
     if (typeof item.problemStatement !== 'string' || !item.problemStatement.trim()) return false;
 
-    if (!Array.isArray(item.examples) || item.examples.length === 0) return false;
-    const expectedExampleCount = item.difficulty === 'easy' ? 1 : 2;
-    if (item.examples.length !== expectedExampleCount) return false;
+    if (!Array.isArray(item.examples) || item.examples.length < 1 || item.examples.length > 3) return false;
     const examplesValid = item.examples.every(ex =>
       typeof ex.input === 'string' && ex.input.trim() &&
       typeof ex.output === 'string' && ex.output.trim() &&
@@ -53,15 +49,28 @@ function validateQuestions(rawText, category, options = {}) {
     );
     if (!glossaryValid) return false;
 
-    if (typeof item.inputFormat !== 'string' || !item.inputFormat.trim()) return false;
-    if (typeof item.outputFormat !== 'string' || !item.outputFormat.trim()) return false;
+    if (typeof item.inputFormat !== 'string') return false;
+    if (typeof item.outputFormat !== 'string') return false;
 
-    if (!Array.isArray(item.constraints) || item.constraints.length === 0) return false;
+    if (!Array.isArray(item.constraints)) return false;
 
     return true;
   };
 
-  const valid = parsed.filter(item => {
+  const normalized = parsed
+    .filter(item => item && typeof item === 'object' && !Array.isArray(item))
+    .map(item => format === 'subjective' && category === 'dsa' ? {
+      ...item,
+      examples: Array.isArray(item.examples)
+        ? item.examples.slice(0, 3).map(example => ({ ...example, explanation: example.explanation || '' }))
+        : [],
+      glossary: Array.isArray(item.glossary) ? item.glossary : [],
+      inputFormat: typeof item.inputFormat === 'string' ? item.inputFormat : '',
+      outputFormat: typeof item.outputFormat === 'string' ? item.outputFormat : '',
+      constraints: Array.isArray(item.constraints) ? item.constraints : []
+    } : item);
+
+  const valid = normalized.filter(item => {
     const hasBaseFields = baseFields.every(field => item[field] !== undefined);
     const topicIsAllowed = allowedTopics.includes(item.topic);
     const idIsNumber = typeof item.id === 'number';
@@ -95,7 +104,7 @@ function validateQuestions(rawText, category, options = {}) {
 
   return {
     questions: valid,
-    requested: parsed.length,
+    requested: options.requestedCount ?? parsed.length,
     delivered: valid.length
   };
 }
