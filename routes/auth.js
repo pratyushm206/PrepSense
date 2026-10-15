@@ -10,10 +10,12 @@ const {
   deactivateMe
 } = require('../controllers/authController');
 const protect = require('../middleware/auth');
+const { authLimiter } = require('../middleware/rateLimiter');
 const { body } = require('express-validator');
 
 router.post(
   '/register',
+  authLimiter,
   [
     body('email').isEmail().withMessage('Please provide a valid email'),
     body('password').isLength({ min: 8 }).withMessage('Password must be at least 8 characters')
@@ -23,6 +25,7 @@ router.post(
 
 router.post(
   '/login',
+  authLimiter,
   [
     body('email').isEmail().withMessage('Please provide a valid email'),
     body('password').notEmpty().withMessage('Password is required')
