@@ -1,35 +1,46 @@
 const Session = require('../models/Session');
-const { hasLatestSuccessfulAnswer, normalizeTopic } = require('../services/scoringEngine');
+const { companyMatch } = require('../services/normalization');
 
 const getInsights = async (req, res, next) => {
   try {
     const { name } = req.params;
 
-    const sessions = (await Session.find({ company: name })).filter(hasLatestSuccessfulAnswer);
-
-    const topicCounts = new Map();
-    const distinctTopics = new Set();
-
-    sessions.forEach(session => {
-      session.questions.forEach(q => {
-        const topic = normalizeTopic(q.topic);
-        if (!topic) return;
-        const normalizedQuestion = String(q.question || '').trim().toLowerCase();
-        const key = `${session.company}:${topic}:${normalizedQuestion}`;
-        if (distinctTopics.has(key)) return;
-        distinctTopics.add(key);
-        topicCounts.set(topic, (topicCounts.get(topic) || 0) + 1);
-      });
-    });
-
-    const topTopics = Array.from(topicCounts.entries())
-      .map(([topic, count]) => ({ topic, count }))
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 5);
+    const [result] = await Session.aggregate([
+      { $match: companyMatch(name) },
+      { $addFields: {
+        successfulLatestAnswers: {
+          $filter: {
+            input: { $ifNull: ['$answers', []] }, as: 'answer',
+            cond: { $and: [
+              { $ne: ['$$answer.isLatest', false] },
+              { $eq: ['$$answer.evaluationStatus', 'success'] }
+            ] }
+          }
+        }
+      } },
+      { $match: { $expr: { $gt: [{ $size: '$successfulLatestAnswers' }, 0] } } },
+      { $facet: {
+        sessions: [{ $count: 'count' }],
+        topics: [
+          { $unwind: '$questions' },
+          { $project: {
+            topic: { $toLower: { $trim: { input: '$questions.topic' } } },
+            question: { $toLower: { $trim: { input: '$questions.question' } } }
+          } },
+          { $match: { topic: { $ne: '' }, question: { $ne: '' } } },
+          { $group: { _id: { topic: '$topic', question: '$question' } } },
+          { $group: { _id: '$_id.topic', count: { $sum: 1 } } },
+          { $sort: { count: -1 } },
+          { $limit: 5 },
+          { $project: { _id: 0, topic: '$_id', count: 1 } }
+        ]
+      } }
+    ]);
+    const topTopics = result?.topics || [];
 
     res.status(200).json({
       success: true,
-      data: { company: name, totalSessionsAnalyzed: sessions.length, topTopics }
+      data: { company: name, totalSessionsAnalyzed: result?.sessions?.[0]?.count || 0, topTopics }
     });
   } catch (error) {
     next(error);

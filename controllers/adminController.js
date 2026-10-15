@@ -4,19 +4,40 @@ const { calculateReadiness, hasLatestSuccessfulAnswer } = require('../services/s
 
 const getStats = async (req, res, next) => {
   try {
-    const [totalUsers, totalSessions, answeredSessions] = await Promise.all([
+    const [totalUsers, totalSessions, companyCounts, answeredSessions] = await Promise.all([
       User.countDocuments(),
-      Session.countDocuments(),
-      Session.find({})
+      Session.countDocuments({ 'questions.0': { $exists: true } }),
+      Session.aggregate([
+        { $addFields: {
+          successfulLatestAnswers: {
+            $filter: {
+              input: { $ifNull: ['$answers', []] }, as: 'answer',
+              cond: { $and: [
+                { $ne: ['$$answer.isLatest', false] },
+                { $eq: ['$$answer.evaluationStatus', 'success'] }
+              ] }
+            }
+          }
+        } },
+        { $match: { $expr: { $gt: [{ $size: '$successfulLatestAnswers' }, 0] } } },
+        { $group: {
+          _id: { $ifNull: ['$companyKey', { $toLower: { $trim: { input: '$company' } } }] },
+          company: { $first: '$company' },
+          count: { $sum: 1 }
+        } },
+        { $sort: { count: -1 } },
+        { $limit: 5 },
+        { $project: { _id: 0, company: 1, count: 1 } }
+      ]),
+      Session.find({ answers: { $elemMatch: { isLatest: { $ne: false }, evaluationStatus: 'success' } } })
+        .select('userId company companyKey completedAt questions.id questions.topic questions.difficulty answers.questionId answers.score answers.evaluationStatus answers.isLatest')
+        .lean()
     ]);
 
     const evaluatedSessions = answeredSessions.filter(hasLatestSuccessfulAnswer);
-    const companyCounts = new Map();
     const sessionsByUser = new Map();
 
     evaluatedSessions.forEach(session => {
-      companyCounts.set(session.company, (companyCounts.get(session.company) || 0) + 1);
-
       const userKey = session.userId.toString();
       if (!sessionsByUser.has(userKey)) {
         sessionsByUser.set(userKey, []);
@@ -24,10 +45,7 @@ const getStats = async (req, res, next) => {
       sessionsByUser.get(userKey).push(session);
     });
 
-    const topCompaniesPracticed = Array.from(companyCounts.entries())
-      .map(([company, count]) => ({ company, count }))
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 5);
+    const topCompaniesPracticed = companyCounts;
 
     const readinessScores = Array.from(sessionsByUser.values()).map(userSessions =>
       calculateReadiness(userSessions)

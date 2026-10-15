@@ -1,52 +1,60 @@
 const Session = require('../models/Session');
 const User = require('../models/User');
 const { WEAK_TOPIC_SCORE_THRESHOLD } = require('../config/constants');
-const { getTopicScores, hasLatestSuccessfulAnswer, normalizeTopic } = require('../services/scoringEngine');
+const { getTopicScores, hasLatestSuccessfulAnswer } = require('../services/scoringEngine');
+const { companyMatch } = require('../services/normalization');
 
-function getTopCompanyTopics(sessions) {
-  const topicCounts = new Map();
-
-  const distinctTopics = new Set();
-
-  sessions.forEach(session => {
-    (session.questions || []).forEach(question => {
-      const topic = normalizeTopic(question.topic);
-      if (!topic) return;
-      const normalizedQuestion = String(question.question || '').trim().toLowerCase();
-      const key = `${session.company}:${topic}:${normalizedQuestion}`;
-      if (distinctTopics.has(key)) return;
-      distinctTopics.add(key);
-      topicCounts.set(topic, (topicCounts.get(topic) || 0) + 1);
-    });
-  });
-
-  return Array.from(topicCounts.entries())
-    .map(([topic, count]) => ({ topic, count }))
-    .sort((a, b) => b.count - a.count)
-    .slice(0, 5);
+async function getTopCompanyTopics(company) {
+  if (!company) return [];
+  const [result] = await Session.aggregate([
+    { $match: companyMatch(company) },
+    { $addFields: {
+      successfulLatestAnswers: {
+        $filter: {
+          input: { $ifNull: ['$answers', []] }, as: 'answer',
+          cond: { $and: [
+            { $ne: ['$$answer.isLatest', false] },
+            { $eq: ['$$answer.evaluationStatus', 'success'] }
+          ] }
+        }
+      }
+    } },
+    { $match: { $expr: { $gt: [{ $size: '$successfulLatestAnswers' }, 0] } } },
+    { $unwind: '$questions' },
+    { $project: {
+      topic: { $toLower: { $trim: { input: '$questions.topic' } } },
+      question: { $toLower: { $trim: { input: '$questions.question' } } }
+    } },
+    { $match: { topic: { $ne: '' }, question: { $ne: '' } } },
+    { $group: { _id: { topic: '$topic', question: '$question' } } },
+    { $group: { _id: '$_id.topic', count: { $sum: 1 } } },
+    { $sort: { count: -1 } },
+    { $limit: 5 },
+    { $project: { _id: 0, topic: '$_id', count: 1 } }
+  ]);
+  return result || [];
 }
 
 const getRecommendations = async (req, res, next) => {
   try {
-    const user = await User.findById(req.user.userId).select('targetCompanies');
+    const user = await User.findById(req.user.userId).select('targetCompanies').lean();
     const targetCompany = req.query.company || user?.targetCompanies?.[0] || null;
 
     const [allUserSessions, allCompanySessions] = await Promise.all([
-      Session.find({ userId: req.user.userId }),
-      targetCompany
-        ? Session.find({ company: targetCompany })
-        : Promise.resolve([])
+      Session.find({ userId: req.user.userId })
+        .select('company companyKey completedAt questions.id questions.topic questions.difficulty answers.questionId answers.score answers.evaluationStatus answers.isLatest')
+        .lean(),
+      getTopCompanyTopics(targetCompany)
     ]);
 
     const userSessions = allUserSessions.filter(hasLatestSuccessfulAnswer);
-    const companySessions = allCompanySessions.filter(hasLatestSuccessfulAnswer);
 
     const weakTopics = getTopicScores(userSessions)
       .filter(topicScore => topicScore.avgScore < WEAK_TOPIC_SCORE_THRESHOLD)
       .sort((a, b) => a.avgScore - b.avgScore)
       .slice(0, 3);
 
-    const companyFocusTopics = getTopCompanyTopics(companySessions);
+    const companyFocusTopics = allCompanySessions;
     const companyTopicSet = new Set(companyFocusTopics.map(t => t.topic));
 
     const recommendations = weakTopics.map(topicScore => ({

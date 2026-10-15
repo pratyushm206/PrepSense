@@ -1,9 +1,10 @@
 const Session = require('../models/Session');
+const { companyMatch } = require('../services/normalization');
 
 function maskName(name = '') {
-  const [first = 'PrepSense', last = 'user'] = String(name).trim().split(/\s+/);
-  const initial = last ? `${last.charAt(0).toUpperCase()}.` : '';
-  return `${first} ${initial}`.trim();
+  const [first, last] = String(name).trim().split(/\s+/);
+  const initial = last ? ` ${last.charAt(0).toUpperCase()}.` : '';
+  return `${first || 'PrepSense'}${initial}`;
 }
 
 const getLeaderboard = async (req, res, next) => {
@@ -16,7 +17,7 @@ const getLeaderboard = async (req, res, next) => {
     const leaderboard = await Session.aggregate([
       {
         $match: {
-          company,
+          ...companyMatch(company),
           answers: {
             $elemMatch: {
               isLatest: { $ne: false },
@@ -26,6 +27,33 @@ const getLeaderboard = async (req, res, next) => {
           overallScore: { $ne: null, $gt: 0 }
         }
       },
+      {
+        $addFields: {
+          latestAnswers: {
+            $filter: {
+              input: { $ifNull: ['$answers', []] },
+              as: 'answer',
+              cond: { $ne: ['$$answer.isLatest', false] }
+            }
+          },
+          qualifyingAnswers: {
+            $filter: {
+              input: { $ifNull: ['$answers', []] },
+              as: 'answer',
+              cond: {
+                $and: [
+                  { $ne: ['$$answer.isLatest', false] },
+                  { $eq: ['$$answer.evaluationStatus', 'success'] }
+                ]
+              }
+            }
+          }
+        }
+      },
+      { $addFields: {
+        answeredQuestionIds: { $setUnion: [{ $map: { input: '$latestAnswers', as: 'answer', in: '$$answer.questionId' } }, []] }
+      } },
+      { $match: { $expr: { $gte: [{ $size: '$answeredQuestionIds' }, 3] } } },
       { $sort: { overallScore: -1, completedAt: -1 } },
       {
         $group: {
