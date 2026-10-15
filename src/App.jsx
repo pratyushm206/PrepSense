@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import Shell from './components/Shell.jsx';
 import Dashboard from './pages/Dashboard.jsx';
+import AdminStats from './pages/AdminStats.jsx';
 import History from './pages/History.jsx';
 import HistoryDetail from './pages/HistoryDetail.jsx';
 import Interview from './pages/Interview.jsx';
@@ -25,6 +26,7 @@ export default function App() {
       <Route element={<ProtectedRoute />}>
         <Route element={<Shell />}>
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/admin" element={<AdminStats />} />
           <Route path="/interview/new" element={<InterviewSetup />} />
           <Route path="/interview/:sessionId" element={<Interview />} />
           <Route path="/interview/:sessionId/summary" element={<Summary />} />
