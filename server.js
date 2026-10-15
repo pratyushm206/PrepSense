@@ -18,7 +18,15 @@ for (const key of ['MONGO_URI', 'JWT_SECRET', 'GEMINI_API_KEY']) {
   }
 }
 app.set('trust proxy', 1);
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+      'style-src': ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+      'font-src': ["'self'", 'https://fonts.gstatic.com', 'data:']
+    }
+  }
+}));
 if (process.env.NODE_ENV !== 'production') {
   app.use(cors());
 } else if (process.env.CLIENT_URL) {
