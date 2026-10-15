@@ -2,13 +2,17 @@ const crypto = require('crypto');
 const Session = require('../models/Session');
 const { getTopicScores, calculateSessionScore } = require('../services/scoringEngine');
 const { SESSION_MODES } = require('../config/constants');
+const { normalizeCompany } = require('../services/normalization');
 
 const createSession = async (req, res, next) => {
   try {
     const { company, role, mode = 'subjective', config = {} } = req.body;
 
-    if (!company || !role) {
+    if (typeof company !== 'string' || typeof role !== 'string' || !company.trim() || !role.trim()) {
       return res.status(400).json({ success: false, message: 'company and role are required' });
+    }
+    if (company.trim().length > 80 || role.trim().length > 80) {
+      return res.status(400).json({ success: false, message: 'Company and role must be 80 characters or fewer' });
     }
 
     if (mode && !SESSION_MODES.includes(mode)) {
@@ -20,8 +24,9 @@ const createSession = async (req, res, next) => {
 
     const session = await Session.create({
       userId: req.user.userId,
-      company,
-      role,
+      company: company.trim(),
+      companyKey: normalizeCompany(company),
+      role: role.trim(),
       mode,
       config: {
         mcqCount: Number(config.mcqCount) || 0,
@@ -37,8 +42,46 @@ const createSession = async (req, res, next) => {
 
 const getSessions = async (req, res, next) => {
   try {
-    const sessions = await Session.find({ userId: req.user.userId }).sort({ completedAt: -1 });
-    res.status(200).json({ success: true, data: sessions });
+    const sessions = await Session.find({ userId: req.user.userId, 'questions.0': { $exists: true } })
+      .sort({ completedAt: -1, createdAt: -1 })
+      .select('company role overallScore completedAt createdAt mode questions.id questions.topic questions.difficulty answers.questionId answers.evaluationStatus answers.isLatest')
+      .lean();
+    const summaries = sessions.map(session => {
+      const latestAnswers = new Map();
+      (session.answers || []).filter(answer => answer.isLatest !== false)
+        .forEach(answer => latestAnswers.set(answer.questionId, answer));
+      return {
+        _id: session._id,
+        company: session.company,
+        role: session.role,
+        overallScore: session.overallScore,
+        completedAt: session.completedAt || session.createdAt,
+        questionCount: session.questions?.length || 0,
+        answerCount: latestAnswers.size,
+        failedEvaluation: [...latestAnswers.values()].some(answer => answer.evaluationStatus === 'failed'),
+        completed: session.questions?.length > 0 && [...latestAnswers.values()].filter(answer => answer.evaluationStatus === 'success').length >= session.questions.length,
+        difficulty: session.questions?.[0]?.difficulty || 'medium',
+        topics: [...new Set((session.questions || []).map(question => question.topic).filter(Boolean))]
+      };
+    });
+    res.status(200).json({ success: true, data: summaries });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const deleteEmptySession = async (req, res, next) => {
+  try {
+    const result = await Session.deleteOne({
+      _id: req.params.id,
+      userId: req.user.userId,
+      questions: { $size: 0 },
+      answers: { $size: 0 }
+    });
+    res.status(result.deletedCount ? 200 : 404).json({
+      success: Boolean(result.deletedCount),
+      ...(result.deletedCount ? { data: { deleted: true } } : { message: 'Empty session not found' })
+    });
   } catch (error) {
     next(error);
   }
@@ -46,7 +89,7 @@ const getSessions = async (req, res, next) => {
 
 const getSessionById = async (req, res, next) => {
   try {
-    const session = await Session.findOne({ _id: req.params.id, userId: req.user.userId });
+    const session = await Session.findOne({ _id: req.params.id, userId: req.user.userId }).lean();
     if (!session) {
       return res.status(404).json({ success: false, message: 'Session not found' });
     }
@@ -80,9 +123,23 @@ const shareSession = async (req, res, next) => {
   }
 };
 
+const revokeShare = async (req, res, next) => {
+  try {
+    const session = await Session.findOne({ _id: req.params.id, userId: req.user.userId });
+    if (!session) {
+      return res.status(404).json({ success: false, message: 'Session not found' });
+    }
+    session.shareToken = undefined;
+    await session.save();
+    res.status(200).json({ success: true, data: { revoked: true } });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const getPublicReport = async (req, res, next) => {
   try {
-    const session = await Session.findOne({ shareToken: req.params.token });
+    const session = await Session.findOne({ shareToken: req.params.token }).lean();
     if (!session) {
       return res.status(404).json({ success: false, message: 'Report not found' });
     }
@@ -106,4 +163,4 @@ const getPublicReport = async (req, res, next) => {
   }
 };
 
-module.exports = { createSession, getSessions, getSessionById, shareSession, getPublicReport };
+module.exports = { createSession, getSessions, getSessionById, deleteEmptySession, shareSession, revokeShare, getPublicReport };

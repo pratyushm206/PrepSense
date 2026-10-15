@@ -12,6 +12,8 @@ export default function Summary() {
   const [error, setError] = useState('');
   const [shareLink, setShareLink] = useState('');
   const [sharing, setSharing] = useState(false);
+  const [revoking, setRevoking] = useState(false);
+  const [shareMessage, setShareMessage] = useState('');
 
   useEffect(() => {
     let cancelled = false;
@@ -47,11 +49,25 @@ export default function Summary() {
       });
       const nextLink = `${window.location.origin}${data.path}`;
       setShareLink(nextLink);
+      setShareMessage('Share link copied');
       await navigator.clipboard?.writeText(nextLink);
     } catch (err) {
       setError(err.message);
     } finally {
       setSharing(false);
+    }
+  }
+
+  async function handleRevokeShare() {
+    try {
+      setRevoking(true);
+      await apiRequest(`/api/sessions/${sessionId}/share`, { method: 'DELETE', token });
+      setShareLink('');
+      setShareMessage('Share link revoked');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setRevoking(false);
     }
   }
 
@@ -73,10 +89,14 @@ export default function Summary() {
       </div>
       {shareLink && (
         <div className="share-strip">
-          <span>Share link copied</span>
+          <span>{shareMessage || 'Share link copied'}</span>
           <a href={shareLink} target="_blank" rel="noreferrer">{shareLink}</a>
+          <button className="button ghost" type="button" onClick={handleRevokeShare} disabled={revoking}>
+            {revoking ? 'Revoking...' : 'Revoke link'}
+          </button>
         </div>
       )}
+      {!shareLink && shareMessage && <div className="share-strip"><span>{shareMessage}</span></div>}
 
       <section className="question-breakdown">
         {session.questions.map(question => {

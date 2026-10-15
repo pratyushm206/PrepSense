@@ -11,8 +11,10 @@ const {
 const getOverview = async (req, res, next) => {
   try {
     const [sessions, user] = await Promise.all([
-      Session.find({ userId: req.user.userId }),
-      User.findById(req.user.userId).select('targetCompanies')
+      Session.find({ userId: req.user.userId })
+        .select('company companyKey completedAt createdAt questions.id questions.topic questions.difficulty answers.questionId answers.score answers.evaluationStatus answers.isLatest')
+        .lean(),
+      User.findById(req.user.userId).select('targetCompanies').lean()
     ]);
     const scoredSessions = sessions.filter(hasLatestSuccessfulAnswer);
     const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;

@@ -3,28 +3,10 @@ const { generateEvaluation } = require('../services/geminiService');
 const { validateEvaluation } = require('../services/responseValidator');
 const Session = require('../models/Session');
 const { calculateSessionScore } = require('../services/scoringEngine');
+const { scoreMcq } = require('../services/mcqScoring');
 
 function isMcqType(type) {
   return type === 'mcq' || type === 'dsa-mcq';
-}
-
-function scoreMcq(question, selectedOptionIndex) {
-  // Zero-token-cost path: MCQ / dsa-mcq answers are scored locally against
-  // the stored correctOptionIndex. No Gemini call.
-  const selected = Number(selectedOptionIndex);
-  const isCorrect = selected === Number(question.correctOptionIndex);
-  const explanation = question.explanation || '';
-
-  return {
-    score: isCorrect ? 100 : 0,
-    strengths: isCorrect ? [explanation || 'Correct option selected.'] : [],
-    improvements: isCorrect ? [] : [explanation || 'Incorrect option selected.'],
-    missedPoints: isCorrect ? [] : ['Selected option does not match the correct answer.'],
-    verdict: isCorrect ? 'good' : 'poor',
-    explanation,
-    evaluationStatus: 'success',
-    failureReason: ''
-  };
 }
 
 async function scoreSubjective(question, answerText) {
@@ -42,6 +24,9 @@ async function scoreSubjective(question, answerText) {
 }
 
 function persistAnswer(session, { questionId, text, evaluation }) {
+  const answeredBefore = new Set(
+    session.answers.filter(answer => answer.isLatest !== false).map(answer => answer.questionId)
+  );
   session.answers.forEach(answer => {
     if (answer.questionId === questionId) answer.isLatest = false;
   });
@@ -60,6 +45,12 @@ function persistAnswer(session, { questionId, text, evaluation }) {
   });
 
   session.overallScore = calculateSessionScore(session);
+  const answeredAfter = new Set(
+    session.answers.filter(answer => answer.isLatest !== false).map(answer => answer.questionId)
+  );
+  if (session.questions.length > 0 && answeredBefore.size < session.questions.length && answeredAfter.size >= session.questions.length) {
+    session.completedAt = new Date();
+  }
 }
 
 async function runEvaluation(session, question, answerText, selectedOptionIndex) {
@@ -116,6 +107,9 @@ const evaluate = async (req, res, next) => {
 
     if (!isMcqType(question.type) && !answerText) {
       return res.status(400).json({ success: false, message: 'answerText is required' });
+    }
+    if (typeof answerText === 'string' && answerText.length > 5000) {
+      return res.status(400).json({ success: false, message: 'Answer must be 5,000 characters or fewer' });
     }
 
     const { evaluation, storedText } = await runEvaluation(

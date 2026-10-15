@@ -6,7 +6,7 @@ const User = require('../models/User');
 // waiting out the token's 7-day expiry.
 const adminOnly = async (req, res, next) => {
   try {
-    const user = await User.findById(req.user.userId);
+    const user = await User.findById(req.user.userId).select('isAdmin').lean();
     if (!user || !user.isAdmin) {
       return res.status(403).json({ success: false, message: 'Admin access required' });
     }

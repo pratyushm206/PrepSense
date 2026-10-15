@@ -5,12 +5,16 @@ const {
   createSession,
   getSessions,
   getSessionById,
-  shareSession
+  deleteEmptySession,
+  shareSession,
+  revokeShare
 } = require('../controllers/sessionController');
 
 router.post('/', protect, createSession);
 router.get('/', protect, getSessions);
+router.delete('/:id/empty', protect, deleteEmptySession);
 router.get('/:id', protect, getSessionById);
 router.post('/:id/share', protect, shareSession);
+router.delete('/:id/share', protect, revokeShare);
 
 module.exports = router;

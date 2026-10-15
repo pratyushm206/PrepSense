@@ -100,10 +100,10 @@ export default function History() {
               <div className="s-role">{getSessionMeta(session)}</div>
             </div>
             <div className="s-tags">
-              {hasFailedEvaluation(session) && (
+              {session.failedEvaluation && (
                 <span className="tag tag-flag">evaluation failed</span>
               )}
-              {getTopicTags(session).map(topic => <span className="tag" key={topic}>{topic}</span>)}
+              {(session.topics || []).slice(0, 2).map(topic => <span className="tag" key={topic}>{topic}</span>)}
             </div>
             <div className="s-date">{formatDate(session.completedAt)}</div>
             <div className="s-arrow">-&gt;</div>
@@ -136,32 +136,18 @@ function getSessionScoreLabel(session) {
 }
 
 function isCompletedSession(session) {
-  const questionCount = session.questions?.length || 0;
-  const latestAnswers = new Set(
-    (session.answers || [])
-      .filter(answer => answer.isLatest !== false && answer.evaluationStatus === 'success')
-      .map(answer => answer.questionId)
-  );
-  return questionCount > 0 && latestAnswers.size >= questionCount;
+  return Boolean(session.completed);
 }
 
 function hasFailedEvaluation(session) {
-  return (session.answers || []).some(answer =>
-    answer.isLatest !== false && answer.evaluationStatus === 'failed'
-  );
+  return Boolean(session.failedEvaluation);
 }
 
 function getSessionMeta(session) {
-  const firstQuestion = session.questions?.[0];
-  const difficulty = firstQuestion?.difficulty || 'Medium';
-  const count = session.questions?.length || 0;
+  const difficulty = session.difficulty || 'Medium';
+  const count = session.questionCount || 0;
   const label = count === 1 ? 'question' : 'questions';
   return `${session.role} · ${capitalize(difficulty)} · ${count} ${label}`;
-}
-
-function getTopicTags(session) {
-  const topics = session.questions?.map(question => question.topic).filter(Boolean) || [];
-  return [...new Set(topics)].slice(0, 2);
 }
 
 function formatDate(value) {

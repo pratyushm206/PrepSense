@@ -12,7 +12,7 @@ const protect = async (req, res, next) => {
     const token = authHeader.split(' ')[1];
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    const user = await User.findById(decoded.userId).select('isActive');
+    const user = await User.findById(decoded.userId).select('isActive').lean();
     if (!user || user.isActive === false) {
       return res.status(401).json({
         success: false,
