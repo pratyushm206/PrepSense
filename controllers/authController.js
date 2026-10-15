@@ -7,7 +7,8 @@ const registerUser = async (req, res, next) => {
     try{
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-          return res.status(400).json({ success: false, errors: errors.array() });
+          const details = errors.array();
+          return res.status(400).json({ success: false, message: details[0].msg, errors: details });
         }
 
         const {name, email, password, targetCompanies = []} = req.body;
@@ -48,7 +49,8 @@ const loginUser = async (req, res, next) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ success: false, errors: errors.array() });
+      const details = errors.array();
+      return res.status(400).json({ success: false, message: details[0].msg, errors: details });
     }
     
     const { email, password } = req.body;

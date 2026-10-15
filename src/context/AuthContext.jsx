@@ -9,6 +9,16 @@ export function AuthProvider({ children }) {
   const [authLoading, setAuthLoading] = useState(true);
 
   useEffect(() => {
+    function handleUnauthorized() {
+      clearStoredToken();
+      setToken(null);
+      setUser(null);
+    }
+    window.addEventListener('prepsense:unauthorized', handleUnauthorized);
+    return () => window.removeEventListener('prepsense:unauthorized', handleUnauthorized);
+  }, []);
+
+  useEffect(() => {
     let cancelled = false;
 
     async function loadUser() {

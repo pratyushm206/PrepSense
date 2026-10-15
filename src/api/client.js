@@ -40,8 +40,11 @@ export async function apiRequest(path, { method = 'GET', body, token } = {}) {
   }
 
   if (!response.ok || !payload?.success) {
+    if (response.status === 401 && token) {
+      window.dispatchEvent(new CustomEvent('prepsense:unauthorized'));
+    }
     const message = response.status === 429
-      ? 'AI requests are temporarily rate limited. Please wait a few minutes before trying again.'
+      ? payload?.message || 'AI is busy. Please try again in a minute.'
       : payload?.message || 'The API server is not available right now. Check that the backend is running and connected to MongoDB.';
 
     const error = new Error(message);
