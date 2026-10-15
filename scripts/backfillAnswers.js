@@ -1,8 +1,11 @@
+require('dotenv').config();
+
 const dns = require('dns');
-dns.setServers(['8.8.8.8', '8.8.4.4']);
+if (process.env.DNS_OVERRIDE === '1') {
+  dns.setServers(['8.8.8.8', '8.8.4.4']);
+}
 
 const mongoose = require('mongoose');
-require('dotenv').config();
 const Session = require('../models/Session');
 const { calculateSessionScore } = require('../services/scoringEngine');
 

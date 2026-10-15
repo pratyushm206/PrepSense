@@ -1,7 +1,9 @@
-const dns = require('dns');
-dns.setServers(['8.8.8.8', '8.8.4.4']);
-
 require('dotenv').config();
+
+const dns = require('dns');
+if (process.env.DNS_OVERRIDE === '1') {
+  dns.setServers(['8.8.8.8', '8.8.4.4']);
+}
 
 const connectDB = require('./config/db');
 const express = require('express');
@@ -10,11 +12,21 @@ const errorHandler = require('./middleware/errorHandler');
 const path = require('path');
 const helmet = require('helmet');
 const cors = require('cors');
+for (const key of ['MONGO_URI', 'JWT_SECRET', 'GEMINI_API_KEY']) {
+  if (!process.env[key]) {
+    throw new Error(`Missing required environment variable: ${key}`);
+  }
+}
+app.set('trust proxy', 1);
 app.use(helmet());
-app.use(cors());
+if (process.env.NODE_ENV !== 'production') {
+  app.use(cors());
+} else if (process.env.CLIENT_URL) {
+  app.use(cors({ origin: process.env.CLIENT_URL }));
+}
 
 
-app.use(express.json());
+app.use(express.json({ limit: '100kb' }));
 
 const PORT = process.env.PORT || 5000;
 
@@ -22,8 +34,10 @@ const PORT = process.env.PORT || 5000;
 
 // GET routes- 
 // health check route
-app.get('/api/health', (req,res) =>{
-    res.json({ status: 'OK' });
+app.get('/api/health', (req, res) => {
+    const mongoose = require('mongoose');
+    const connected = mongoose.connection.readyState === 1;
+    res.status(connected ? 200 : 503).json({ status: connected ? 'OK' : 'DEGRADED', database: connected ? 'connected' : 'disconnected' });
 });
 
 // POST Routes
@@ -37,6 +51,7 @@ app.use('/api/admin', require('./routes/admin'));
 app.use('/api/recommendations', require('./routes/recommendations'));
 app.use('/api/leaderboard', require('./routes/leaderboard'));
 app.get('/api/public/report/:token', require('./controllers/sessionController').getPublicReport);
+app.use('/api', (req, res) => res.status(404).json({ success: false, message: 'API route not found' }));
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, 'dist')));
   app.get(/^\/(?!api).*/, (req, res) => {
