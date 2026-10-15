@@ -1850,6 +1850,53 @@ h2 {
   border-color: var(--status-warn);
 }
 
+.performance-panel {
+  min-width: 0;
+}
+
+.performance-chart-wrap {
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.performance-chart {
+  display: block;
+  width: 100%;
+  min-width: 280px;
+  color: var(--text-dim);
+}
+
+.performance-chart line {
+  stroke: var(--border);
+  stroke-dasharray: 4 5;
+}
+
+.performance-chart text {
+  fill: var(--text-dim);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+}
+
+.performance-chart .performance-date {
+  font-family: Manrope, sans-serif;
+  font-size: 11px;
+}
+
+.performance-line {
+  fill: none;
+  stroke: var(--status-good);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 3;
+}
+
+.performance-chart circle {
+  fill: var(--bg-card);
+  stroke: var(--status-good);
+  stroke-width: 3;
+}
+
 .question-meta,
 .action-row {
   display: flex;

@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { normalizeScore, calculateSessionScore, detectTrend } = require('../services/scoringEngine');
+const { normalizeScore, calculateSessionScore, detectTrend, hasLatestSuccessfulAnswer } = require('../services/scoringEngine');
 
 test('difficulty normalization keeps the existing score rules', () => {
   assert.equal(normalizeScore(80, 'hard'), 100);
@@ -18,6 +18,12 @@ test('session score uses latest successful answers', () => {
     ]
   };
   assert.equal(calculateSessionScore(session), 76);
+});
+
+test('dashboard history includes only sessions with a latest successful evaluation', () => {
+  assert.equal(hasLatestSuccessfulAnswer({ answers: [{ questionId: 1, evaluationStatus: 'success', isLatest: true }] }), true);
+  assert.equal(hasLatestSuccessfulAnswer({ answers: [{ questionId: 1, evaluationStatus: 'failed', isLatest: true }] }), false);
+  assert.equal(hasLatestSuccessfulAnswer({ answers: [{ questionId: 1, evaluationStatus: 'success', isLatest: false }] }), false);
 });
 
 test('trend detection identifies direction and stability', () => {

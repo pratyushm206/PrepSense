@@ -60,6 +60,8 @@ export default function Dashboard() {
             <TopicList title="Strong areas" tone="strong" topics={overview.strongAreas} />
           </section>
 
+          <PerformanceHistory points={overview.performanceHistory || []} />
+
           <section className="breakdown depth-panel">
             <div className="section-heading">
               <h2>Topic breakdown</h2>
@@ -82,6 +84,51 @@ export default function Dashboard() {
       )}
     </section>
   );
+}
+
+function PerformanceHistory({ points }) {
+  if (points.length === 0) return null;
+  const width = 640;
+  const height = 230;
+  const padding = { top: 18, right: 24, bottom: 34, left: 36 };
+  const plotWidth = width - padding.left - padding.right;
+  const plotHeight = height - padding.top - padding.bottom;
+  const coordinates = points.map((point, index) => ({
+    ...point,
+    x: padding.left + (points.length === 1 ? plotWidth / 2 : (index / (points.length - 1)) * plotWidth),
+    y: padding.top + ((100 - point.score) / 100) * plotHeight
+  }));
+  const line = coordinates.map(point => `${point.x},${point.y}`).join(' ');
+
+  return (
+    <section className="panel performance-panel">
+      <div className="section-heading">
+        <div><h2>Performance history</h2><span>Session score over time</span></div>
+        <span>{points.length} recent sessions</span>
+      </div>
+      <div className="performance-chart-wrap">
+        <svg className="performance-chart" viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Session scores over time, from 0 to 100">
+          {[0, 50, 100].map(score => {
+            const y = padding.top + ((100 - score) / 100) * plotHeight;
+            return <g key={score}><line x1={padding.left} x2={width - padding.right} y1={y} y2={y} /><text x="4" y={y + 4}>{score}</text></g>;
+          })}
+          {coordinates.length > 1 && <polyline className="performance-line" points={line} />}
+          {coordinates.map((point, index) => (
+            <circle key={`${point.date}-${index}`} cx={point.x} cy={point.y} r="5">
+              <title>{`${point.score} on ${formatChartDate(point.date)} · ${point.company} · ${point.role}`}</title>
+            </circle>
+          ))}
+          <text className="performance-date" x={padding.left} y={height - 8}>{formatChartDate(coordinates[0].date)}</text>
+          {coordinates.length > 1 && <text className="performance-date" x={width - padding.right} y={height - 8} textAnchor="end">{formatChartDate(coordinates[coordinates.length - 1].date)}</text>}
+        </svg>
+      </div>
+    </section>
+  );
+}
+
+function formatChartDate(value) {
+  if (!value) return '';
+  return new Intl.DateTimeFormat(undefined, { day: 'numeric', month: 'short' }).format(new Date(value));
 }
 
 function GaugeHero({ score, firstName, sessionCount, topicCount }) {

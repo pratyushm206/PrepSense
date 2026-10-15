@@ -12,11 +12,20 @@ const getOverview = async (req, res, next) => {
   try {
     const [sessions, user] = await Promise.all([
       Session.find({ userId: req.user.userId })
-        .select('company companyKey completedAt createdAt questions.id questions.topic questions.difficulty answers.questionId answers.score answers.evaluationStatus answers.isLatest')
+        .select('company companyKey role completedAt createdAt questions.id questions.topic questions.difficulty answers.questionId answers.score answers.evaluationStatus answers.isLatest')
         .lean(),
       User.findById(req.user.userId).select('targetCompanies').lean()
     ]);
     const scoredSessions = sessions.filter(hasLatestSuccessfulAnswer);
+    const performanceHistory = [...scoredSessions]
+      .sort((a, b) => new Date(a.completedAt || a.createdAt) - new Date(b.completedAt || b.createdAt))
+      .slice(-12)
+      .map(session => ({
+        date: session.completedAt || session.createdAt,
+        score: calculateSessionScore(session),
+        company: session.company,
+        role: session.role
+      }));
     const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
     const sessionsThisWeek = scoredSessions.filter(session => {
       const sessionDate = session.completedAt || session.createdAt;
@@ -32,7 +41,8 @@ const getOverview = async (req, res, next) => {
           sessionsThisWeek,
           topicBreakdown: [],
           weakAreas: [],
-          strongAreas: []
+          strongAreas: [],
+          performanceHistory
         }
       });
     }
@@ -64,7 +74,8 @@ const getOverview = async (req, res, next) => {
         sessionsThisWeek,
         topicBreakdown,
         weakAreas,
-        strongAreas
+        strongAreas,
+        performanceHistory
       }
     });
   } catch (error) {

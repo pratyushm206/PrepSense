@@ -5,6 +5,13 @@ PrepSense is an AI mock-interview and campus-placement readiness platform. Stude
 **Live demo:** pending Render deployment.  
 **Screenshots:** to be added after the live UI is verified.
 
+## Project materials
+
+- [Postman API smoke collection](postman/PrepSense.postman_collection.json)
+- [Project interview answers and resume bullets](docs/PROJECT_INTERVIEW_ANSWERS.md)
+- Demo walkthrough: pending a deployed URL and recorded run.
+- Privacy note: PrepSense stores account credentials as bcrypt hashes and practice sessions in MongoDB. Do not include secrets in answers. Public reports contain a sanitized session summary and can be revoked by the owner. Contact the project owner to request account or data removal.
+
 ## Features
 
 - Interview categories: DSA, system design, core subjects, and behavioral.

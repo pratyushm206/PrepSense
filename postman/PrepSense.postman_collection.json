@@ -1,0 +1,86 @@
+{
+  "info": {
+    "_postman_id": "97c96f1c-51ab-4bde-a23a-6b32f172095d",
+    "name": "PrepSense API",
+    "description": "API smoke checks for a local or deployed PrepSense service. Set baseUrl and credentials in collection variables before running authenticated requests.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000" },
+    { "key": "email", "value": "" },
+    { "key": "password", "value": "" },
+    { "key": "token", "value": "" },
+    { "key": "sessionId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "API and database health",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/health" },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('service and database are healthy', function () {", "  pm.response.to.have.status(200);", "  pm.expect(pm.response.json()).to.include({ status: 'OK', database: 'connected' });", "});"] } }]
+        }
+      ]
+    },
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register account (optional, creates data)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"PrepSense Smoke Test\",\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\",\n  \"targetCompanies\": []\n}" },
+            "url": "{{baseUrl}}/api/auth/register"
+          },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('account created', function () {", "  pm.response.to.have.status(201);", "  const body = pm.response.json();", "  pm.expect(body.success).to.eql(true);", "  if (body.token) pm.collectionVariables.set('token', body.token);", "});"] } }]
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}" },
+            "url": "{{baseUrl}}/api/auth/login"
+          },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('login returns a bearer token', function () {", "  pm.response.to.have.status(200);", "  const body = pm.response.json();", "  pm.expect(body.success).to.eql(true);", "  pm.expect(body.token).to.be.a('string');", "  pm.collectionVariables.set('token', body.token);", "});"] } }]
+        },
+        {
+          "name": "Get current user",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/auth/me"
+          },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('current user is returned', function () {", "  pm.response.to.have.status(200);", "  pm.expect(pm.response.json().success).to.eql(true);", "});"] } }]
+        }
+      ]
+    },
+    {
+      "name": "Practice and analytics",
+      "item": [
+        {
+          "name": "Create session (creates data)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"company\": \"Smoke Test\",\n  \"role\": \"Software Engineer\",\n  \"mode\": \"subjective\",\n  \"config\": { \"mcqCount\": 0, \"subjectiveCount\": 1 }\n}" },
+            "url": "{{baseUrl}}/api/sessions"
+          },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('session created', function () {", "  pm.response.to.have.status(201);", "  const body = pm.response.json();", "  pm.expect(body.success).to.eql(true);", "  if (body.data?._id) pm.collectionVariables.set('sessionId', body.data._id);", "});"] } }]
+        },
+        {
+          "name": "Analytics overview",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/api/analytics/overview" },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('analytics overview is returned', function () {", "  pm.response.to.have.status(200);", "  pm.expect(pm.response.json().success).to.eql(true);", "});"] } }]
+        },
+        {
+          "name": "Session history",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/api/sessions" },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('session history is returned', function () {", "  pm.response.to.have.status(200);", "  pm.expect(pm.response.json().success).to.eql(true);", "});"] } }]
+        }
+      ]
+    }
+  ]
+}
