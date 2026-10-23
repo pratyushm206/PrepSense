@@ -242,33 +242,6 @@ export default function Profile() {
         </div>
       </form>
 
-      <section className="panel profile-projects">
-        <div className="section-heading">
-          <h2>Other Projects by Pratyush Mishra</h2>
-          <span>Portfolio</span>
-        </div>
-        <div className="project-link-grid">
-          <a
-            className="project-link-card"
-            href="https://nutri-track-sage.vercel.app/"
-            target="_blank"
-            rel="noreferrer"
-          >
-            <strong>NutriTrack</strong>
-            <span>Nutrition and fitness tracker</span>
-          </a>
-          <a
-            className="project-link-card"
-            href="https://ai-resume-analyzer-pratyushm206.streamlit.app/"
-            target="_blank"
-            rel="noreferrer"
-          >
-            <strong>AI Resume Analyzer</strong>
-            <span>Resume feedback and analysis</span>
-          </a>
-        </div>
-      </section>
-
       <section className="panel danger-zone">
         <div>
           <h2>Deactivate account</h2>

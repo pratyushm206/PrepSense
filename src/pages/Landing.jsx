@@ -1,6 +1,7 @@
 import { Link, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import ThemeToggle from '../components/ThemeToggle.jsx';
+import { RESUME_ANALYZER_URL } from '../config/links.js';
 
 const GITHUB_REPO = 'https://github.com/pratyushm206/PrepSense';
 
@@ -272,14 +273,14 @@ export default function Landing() {
               <article>
                 <a
                   className="landing-project-link"
-                  href="https://ai-resume-analyzer-pratyushm206.streamlit.app/"
+                  href={RESUME_ANALYZER_URL}
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                 >
                   AI Resume Analyzer
                 </a>
                 <p className="landing-footer-meta">
-                  Upload a resume, get structured AI feedback — Python, Streamlit.
+                  Compare a PDF resume with a job description using a weighted score, ATS format check, and written feedback.
                 </p>
                 <a
                   className="landing-repo-link"
