@@ -4,6 +4,12 @@ const { getTopicScores, calculateSessionScore } = require('../services/scoringEn
 const { SESSION_MODES } = require('../config/constants');
 const { normalizeCompany } = require('../services/normalization');
 
+const failedSessionsFilter = userId => ({
+  userId,
+  answers: { $exists: true, $ne: [] },
+  $expr: { $allElementsTrue: { $map: { input: '$answers', as: 'answer', in: { $eq: ['$$answer.evaluationStatus', 'failed'] } } } }
+});
+
 const createSession = async (req, res, next) => {
   try {
     const { company, role, mode = 'subjective', config = {} } = req.body;
@@ -110,11 +116,7 @@ const deleteSession = async (req, res, next) => {
 
 const deleteFailedSessions = async (req, res, next) => {
   try {
-    const result = await Session.deleteMany({
-      userId: req.user.userId,
-      answers: { $exists: true, $ne: [] },
-      $expr: { $allElementsTrue: { $map: { input: '$answers', as: 'answer', in: { $eq: ['$$answer.evaluationStatus', 'failed'] } } } }
-    });
+    const result = await Session.deleteMany(failedSessionsFilter(req.user.userId));
     res.status(200).json({ success: true, data: { deletedCount: result.deletedCount || 0 } });
   } catch (error) {
     next(error);
@@ -214,4 +216,4 @@ const getPublicReport = async (req, res, next) => {
   }
 };
 
-module.exports = { createSession, getSessions, getSessionById, deleteEmptySession, deleteSession, deleteFailedSessions, shareSession, revokeShare, getPublicReport };
+module.exports = { createSession, getSessions, getSessionById, deleteEmptySession, deleteSession, deleteFailedSessions, failedSessionsFilter, shareSession, revokeShare, getPublicReport };
