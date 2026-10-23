@@ -1,5 +1,7 @@
 /* Read-only production audit + isolated integration checks. All writes are gated to *_test databases. */
 require('dotenv').config();
+const dns = require('dns');
+if (process.env.DNS_OVERRIDE === '1') dns.setServers(['8.8.8.8', '8.8.4.4']);
 const { spawn, spawnSync } = require('node:child_process');
 const fs = require('node:fs');
 const path = require('node:path');
@@ -52,7 +54,7 @@ function testDatabaseUri(uri) {
   if (!name.endsWith('_test') || name !== 'prepsense_test') throw new Error('Refusing test writes: database must be prepsense_test and end with _test');
   return parsed.toString();
 }
-async function connect(uri) { await mongoose.connect(uri); }
+async function connect(uri) { await mongoose.connect(uri, { serverSelectionTimeoutMS: 10000, connectTimeoutMS: 10000 }); }
 async function disconnect() { if (mongoose.connection.readyState) await mongoose.disconnect(); }
 async function seed() {
   const actual = safeDatabase(testUri);
@@ -394,6 +396,9 @@ async function runIntegration() {
 
 async function main() {
   try {
+    if (!process.env.MONGO_URI) throw new Error('Pre-flight Mongo connection failed: MONGO_URI is missing (Error)');
+    try { await connect(process.env.MONGO_URI); await disconnect(); }
+    catch (error) { await disconnect().catch(() => {}); throw new Error(`Pre-flight Mongo connection failed (${error.name})`); }
     await runV1();
     await runStaticChecks();
     await runIntegration();
