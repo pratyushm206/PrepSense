@@ -112,7 +112,8 @@ const deleteFailedSessions = async (req, res, next) => {
   try {
     const result = await Session.deleteMany({
       userId: req.user.userId,
-      answers: { $elemMatch: { isLatest: { $ne: false }, evaluationStatus: 'failed' } }
+      answers: { $exists: true, $ne: [] },
+      $expr: { $allElementsTrue: { $map: { input: '$answers', as: 'answer', in: { $eq: ['$$answer.evaluationStatus', 'failed'] } } } }
     });
     res.status(200).json({ success: true, data: { deletedCount: result.deletedCount || 0 } });
   } catch (error) {
