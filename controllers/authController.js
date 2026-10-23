@@ -4,6 +4,10 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator');
 
+function validateTargetCompanies(value) {
+  return Array.isArray(value) && value.length <= 10 && value.every(company => typeof company === 'string' && company.trim().length <= 60);
+}
+
 const registerUser = async (req, res, next) => {
     try{
         const errors = validationResult(req);
@@ -13,6 +17,7 @@ const registerUser = async (req, res, next) => {
         }
 
         const {name, password, targetCompanies = []} = req.body;
+        if (!validateTargetCompanies(targetCompanies)) return res.status(400).json({ success: false, message: 'targetCompanies must be an array of up to 10 strings, each at most 60 characters' });
         const email = String(req.body.email || '').trim().toLowerCase();
         // prevents duplicate accounts and matches the Guide's consistent response shape (success/message).
         const existingUser = await User.findOne({ email }).collation({ locale: 'en', strength: 2 });
@@ -261,4 +266,4 @@ const deleteMe = async (req, res, next) => {
   }
 };
 
-module.exports = { registerUser, loginUser, getMe, updateMe, exportMyData, updatePassword, deactivateMe, deleteMe };
+module.exports = { registerUser, loginUser, getMe, updateMe, exportMyData, updatePassword, deactivateMe, deleteMe, validateTargetCompanies };

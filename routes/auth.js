@@ -12,15 +12,17 @@ const {
   deleteMe
 } = require('../controllers/authController');
 const protect = require('../middleware/auth');
-const { authLimiter } = require('../middleware/rateLimiter');
+const { authLimiter, registrationLimiter } = require('../middleware/rateLimiter');
+const { validateTargetCompanies } = require('../controllers/authController');
 const { body } = require('express-validator');
 
 router.post(
   '/register',
-  authLimiter,
+  registrationLimiter,
   [
     body('email').trim().customSanitizer(value => String(value || '').toLowerCase()).isEmail().withMessage('Please provide a valid email'),
-    body('password').isLength({ min: 8 }).withMessage('Password must be at least 8 characters')
+    body('password').isLength({ min: 8 }).withMessage('Password must be at least 8 characters'),
+    body('targetCompanies').optional().custom(validateTargetCompanies).withMessage('targetCompanies must be an array of up to 10 strings, each at most 60 characters')
   ],
   registerUser
 );

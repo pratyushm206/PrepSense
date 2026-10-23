@@ -76,4 +76,12 @@ const authLimiter = rateLimit({
   legacyHeaders: false
 });
 
-module.exports = { generationLimiter, evaluationLimiter, retryLimiter, authLimiter };
+const registrationLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 20,
+  handler: (req, res) => res.status(429).json({ success: false, message: 'Too many registration attempts. Please try again in an hour.' }),
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
+module.exports = { generationLimiter, evaluationLimiter, retryLimiter, authLimiter, registrationLimiter };
