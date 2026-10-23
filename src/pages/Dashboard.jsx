@@ -71,14 +71,14 @@ export default function Dashboard() {
             </div>
             <div className="topic-table">
               {overview.topicBreakdown.map(topic => (
-                <div className="topic-row interactive-row" key={topic.topic}>
+                <Link className="topic-row interactive-row" key={topic.topic} to={`/history?topic=${encodeURIComponent(topic.topic)}`}>
                   <div>
                     <strong>{topic.topic}</strong>
                     <span>{topic.totalAttempted} attempted</span>
                   </div>
                   <span className={`trend ${topic.trend}`}>{topic.trend}</span>
                   <strong>{topic.avgScore}</strong>
-                </div>
+                </Link>
               ))}
             </div>
           </section>

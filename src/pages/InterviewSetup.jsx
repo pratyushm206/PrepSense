@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { apiRequest } from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
 
@@ -13,10 +13,11 @@ const CATEGORIES = [
 export default function InterviewSetup() {
   const { token } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [values, setValues] = useState({
-    company: '',
+    company: searchParams.get('company') || '',
     role: '',
-    category: '',
+    category: searchParams.get('category') || '',
     difficulty: 'medium',
     count: 5,
     mode: 'subjective',

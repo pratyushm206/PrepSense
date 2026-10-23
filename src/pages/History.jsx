@@ -153,12 +153,12 @@ export default function History() {
         <div className="session-list">
           {filteredSessions.map(session => (
           <div className="session session-row" key={session._id}>
+          <Link className="s-company history-company-link" to={`/history?company=${encodeURIComponent(session.company)}`}>{session.company}</Link>
           <Link className="session-main-link" to={`/history/${session._id}`}>
             <div className={`score-badge ${getScoreClass(session.overallScore)}`}>
               {getSessionScoreLabel(session)}
             </div>
             <div className="s-main">
-              <div className="s-company">{session.company}</div>
               <div className="s-role">{getSessionMeta(session)}</div>
             </div>
             <div className="s-tags">

@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { apiRequest } from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -97,6 +98,9 @@ export default function Recommendations() {
                   <span className={`status-label priority-${recommendation.priority}`}>
                     {recommendation.priority}
                   </span>
+                  <Link className="button primary" to={`/interview/new?company=${encodeURIComponent(data?.targetCompany || '')}&category=${categoryForTopic(recommendation.topic)}`}>
+                    Practice this
+                  </Link>
                 </div>
               </div>
             ))}
@@ -110,6 +114,15 @@ export default function Recommendations() {
       </section>
     </section>
   );
+}
+
+function categoryForTopic(topic) {
+  const normalized = String(topic || '').trim().toLowerCase();
+  if (['arrays', 'strings', 'trees', 'graphs', 'dynamic programming'].includes(normalized)) return 'dsa';
+  if (normalized === 'system design') return 'system_design';
+  if (['os', 'dbms', 'networks'].includes(normalized)) return 'core';
+  if (normalized === 'behavioral') return 'behavioral';
+  return 'core';
 }
 
 function TopicPanel({ title, topics, tone }) {

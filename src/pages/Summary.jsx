@@ -104,7 +104,7 @@ export default function Summary() {
           return (
             <article className="panel qa-card" key={question.id}>
               <div className="question-meta">
-                <span className="tag">{question.topic}</span>
+                <Link className="tag" to={`/history?topic=${encodeURIComponent(question.topic || '')}`}>{question.topic}</Link>
                 <span className="tag">{question.difficulty}</span>
                 {answer && <strong>{formatScore(answer.score)}/100</strong>}
               </div>
