@@ -10,6 +10,7 @@
     "dev:server": "nodemon server.js",
     "build": "vite build",
     "test": "node --test",
+    "lint": "eslint .",
     "preview": "vite preview",
     "verify": "node scripts/verify.js"
   },
@@ -38,6 +39,8 @@
   "devDependencies": {
     "@vitejs/plugin-react": "^5.0.0",
     "concurrently": "^10.0.4",
+    "eslint": "^10.13.0",
+    "globals": "^17.13.0",
     "nodemon": "^3.1.14",
     "vite": "^7.0.6"
   }
