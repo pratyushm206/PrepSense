@@ -20,7 +20,7 @@ Analytics use the latest successful evaluation per question. I normalize scores 
 
 ## 5. What security decisions did you make?
 
-Passwords are hashed, protected routes use JWTs, inputs have explicit limits and validation, and generation, evaluation, and authentication have separate rate limits. Public reports expose a sanitized result and can be revoked. Shared report tokens use a partial unique index, so sessions without a public token do not compete for a null unique value. Production deployment still needs a dedicated least privilege Atlas user and a narrow network allowlist.
+Passwords are hashed, protected routes use JWTs, inputs have explicit limits and validation, and generation, evaluation, login, and registration have separate rate limits. Registration is limited to 20 attempts per IP per hour; the shared login limiter allows 30 attempts per IP per 15 minutes and skips successful requests. Public reports expose a sanitized result and can be revoked. Shared report tokens use a partial unique index, so sessions without a public token do not compete for a null unique value. Production deployment still needs a dedicated least privilege Atlas user and a narrow network allowlist.
 
 ## 6. What was a tricky database issue?
 
@@ -36,7 +36,7 @@ I added unit coverage for MCQ scoring, difficulty normalization, session scoring
 
 ## 9. What would you improve next?
 
-I would add end to end tests around the full student journey, make the dashboard bundle smaller with route based code splitting, and instrument model latency, retry rates, and evaluation failures. I would also compare generated sets for quality across categories and difficulty levels before making any claims about company specific accuracy.
+I would expand end to end tests around the full student journey and instrument model latency, retry rates, and evaluation failures. The admin, public report, and resume pages are already route-split with React.lazy. I would also compare generated sets for quality across categories and difficulty levels before making any claims about company specific accuracy.
 
 ## 10. What result did the project achieve?
 
