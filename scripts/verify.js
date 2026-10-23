@@ -15,6 +15,7 @@ const root = path.resolve(__dirname, '..');
 const rows = [];
 const base = 'http://127.0.0.1:5055';
 const password = 'TestOnly!Pass123';
+const TEST_JWT_SECRET = 'test-only-jwt-secret-that-is-longer-than-32-characters';
 let server;
 let serverText = '';
 let dbName = '';
@@ -108,7 +109,7 @@ async function login(email, pass = password, headers = {}) {
 async function startServer(overrides = {}) {
   const env = {
     ...process.env, NODE_ENV: 'production', PORT: '5055', MONGO_URI: testUri,
-    JWT_SECRET: 'test-only-jwt-secret-that-is-longer-than-32-characters',
+    JWT_SECRET: TEST_JWT_SECRET,
     GEMINI_API_KEY: 'dummy-test-key', CLIENT_URL: 'http://127.0.0.1:5055', ...overrides
   };
   serverText = '';
@@ -214,7 +215,7 @@ async function runStaticChecks() {
   sourceAudit('E2s', 'trust proxy config', 'server.js', /app.set\('trust proxy', 1\)/, true);
   row('B2', 'Bulk failed-session deletion includes mixed sessions', 'FAIL', `${lineOf('controllers/sessionController.js', /evaluationStatus: 'failed'/)}; query deletes any session with a latest failed answer; API run blocked`);
   row('F5', 'Logged-out /dashboard redirect target', 'FAIL', `${lineOf('src/components/ProtectedRoute.jsx', /<Navigate to="\/" replace/)}; code redirects to /, not the requested /login; browser run blocked`);
-  row('E3', 'Production JWT/client URL boot validation', 'FAIL', `${lineOf('server.js', /if \(!process.env\[key\]\)/)}; presence only, no secret length check and CLIENT_URL is not required; boot matrix blocked`);
+  row('E3 static', 'Production boot environment validator', 'PASS', `${lineOf('config/validateEnv.js', /JWT_SECRET must be at least 32 characters/)}; requires MONGO_URI, CLIENT_URL, GEMINI_API_KEY, and JWT_SECRET`);
 }
 
 async function runIntegration() {
@@ -322,11 +323,12 @@ async function runIntegration() {
   const cAgainLogin = await login(cAgain.email);
   const withTwoAdmins = await api('/api/auth/me/delete', json({ password, confirm: 'DELETE' }, cAgainLogin.body.token));
   const inactive = await User.create({ name: 'Inactive Admin', email: 'inactive-admin@verification.invalid', password: await bcrypt.hash(password, 10), isAdmin: true, isActive: false });
-  const inactiveToken = jwt.sign({ userId: String(inactive._id) }, process.env.JWT_SECRET, { expiresIn: '7d' });
+  const activeTokenCheck = await api('/api/auth/me', { headers: { authorization: `Bearer ${tokenA}` } });
+  const inactiveToken = jwt.sign({ userId: String(inactive._id) }, TEST_JWT_SECRET, { expiresIn: '7d' });
   const inactiveAdmin = await api('/api/admin/stats', { headers: { authorization: `Bearer ${inactiveToken}` } });
   userD = await User.findById(admin2._id);
   const dLogin = await login(userD.email); tokenD = dLogin.body.token; userC = cAgain;
-  ok('D5', 'Last-admin guard and inactive-admin auth behavior', lastAdminDelete.response.status === 409 && withTwoAdmins.response.status === 200 && inactiveAdmin.response.status === 401, `only admin=${lastAdminDelete.response.status}; two admins delete=${withTwoAdmins.response.status}; inactive admin token=${inactiveAdmin.response.status}`);
+  ok('D5', 'Last-admin guard and inactive-admin auth behavior', lastAdminDelete.response.status === 409 && withTwoAdmins.response.status === 200 && activeTokenCheck.response.status === 200 && inactiveAdmin.response.status === 401, `only admin=${lastAdminDelete.response.status}; two admins delete=${withTwoAdmins.response.status}; active token=${activeTokenCheck.response.status}; inactive admin token=${inactiveAdmin.response.status}`);
 
   const normalAdmin = await api('/api/admin/stats', { headers: { authorization: `Bearer ${tokenA}` } });
   const noAdminToken = await api('/api/admin/stats');
@@ -357,13 +359,27 @@ async function runIntegration() {
 
   const bootChecks = [];
   await stopServer();
-  let missingJwt = await startServer({ JWT_SECRET: '' });
-  bootChecks.push(`missing JWT starts=${missingJwt}`); await stopServer();
-  let shortJwt = await startServer({ JWT_SECRET: 'short' });
-  bootChecks.push(`short JWT starts=${shortJwt}`); await stopServer();
-  let noClient = await startServer({ CLIENT_URL: '' });
-  bootChecks.push(`missing CLIENT_URL starts=${noClient}`); await stopServer();
-  row('E3', 'Production boot env checks', !missingJwt && shortJwt && noClient ? 'PASS' : 'FAIL', `${bootChecks.join('; ')}; ${lineOf('server.js', /for \(const key of \['MONGO_URI'/)}; CLIENT_URL is conditional CORS`);
+  const probeBoot = async (label, overrides = {}) => {
+    const env = { ...process.env, NODE_ENV: 'production', PORT: '5055', MONGO_URI: testUri, JWT_SECRET: TEST_JWT_SECRET, GEMINI_API_KEY: 'dummy-test-key', CLIENT_URL: 'http://127.0.0.1:5055', ...overrides };
+    const child = spawn(process.execPath, ['server.js'], { cwd: root, env, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] });
+    let output = '';
+    child.stdout.on('data', chunk => { output += chunk.toString(); });
+    child.stderr.on('data', chunk => { output += chunk.toString(); });
+    const exited = await Promise.race([new Promise(resolve => child.once('exit', (code, signal) => resolve({ exited: true, code, signal }))), new Promise(resolve => setTimeout(() => resolve({ exited: false }), 10000))]);
+    if (!exited.exited) { child.kill(); await new Promise(resolve => child.once('exit', resolve)); }
+    const secrets = [env.MONGO_URI, env.JWT_SECRET, env.GEMINI_API_KEY, env.CLIENT_URL].filter(Boolean);
+    const noSecrets = secrets.every(secret => !output.includes(secret));
+    return { refused: exited.exited && exited.code !== 0 && noSecrets, detail: `${label}: exited=${exited.exited}, code=${exited.code ?? 'timeout'}, noSecrets=${noSecrets}` };
+  };
+  const baseline = await startServer();
+  await stopServer();
+  for (const [label, overrides] of [
+    ['JWT_SECRET missing', { JWT_SECRET: undefined }], ['JWT_SECRET short', { JWT_SECRET: 'short' }],
+    ['CLIENT_URL missing', { CLIENT_URL: undefined }], ['GEMINI_API_KEY missing', { GEMINI_API_KEY: undefined }],
+    ['MONGO_URI missing', { MONGO_URI: undefined }]
+  ]) bootChecks.push(await probeBoot(label, overrides));
+  const allRefused = bootChecks.every(result => result.refused);
+  row('E3', 'Production boot env checks', baseline && allRefused ? 'PASS' : 'FAIL', `baseline valid config starts=${baseline}; ${bootChecks.map(result => result.detail).join('; ')}; ${lineOf('config/validateEnv.js', /JWT_SECRET must be at least 32 characters/)}`);
 
   await stopServer();
   await seed();
