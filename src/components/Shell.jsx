@@ -24,6 +24,7 @@ export default function Shell() {
           <NavLink to="/history">History</NavLink>
           <NavLink to="/leaderboard">Leaderboard</NavLink>
           <NavLink to="/recommendations">Recommendations</NavLink>
+          <NavLink to="/resume-analyzer">Resume</NavLink>
           {user?.isAdmin && <NavLink to="/admin">Admin</NavLink>}
         </nav>
         <div className="user-actions">

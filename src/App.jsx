@@ -13,6 +13,7 @@ import Login from './pages/Login.jsx';
 import Profile from './pages/Profile.jsx';
 import PublicReport from './pages/PublicReport.jsx';
 import Recommendations from './pages/Recommendations.jsx';
+import ResumeAnalyzer from './pages/ResumeAnalyzer.jsx';
 import Register from './pages/Register.jsx';
 import Summary from './pages/Summary.jsx';
 
@@ -34,6 +35,7 @@ export default function App() {
           <Route path="/history/:sessionId" element={<HistoryDetail />} />
           <Route path="/leaderboard" element={<Leaderboard />} />
           <Route path="/recommendations" element={<Recommendations />} />
+          <Route path="/resume-analyzer" element={<ResumeAnalyzer />} />
           <Route path="/profile" element={<Profile />} />
         </Route>
       </Route>

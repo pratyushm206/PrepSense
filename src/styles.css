@@ -600,6 +600,84 @@ h2 {
   text-transform: uppercase;
 }
 
+.resume-analyzer-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 220px;
+  gap: 2rem;
+  align-items: center;
+  padding: clamp(1.4rem, 4vw, 3rem);
+  background: linear-gradient(115deg, color-mix(in srgb, var(--cat-behavioral) 9%, var(--bg-card)), var(--bg-card) 62%);
+}
+
+.resume-analyzer-hero h1 {
+  max-width: 18ch;
+  margin-bottom: 0.8rem;
+  font-size: clamp(2rem, 4vw, 3.35rem);
+}
+
+.resume-analyzer-hero .lead {
+  max-width: 62ch;
+}
+
+.resume-info-card {
+  display: grid;
+  align-content: start;
+  gap: 0.7rem;
+}
+
+.resume-info-card h2 {
+  font-size: 1.25rem;
+}
+
+.resume-info-card p,
+.resume-info-card ol,
+.resume-info-card ul {
+  margin-bottom: 0;
+  color: var(--text-dim);
+  line-height: 1.65;
+}
+
+.resume-info-card ol,
+.resume-info-card ul {
+  padding-left: 1.3rem;
+}
+
+.resume-info-card li + li {
+  margin-top: 0.35rem;
+}
+
+.resume-signal-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.resume-signal {
+  display: grid;
+  gap: 0.4rem;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface2);
+}
+
+.resume-signal strong {
+  color: var(--text);
+}
+
+.resume-signal span,
+.resume-note {
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.resume-info-card .resume-note {
+  padding: 0.75rem 0.9rem;
+  border-left: 3px solid var(--cat-behavioral);
+  background: color-mix(in srgb, var(--cat-behavioral) 7%, var(--bg-card));
+}
+
 .gauge-panel::before {
   content: '';
   position: absolute;
@@ -2163,6 +2241,7 @@ a.topic-row {
   }
 
   .gauge-panel,
+  .resume-analyzer-hero,
   .practice-layout,
   .grid.two,
   .grid.three,
@@ -2172,6 +2251,14 @@ a.topic-row {
 
   .gauge-panel {
     text-align: center;
+  }
+
+  .resume-analyzer-hero {
+    grid-template-columns: minmax(0, 1fr) 150px;
+  }
+
+  .resume-signal-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .gauge-side {
@@ -2219,6 +2306,18 @@ a.topic-row {
 }
 
 @media (max-width: 760px) {
+  .resume-analyzer-hero {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .resume-analyzer-hero .resume-gauge-motif {
+    justify-self: end;
+  }
+
+  .resume-signal-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .resume-feature {
     grid-template-columns: minmax(0, 1fr);
     gap: 0.75rem;
