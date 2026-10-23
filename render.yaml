@@ -15,3 +15,5 @@ services:
         generateValue: true
       - key: GEMINI_API_KEY
         sync: false
+      - key: CLIENT_URL
+        value: https://your-service-name.onrender.com
