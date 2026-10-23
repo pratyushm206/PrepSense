@@ -277,16 +277,11 @@ function DsaDetails({ question }) {
 }
 
 function FeedbackList({ title, items = [] }) {
+  if (items.length === 0) return null;
   return (
     <div className="feedback-list">
       <h3>{title}</h3>
-      {items.length === 0 ? (
-        <p className="muted">No notes returned.</p>
-      ) : (
-        <ul>
-          {items.map((item, index) => <li key={`${title}-${index}`}>{item}</li>)}
-        </ul>
-      )}
+      <ul>{items.map((item, index) => <li key={`${title}-${index}`}>{item}</li>)}</ul>
     </div>
   );
 }
