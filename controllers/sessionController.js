@@ -42,6 +42,13 @@ const createSession = async (req, res, next) => {
 
 const getSessions = async (req, res, next) => {
   try {
+    const { topic = '', company = '', status = '' } = req.query;
+    const normalizedTopic = String(topic).trim().toLowerCase();
+    const normalizedCompany = String(company).trim().toLowerCase();
+    if (status && !['all', 'completed', 'needs-attention', 'failed'].includes(status)) {
+      return res.status(400).json({ success: false, message: 'status must be all, completed, or needs-attention' });
+    }
+
     const sessions = await Session.find({ userId: req.user.userId, 'questions.0': { $exists: true } })
       .sort({ completedAt: -1, createdAt: -1 })
       .select('company role overallScore completedAt createdAt mode questions.id questions.topic questions.difficulty answers.questionId answers.evaluationStatus answers.isLatest')
@@ -50,6 +57,14 @@ const getSessions = async (req, res, next) => {
       const latestAnswers = new Map();
       (session.answers || []).filter(answer => answer.isLatest !== false)
         .forEach(answer => latestAnswers.set(answer.questionId, answer));
+      const questions = (session.questions || []).map(question => ({
+        id: question.id,
+        topic: question.topic,
+        difficulty: question.difficulty
+      }));
+      const matchingQuestions = normalizedTopic
+        ? questions.filter(question => String(question.topic || '').trim().toLowerCase() === normalizedTopic)
+        : questions;
       return {
         _id: session._id,
         company: session.company,
@@ -61,10 +76,44 @@ const getSessions = async (req, res, next) => {
         failedEvaluation: [...latestAnswers.values()].some(answer => answer.evaluationStatus === 'failed'),
         completed: session.questions?.length > 0 && [...latestAnswers.values()].filter(answer => answer.evaluationStatus === 'success').length >= session.questions.length,
         difficulty: session.questions?.[0]?.difficulty || 'medium',
-        topics: [...new Set((session.questions || []).map(question => question.topic).filter(Boolean))]
+        topics: [...new Set(questions.map(question => question.topic).filter(Boolean))],
+        matchingQuestions
       };
+    }).filter(session => {
+      if (normalizedCompany && session.company.trim().toLowerCase() !== normalizedCompany) return false;
+      if (normalizedTopic && session.matchingQuestions.length === 0) return false;
+      if (status === 'completed' && !session.completed) return false;
+      if (['needs-attention', 'failed'].includes(status) && !session.failedEvaluation) return false;
+      return true;
     });
     res.status(200).json({ success: true, data: summaries });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const deleteSession = async (req, res, next) => {
+  try {
+    if (!/^[a-f\d]{24}$/i.test(req.params.id)) {
+      return res.status(400).json({ success: false, message: 'Invalid session id' });
+    }
+    const result = await Session.deleteOne({ _id: req.params.id, userId: req.user.userId });
+    if (!result.deletedCount) {
+      return res.status(404).json({ success: false, message: 'Session not found' });
+    }
+    res.status(200).json({ success: true, data: { deleted: true } });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const deleteFailedSessions = async (req, res, next) => {
+  try {
+    const result = await Session.deleteMany({
+      userId: req.user.userId,
+      answers: { $elemMatch: { isLatest: { $ne: false }, evaluationStatus: 'failed' } }
+    });
+    res.status(200).json({ success: true, data: { deletedCount: result.deletedCount || 0 } });
   } catch (error) {
     next(error);
   }
@@ -163,4 +212,4 @@ const getPublicReport = async (req, res, next) => {
   }
 };
 
-module.exports = { createSession, getSessions, getSessionById, deleteEmptySession, shareSession, revokeShare, getPublicReport };
+module.exports = { createSession, getSessions, getSessionById, deleteEmptySession, deleteSession, deleteFailedSessions, shareSession, revokeShare, getPublicReport };
