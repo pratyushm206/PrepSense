@@ -7,6 +7,7 @@ export function AuthProvider({ children }) {
   const [token, setToken] = useState(() => getStoredToken());
   const [user, setUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
+  const [logoutInProgress, setLogoutInProgress] = useState(false);
 
   useEffect(() => {
     function handleUnauthorized() {
@@ -48,6 +49,7 @@ export function AuthProvider({ children }) {
   }, [token]);
 
   async function login(credentials) {
+    setLogoutInProgress(false);
     const data = await apiRequest('/api/auth/login', {
       method: 'POST',
       body: credentials
@@ -60,6 +62,7 @@ export function AuthProvider({ children }) {
   }
 
   async function register(details) {
+    setLogoutInProgress(false);
     const data = await apiRequest('/api/auth/register', {
       method: 'POST',
       body: details
@@ -81,6 +84,7 @@ export function AuthProvider({ children }) {
   }
 
   function logout() {
+    setLogoutInProgress(true);
     clearStoredToken();
     setToken(null);
     setUser(null);
@@ -90,12 +94,13 @@ export function AuthProvider({ children }) {
     token,
     user,
     authLoading,
+    logoutInProgress,
     isAuthenticated: Boolean(token && user),
     login,
     register,
     updateProfile,
     logout
-  }), [token, user, authLoading]);
+  }), [token, user, authLoading, logoutInProgress]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

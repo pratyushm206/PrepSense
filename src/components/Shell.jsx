@@ -8,7 +8,7 @@ export default function Shell() {
 
   function handleLogout() {
     logout();
-    navigate('/login');
+    navigate('/', { replace: true });
   }
 
   return (

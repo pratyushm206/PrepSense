@@ -2,10 +2,10 @@ import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 
 export default function ProtectedRoute() {
-  const { authLoading, isAuthenticated } = useAuth();
+  const { authLoading, isAuthenticated, logoutInProgress } = useAuth();
   const location = useLocation();
 
-  if (authLoading) {
+  if (authLoading || logoutInProgress) {
     return (
       <main className="center-screen">
         <div className="loader" />
@@ -15,7 +15,7 @@ export default function ProtectedRoute() {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace state={{ from: location }} />;
+    return <Navigate to="/" replace state={{ from: location }} />;
   }
 
   return <Outlet />;
