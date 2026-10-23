@@ -5,7 +5,8 @@ const {
   getTopicScores,
   calculateReadiness,
   getTopicTrends,
-  hasLatestSuccessfulAnswer
+  hasLatestSuccessfulAnswer,
+  calculateSessionScore
 } = require('../services/scoringEngine');
 
 const getOverview = async (req, res, next) => {
