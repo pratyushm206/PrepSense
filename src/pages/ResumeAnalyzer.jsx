@@ -39,7 +39,7 @@ export default function ResumeAnalyzer() {
           <h2>Get a clearer view before you apply.</h2>
           <p>Recruiters and ATS filters can screen resumes before a person sees them. Use an explainable score and feedback connected to the specific job description.</p>
           <p>The numeric score is a deterministic weighted calculation from these five signals. Gemini writes the explanatory prose; it does not set the score.</p>
-          <p>Your resume text is sent to Google’s Gemini API to write the explanation of the score.</p>
+          <p>The analyzer is a separate app. When you analyze a resume, it sends the text to Google's Gemini API to write the explanation of your score. PrepSense does not receive or store your resume.</p>
         </article>
         <article className="panel resume-info-card">
           <p className="eyebrow">How it works</p>
