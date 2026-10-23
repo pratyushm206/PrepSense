@@ -1384,6 +1384,31 @@ h2 {
   gap: 0.85rem;
 }
 
+.history-query-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+}
+
+.history-query-filters .field {
+  min-width: min(210px, 100%);
+}
+
+.matching-questions {
+  grid-column: 1 / -1;
+  padding: 0.85rem 1.25rem 1rem;
+  border-top: 1px solid var(--border);
+  color: var(--text-dim);
+}
+
+.matching-questions strong {
+  color: var(--text);
+}
+
+.matching-questions p {
+  margin: 0.5rem 0 0;
+}
+
 .session {
   display: grid;
   grid-template-columns: auto 1fr auto auto auto;

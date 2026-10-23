@@ -51,7 +51,7 @@ const getSessions = async (req, res, next) => {
 
     const sessions = await Session.find({ userId: req.user.userId, 'questions.0': { $exists: true } })
       .sort({ completedAt: -1, createdAt: -1 })
-      .select('company role overallScore completedAt createdAt mode questions.id questions.topic questions.difficulty answers.questionId answers.evaluationStatus answers.isLatest')
+      .select('company role overallScore completedAt createdAt mode questions.id questions.question questions.topic questions.difficulty answers.questionId answers.evaluationStatus answers.isLatest')
       .lean();
     const summaries = sessions.map(session => {
       const latestAnswers = new Map();
@@ -59,6 +59,7 @@ const getSessions = async (req, res, next) => {
         .forEach(answer => latestAnswers.set(answer.questionId, answer));
       const questions = (session.questions || []).map(question => ({
         id: question.id,
+        question: question.question,
         topic: question.topic,
         difficulty: question.difficulty
       }));
