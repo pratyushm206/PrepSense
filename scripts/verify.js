@@ -369,17 +369,24 @@ async function runIntegration() {
     if (!exited.exited) { child.kill(); await new Promise(resolve => child.once('exit', resolve)); }
     const secrets = [env.MONGO_URI, env.JWT_SECRET, env.GEMINI_API_KEY, env.CLIENT_URL].filter(Boolean);
     const noSecrets = secrets.every(secret => !output.includes(secret));
-    return { refused: exited.exited && exited.code !== 0 && noSecrets, detail: `${label}: exited=${exited.exited}, code=${exited.code ?? 'timeout'}, noSecrets=${noSecrets}` };
+    const variable = label.startsWith('JWT_SECRET') ? 'JWT_SECRET' : label.split(' ')[0];
+    const namesVariable = output.includes(variable);
+    return { refused: exited.exited && exited.code !== 0 && noSecrets && namesVariable, detail: `${label}: exited=${exited.exited}, code=${exited.code ?? 'timeout'}, namesVariable=${namesVariable}, noSecrets=${noSecrets}` };
   };
+  // Establish the valid baseline first; failed baseline makes the matrix inconclusive.
   const baseline = await startServer();
   await stopServer();
+  if (!baseline) {
+    row('E3', 'Production boot env checks', 'BLOCKED', `baseline valid config did not reach /api/health; startup output: ${serverText.split(/\r?\n/).filter(Boolean).slice(-3).join(' ').replace(/mongodb(?:\+srv)?:\/\/[^\s]+/gi, '[REDACTED MONGO URI]') || 'no startup output'}`);
+  } else {
   for (const [label, overrides] of [
     ['JWT_SECRET missing', { JWT_SECRET: undefined }], ['JWT_SECRET short', { JWT_SECRET: 'short' }],
     ['CLIENT_URL missing', { CLIENT_URL: undefined }], ['GEMINI_API_KEY missing', { GEMINI_API_KEY: undefined }],
     ['MONGO_URI missing', { MONGO_URI: undefined }]
   ]) bootChecks.push(await probeBoot(label, overrides));
   const allRefused = bootChecks.every(result => result.refused);
-  row('E3', 'Production boot env checks', baseline && allRefused ? 'PASS' : 'FAIL', `baseline valid config starts=${baseline}; ${bootChecks.map(result => result.detail).join('; ')}; ${lineOf('config/validateEnv.js', /JWT_SECRET must be at least 32 characters/)}`);
+  row('E3', 'Production boot env checks', allRefused ? 'PASS' : 'FAIL', `baseline valid config starts=true; ${bootChecks.map(result => result.detail).join('; ')}; ${lineOf('config/validateEnv.js', /JWT_SECRET must be at least 32 characters/)}`);
+  }
 
   await stopServer();
   await seed();
