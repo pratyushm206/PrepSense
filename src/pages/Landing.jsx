@@ -254,7 +254,7 @@ export default function Landing() {
                   className="landing-project-link"
                   href="https://nutri-track-sage.vercel.app/"
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                 >
                   NutriTrack
                 </a>
@@ -265,7 +265,7 @@ export default function Landing() {
                   className="landing-repo-link"
                   href="https://github.com/pratyushm206/NutriTrack"
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                 >
                   GitHub repo
                 </a>
@@ -286,7 +286,7 @@ export default function Landing() {
                   className="landing-repo-link"
                   href="https://github.com/pratyushm206/AI-Resume-Analyzer"
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                 >
                   GitHub repo
                 </a>
@@ -303,25 +303,25 @@ export default function Landing() {
                 </a>
               </li>
               <li>
-                <a href="https://github.com/pratyushm206" target="_blank" rel="noreferrer">
+                <a href="https://github.com/pratyushm206" target="_blank" rel="noopener noreferrer">
                   <IconGithub />
                   github.com/pratyushm206
                 </a>
               </li>
               <li>
-                <a href="https://www.linkedin.com/in/pratyushm206" target="_blank" rel="noreferrer">
+                <a href="https://www.linkedin.com/in/pratyushm206" target="_blank" rel="noopener noreferrer">
                   <IconLinkedIn />
                   LinkedIn
                 </a>
               </li>
               <li>
-                <a href={GITHUB_REPO} target="_blank" rel="noreferrer">
+                <a href={GITHUB_REPO} target="_blank" rel="noopener noreferrer">
                   <IconCode />
                   View source
                 </a>
               </li>
               <li>
-                <a href="https://x.com/Pratyus35569136" target="_blank" rel="noreferrer">
+                <a href="https://x.com/Pratyus35569136" target="_blank" rel="noopener noreferrer">
                   <IconX />
                   x.com/Pratyus35569136
                 </a>

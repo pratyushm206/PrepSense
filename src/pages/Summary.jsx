@@ -90,7 +90,7 @@ export default function Summary() {
       {shareLink && (
         <div className="share-strip">
           <span>{shareMessage || 'Share link copied'}</span>
-          <a href={shareLink} target="_blank" rel="noreferrer">{shareLink}</a>
+          <a href={shareLink} target="_blank" rel="noopener noreferrer">{shareLink}</a>
           <button className="button ghost" type="button" onClick={handleRevokeShare} disabled={revoking}>
             {revoking ? 'Revoking...' : 'Revoke link'}
           </button>
