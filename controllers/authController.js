@@ -99,7 +99,7 @@ const getMe = async (req, res, next) => {
 
 const updateMe = async (req, res, next) => {
   try {
-    const { name, targetCompanies } = req.body;
+    const { name, targetCompanies, college, graduationYear, githubUrl, linkedinUrl } = req.body;
     const updates = {};
 
     if (typeof name === 'string' && name.trim()) {
@@ -119,6 +119,35 @@ const updateMe = async (req, res, next) => {
       updates.targetCompanies = targetCompanies.map(company => company.trim()).filter(Boolean);
     }
 
+    if (college !== undefined) {
+      if (typeof college !== 'string' || college.trim().length > 120) {
+        return res.status(400).json({ success: false, message: 'College must be 120 characters or fewer' });
+      }
+      updates.college = college.trim();
+    }
+    if (graduationYear !== undefined) {
+      const currentYear = new Date().getFullYear();
+      const year = Number(graduationYear);
+      if (graduationYear !== null && (!Number.isInteger(year) || year < currentYear - 10 || year > currentYear + 10)) {
+        return res.status(400).json({ success: false, message: `Graduation year must be between ${currentYear - 10} and ${currentYear + 10}` });
+      }
+      updates.graduationYear = graduationYear === null ? null : year;
+    }
+    for (const [field, value] of [['githubUrl', githubUrl], ['linkedinUrl', linkedinUrl]]) {
+      if (value === undefined) continue;
+      if (typeof value !== 'string' || value.length > 300) {
+        return res.status(400).json({ success: false, message: `${field} must be a URL of 300 characters or fewer` });
+      }
+      if (value.trim()) {
+        try {
+          if (new URL(value.trim()).protocol !== 'https:') throw new Error('https required');
+        } catch {
+          return res.status(400).json({ success: false, message: `${field} must be a valid HTTPS URL` });
+        }
+      }
+      updates[field] = value.trim();
+    }
+
     const user = await User.findByIdAndUpdate(req.user.userId, updates, {
       new: true,
       runValidators: true
@@ -129,6 +158,19 @@ const updateMe = async (req, res, next) => {
     }
 
     res.status(200).json({ success: true, data: user });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const exportMyData = async (req, res, next) => {
+  try {
+    const [user, sessions] = await Promise.all([
+      User.findById(req.user.userId).select('-password').lean(),
+      Session.find({ userId: req.user.userId }).lean()
+    ]);
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+    res.status(200).json({ success: true, data: { exportedAt: new Date().toISOString(), user, sessions } });
   } catch (error) {
     next(error);
   }
@@ -219,4 +261,4 @@ const deleteMe = async (req, res, next) => {
   }
 };
 
-module.exports = { registerUser, loginUser, getMe, updateMe, updatePassword, deactivateMe, deleteMe };
+module.exports = { registerUser, loginUser, getMe, updateMe, exportMyData, updatePassword, deactivateMe, deleteMe };

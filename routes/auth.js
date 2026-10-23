@@ -6,6 +6,7 @@ const {
   loginUser,
   getMe,
   updateMe,
+  exportMyData,
   updatePassword,
   deactivateMe,
   deleteMe
@@ -35,6 +36,7 @@ router.post(
 );
 
 router.get('/me', protect, getMe);
+router.get('/me/export', protect, exportMyData);
 router.put('/me', protect, updateMe);
 router.patch('/me', protect, updateMe);
 router.put('/me/password', protect, updatePassword);

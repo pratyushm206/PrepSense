@@ -9,6 +9,10 @@ export default function Profile() {
   const navigate = useNavigate();
   const [name, setName] = useState(user?.name || '');
   const [companies, setCompanies] = useState(user?.targetCompanies || []);
+  const [college, setCollege] = useState(user?.college || '');
+  const [graduationYear, setGraduationYear] = useState(user?.graduationYear || '');
+  const [githubUrl, setGithubUrl] = useState(user?.githubUrl || '');
+  const [linkedinUrl, setLinkedinUrl] = useState(user?.linkedinUrl || '');
   const [companyDraft, setCompanyDraft] = useState('');
   const [passwords, setPasswords] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
   const [overview, setOverview] = useState(null);
@@ -23,16 +27,9 @@ export default function Profile() {
   const [error, setError] = useState('');
   const [passwordMessage, setPasswordMessage] = useState('');
   const [saved, setSaved] = useState(false);
+  const [exporting, setExporting] = useState(false);
 
   const initial = (user?.name || user?.email || 'P').trim().charAt(0).toUpperCase();
-  const joined = user?.createdAt
-    ? new Date(user.createdAt).toLocaleDateString(undefined, {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      })
-    : '—';
-
   useEffect(() => {
     let cancelled = false;
 
@@ -64,12 +61,38 @@ export default function Profile() {
 
     try {
       setSaving(true);
-      await updateProfile({ name: nextName, targetCompanies: companies });
+      await updateProfile({
+        name: nextName,
+        targetCompanies: companies,
+        college,
+        graduationYear: graduationYear === '' ? null : Number(graduationYear),
+        githubUrl,
+        linkedinUrl
+      });
       setSaved(true);
     } catch (err) {
       setError(err.message);
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function handleExport() {
+    try {
+      setError('');
+      setExporting(true);
+      const data = await apiRequest('/api/auth/me/export', { token });
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = 'prepsense-account-export.json';
+      anchor.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setExporting(false);
     }
   }
 
@@ -166,16 +189,16 @@ export default function Profile() {
 
       <div className="grid three profile-stats">
         <article className="stat-orb">
-          <span>Sessions</span>
-          <strong>{overview?.evaluatedSessionCount || 0}</strong>
+          <span>Average score</span>
+          <strong>{overview ? `${overview.averageScore}%` : '—'}</strong>
         </article>
         <article className="stat-orb">
-          <span>Target companies</span>
-          <strong>{user?.targetCompanies?.length || 0}</strong>
+          <span>Best topic</span>
+          <strong>{overview?.bestTopic || '—'}</strong>
         </article>
         <article className="stat-orb">
-          <span>Member since</span>
-          <strong className="stat-date">{joined}</strong>
+          <span>Answers evaluated</span>
+          <strong>{overview?.answersEvaluated ?? '—'}</strong>
         </article>
       </div>
 
@@ -194,6 +217,22 @@ export default function Profile() {
           Email
           <input value={user?.email || ''} disabled />
           <span className="helper-text">Email is tied to your account and cannot be changed here.</span>
+        </label>
+        <label>
+          College (optional)
+          <input maxLength="120" value={college} onChange={event => setCollege(event.target.value)} />
+        </label>
+        <label>
+          Graduation year (optional)
+          <input type="number" min={new Date().getFullYear() - 10} max={new Date().getFullYear() + 10} value={graduationYear} onChange={event => setGraduationYear(event.target.value)} />
+        </label>
+        <label>
+          GitHub URL (optional)
+          <input type="url" placeholder="https://github.com/username" value={githubUrl} onChange={event => setGithubUrl(event.target.value)} />
+        </label>
+        <label>
+          LinkedIn URL (optional)
+          <input type="url" placeholder="https://www.linkedin.com/in/username" value={linkedinUrl} onChange={event => setLinkedinUrl(event.target.value)} />
         </label>
         <div className="field">
           <span className="field-label">Target companies</span>
@@ -225,6 +264,11 @@ export default function Profile() {
             {saving ? 'Saving...' : 'Save profile'}
           </button>
           <Link className="button ghost" to="/dashboard">Back to dashboard</Link>
+        </div>
+        <div className="action-row">
+          <button className="button secondary" type="button" onClick={handleExport} disabled={exporting}>
+            {exporting ? 'Preparing export...' : 'Export my data (JSON)'}
+          </button>
         </div>
       </form>
 

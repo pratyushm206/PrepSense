@@ -21,6 +21,10 @@ const UserSchema = new mongoose.Schema({
     type: [String],
     default: []
   },
+  college: { type: String, trim: true, maxlength: 120, default: '' },
+  graduationYear: { type: Number, min: 1900, max: 2200, default: null },
+  githubUrl: { type: String, trim: true, maxlength: 300, default: '' },
+  linkedinUrl: { type: String, trim: true, maxlength: 300, default: '' },
   isAdmin: {
     type: Boolean,
     default: false

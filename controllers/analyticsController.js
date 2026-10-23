@@ -37,6 +37,9 @@ const getOverview = async (req, res, next) => {
         success: true,
         data: {
           readinessScore: 0,
+          averageScore: 0,
+          bestTopic: null,
+          answersEvaluated: 0,
           evaluatedSessionCount: 0,
           sessionsThisWeek,
           topicBreakdown: [],
@@ -48,6 +51,8 @@ const getOverview = async (req, res, next) => {
     }
 
     const topicScores = getTopicScores(scoredSessions);
+    const sessionScores = scoredSessions.map(calculateSessionScore);
+    const evaluatedAnswers = scoredSessions.reduce((total, session) => total + (session.answers || []).filter(answer => answer.isLatest !== false && answer.evaluationStatus === 'success').length, 0);
     const topicTrends = getTopicTrends(scoredSessions);
     const topicBreakdown = topicScores.map(t => ({
       ...t,
@@ -70,6 +75,9 @@ const getOverview = async (req, res, next) => {
       success: true,
       data: {
         readinessScore,
+        averageScore: Math.round(sessionScores.reduce((sum, score) => sum + score, 0) / sessionScores.length),
+        bestTopic: topicScores[0]?.topic || null,
+        answersEvaluated: evaluatedAnswers,
         evaluatedSessionCount: scoredSessions.length,
         sessionsThisWeek,
         topicBreakdown,
