@@ -10,7 +10,8 @@
     "dev:server": "nodemon server.js",
     "build": "vite build",
     "test": "node --test",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "verify": "node scripts/verify.js"
   },
   "keywords": [],
   "author": "",
