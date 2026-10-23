@@ -29,6 +29,17 @@ function row(id, check, status, evidence) {
   const clipped = String(evidence).replace(/mongodb(?:\+srv)?:\/\/[^\s]+/gi, '[REDACTED MONGO URI]').replace(/(JWT_SECRET|GEMINI_API_KEY|MONGO_URI)=\S+/g, '$1=[REDACTED]');
   rows.push({ id, check, status, evidence: clipped.replace(/[\r\n|]+/g, ' ').slice(0, 230) });
 }
+function errorEvidence(error) {
+  const message = String(error?.stack || error?.message || error || 'unknown error');
+  const frames = message.split(/[\r\n]/).slice(0, 4).join(' ');
+  return frames.replace(/mongodb(?:\+srv)?:\/\/[^\s'"`]+/gi, '[REDACTED MONGO URI]').replace(/(JWT_SECRET|GEMINI_API_KEY|MONGO_URI)=\S+/g, '$1=[REDACTED]').replace(/test-only-jwt-secret[^\s'"`]*/gi, '[REDACTED SECRET]');
+}
+async function section(name, fn, ids) {
+  try { await fn(); }
+  catch (error) {
+    for (const id of ids) row(id, `${name} section`, 'BLOCKED', errorEvidence(error));
+  }
+}
 function ok(id, check, pass, evidence) { row(id, check, pass ? 'PASS' : 'FAIL', evidence); }
 function run(command, args, options = {}) {
   const windowsScript = process.platform === 'win32' && /\.cmd$/i.test(command);
@@ -155,7 +166,7 @@ async function runV1() {
     row('V1a', 'Whether real sessions live in this database', sessionCount > 0 ? 'PASS' : 'FAIL', `sessions=${sessionCount} in ${dbName}`);
     await disconnect();
     const dry = run(process.execPath, ['scripts/backfillFailedScores.js']);
-    row('V1b', 'backfillFailedScores dry-run (no --write)', dry.status === 0 ? 'PASS' : 'BLOCKED', `${(dry.stdout || dry.stderr).trim().split(/\r?\n/).filter(line => /Mode:|Sessions affected:|Failed answers affected:/.test(line)).join('; ') || 'dry-run produced no count output'}`);
+    row('V1b', 'backfillFailedScores dry-run (no --write)', dry.status === 0 ? 'PASS' : 'BLOCKED', `${String(dry.stdout || dry.stderr || dry.error?.message || '').trim().split(/\r?\n/).filter(line => /Mode:|Sessions affected:|Failed answers affected:/.test(line)).join('; ') || 'dry-run produced no count output'}`);
   } catch (error) {
     await disconnect().catch(() => {});
     row('V1', 'Real-data read-only sanity + backfill dry-run', 'BLOCKED', `database=${dbName}; read-only connection failed (${error.code || error.name}); exact command: npm run verify outside sandbox`);
@@ -167,14 +178,16 @@ async function runStaticChecks() {
     const result = run(command, args); row(id, args.join(' '), result.status === 0 ? 'PASS' : 'BLOCKED', (result.stdout || '(empty)').trim() || '(empty)');
   }
   const unit = run('npm.cmd', ['test']); row('V2e', 'npm test', unit.status === 0 ? 'PASS' : unit.error?.code === 'ETIMEDOUT' ? 'BLOCKED' : 'FAIL', String(unit.stdout || unit.stderr || unit.error?.message || 'no output').trim().split(/\r?\n/).slice(-7).join('; '));
-  const audit = run('npm.cmd', ['audit', '--json']);
-  try { const data = JSON.parse(audit.stdout); row('V2f', 'npm audit', audit.status === 0 ? 'PASS' : 'FAIL', `vulnerabilities=${JSON.stringify(data.metadata?.vulnerabilities || {})}`); }
-  catch { row('V2f', 'npm audit', 'BLOCKED', 'npm audit did not return parseable JSON (registry may be unavailable)'); }
+  for (const [id, args, informational] of [['V2f', ['audit', '--json'], true], ['V2f-prod', ['audit', '--omit=dev', '--json'], false]]) {
+    const audit = run('npm.cmd', args);
+    try { const data = JSON.parse(audit.stdout || '{}'); const counts = data.metadata?.vulnerabilities || {}; const vulnerabilities = Number(counts.total || 0); row(id, `npm ${args.join(' ')}${informational ? ' (informational)' : ''}`, informational ? 'PASS' : vulnerabilities === 0 ? 'PASS' : 'FAIL', `vulnerabilities=${JSON.stringify(counts)}`); }
+    catch { row(id, `npm ${args.join(' ')}`, 'BLOCKED', 'npm audit did not return parseable JSON (registry may be unavailable)'); }
+  }
   const consoleMatches = run('rg', ['-n', 'console\\.log', '--glob', '!scripts/**', '--glob', '!e2e/**', '--glob', '!node_modules/**', '.']);
-  row('V2g', 'console.log outside scripts/', consoleMatches.status === 1 ? 'PASS' : 'FAIL', (consoleMatches.stdout || 'none').trim() || 'none');
+  row('V2g', 'console.log outside scripts/', consoleMatches.status === 1 ? 'PASS' : 'FAIL', consoleMatches.status === 1 ? 'none' : (consoleMatches.stdout || consoleMatches.stderr || 'rg failed without output').trim());
   const sourceFiles = run('rg', ['--files', 'src']);
   const scoreLines = [];
-  for (const file of sourceFiles.stdout.split(/\r?\n/).filter(Boolean)) {
+  for (const file of String(sourceFiles.stdout || '').split(/\r?\n/).filter(Boolean)) {
     const lines = fs.readFileSync(path.join(root, file), 'utf8').split(/\r?\n/);
     lines.forEach((line, index) => { if (/\{[^}]*\b(?:score|verdict|overallScore)\b[^}]*\}/i.test(line)) scoreLines.push(`${file}:${index + 1}:${line.trim()}`); });
   }
@@ -183,7 +196,7 @@ async function runStaticChecks() {
   const linkFiles = run('rg', ['-n', 'RESUME_ANALYZER_URL', 'src']);
   const linkProof = linkFiles.stdout.trim().replace(/\r?\n/g, '; ');
   const noIframe = !/<iframe/i.test(run('rg', ['-n', '<iframe', 'src']).stdout || '');
-  const sourceText = run('rg', ['--files', 'src']).stdout.split(/\r?\n/).filter(Boolean).map(file => [file, fs.readFileSync(path.join(root, file), 'utf8')]);
+  const sourceText = String(run('rg', ['--files', 'src']).stdout || '').split(/\r?\n/).filter(Boolean).map(file => [file, fs.readFileSync(path.join(root, file), 'utf8')]);
   const unsafeExternal = [];
   for (const [file, text] of sourceText) for (const anchor of text.matchAll(/<a\b[\s\S]*?<\/a>/g)) {
     const snippet = anchor[0];
@@ -224,7 +237,7 @@ async function runIntegration() {
   testUri = testDatabaseUri(realUri);
   if (!safeDatabase(testUri).endsWith('_test')) throw new Error('Refusing to run: test database name is not suffixed _test');
   const build = run('npm.cmd', ['run', 'build']);
-  row('V2 build', 'npm run build', build.status === 0 ? 'PASS' : 'FAIL', (build.stdout || build.stderr).trim().split(/\r?\n/).slice(-4).join('; '));
+  row('V2 build', 'npm run build', build.status === 0 ? 'PASS' : 'FAIL', String(build.stdout || build.stderr || build.error?.message || 'no build output').trim().split(/\r?\n/).slice(-4).join('; '));
   try { await connect(testUri); }
   catch (error) {
     row('TEST DB', 'Connect only to prepsense_test', 'BLOCKED', `${error.code || error.name}; requested database=${safeDatabase(testUri)}; no test collections were created or dropped`);
@@ -369,7 +382,7 @@ async function runIntegration() {
     if (!exited.exited) { child.kill(); await new Promise(resolve => child.once('exit', resolve)); }
     const secrets = [env.MONGO_URI, env.JWT_SECRET, env.GEMINI_API_KEY, env.CLIENT_URL].filter(Boolean);
     const noSecrets = secrets.every(secret => !output.includes(secret));
-    const variable = label.startsWith('JWT_SECRET') ? 'JWT_SECRET' : label.split(' ')[0];
+    const variable = String(label || '').startsWith('JWT_SECRET') ? 'JWT_SECRET' : String(label || 'unknown').split(' ')[0];
     const namesVariable = output.includes(variable);
     return { refused: exited.exited && exited.code !== 0 && noSecrets && namesVariable, detail: `${label}: exited=${exited.exited}, code=${exited.code ?? 'timeout'}, namesVariable=${namesVariable}, noSecrets=${noSecrets}` };
   };
@@ -377,7 +390,7 @@ async function runIntegration() {
   const baseline = await startServer();
   await stopServer();
   if (!baseline) {
-    row('E3', 'Production boot env checks', 'BLOCKED', `baseline valid config did not reach /api/health; startup output: ${serverText.split(/\r?\n/).filter(Boolean).slice(-3).join(' ').replace(/mongodb(?:\+srv)?:\/\/[^\s]+/gi, '[REDACTED MONGO URI]') || 'no startup output'}`);
+    row('E3', 'Production boot env checks', 'BLOCKED', `baseline valid config did not reach /api/health; startup output: ${String(serverText || '').split(/\r?\n/).filter(Boolean).slice(-3).join(' ').replace(/mongodb(?:\+srv)?:\/\/[^\s]+/gi, '[REDACTED MONGO URI]') || 'no startup output'}`);
   } else {
   for (const [label, overrides] of [
     ['JWT_SECRET missing', { JWT_SECRET: undefined }], ['JWT_SECRET short', { JWT_SECRET: 'short' }],
@@ -400,7 +413,7 @@ async function runIntegration() {
   for (let index = 1; index <= 10; index++) {
     const id = `F${index}`;
     const item = e2eCases.find(testCase => testCase.title.startsWith(`${id} `));
-    row(id, item?.title || 'Playwright Chromium E2E', !item ? 'BLOCKED' : item.status === 'passed' ? 'PASS' : 'FAIL', item ? (item.status === 'passed' ? 'Playwright Chromium test passed' : item.error || `test status=${item.status}`) : `${e2eRun.error?.code || 'test result missing'}; ${(e2eRun.stdout || e2eRun.stderr).trim().split(/\r?\n/).slice(-2).join('; ') || 'no result file'}`);
+    row(id, item?.title || 'Playwright Chromium E2E', !item ? 'BLOCKED' : item.status === 'passed' ? 'PASS' : 'FAIL', item ? (item.status === 'passed' ? 'Playwright Chromium test passed' : item.error || `test status=${item.status}`) : `${e2eRun.error?.code || 'test result missing'}; ${String(e2eRun.stdout || e2eRun.stderr || '').trim().split(/\r?\n/).slice(-2).join('; ') || 'no result file'}`);
   }
 
   // E1/E2 run last on a fresh process so limiter memory starts empty.
@@ -422,22 +435,28 @@ async function main() {
     if (!process.env.MONGO_URI) throw new Error('Pre-flight Mongo connection failed: MONGO_URI is missing (Error)');
     try { await connect(process.env.MONGO_URI); await disconnect(); }
     catch (error) { await disconnect().catch(() => {}); throw new Error(`Pre-flight Mongo connection failed (${error.name})`); }
-    await runV1();
-    await runStaticChecks();
-    await runIntegration();
+    await section('V1 database sanity', runV1, ['V1', 'V1a', 'V1b']);
+    await section('V2 static and build checks', runStaticChecks, ['V2a', 'V2b', 'V2c', 'V2d', 'V2e', 'V2f', 'V2f-prod', 'V2g', 'V3', 'C1', 'C2', 'C3', 'D1s', 'D2s', 'E1s', 'E1config', 'E2s', 'B2', 'F5', 'E3 static', 'V2 build']);
+    await section('API and browser checks', runIntegration, ['A1', 'A2', 'A3', 'A4', 'A5', 'B1', 'B3', 'B4', 'B5', 'D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'E1', 'E2', 'E3', 'E4', 'E5', 'E6', 'F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10']);
   } catch (error) {
-    row('HARNESS', 'Verification execution', 'BLOCKED', `${error.code || error.name}: ${error.message.split(/[\r\n]/)[0]}`);
+    row('HARNESS', 'Verification execution', 'BLOCKED', errorEvidence(error));
   } finally {
     await stopServer();
-    if (mongoose.connection.readyState && String(mongoose.connection.name || '').endsWith('_test')) {
-      await mongoose.connection.dropDatabase().then(() => { testDbDropped = true; }).catch(() => {});
+    let dropReason = 'no test database connection';
+    if (mongoose.connection.readyState) {
+      const connectedName = String(mongoose.connection.name || '');
+      if (!connectedName.endsWith('_test')) dropReason = 'refused: connected database name does not end with _test';
+      else {
+        try { await mongoose.connection.dropDatabase(); testDbDropped = true; dropReason = 'dropped guarded *_test database'; }
+        catch (error) { dropReason = `drop failed: ${error.name || 'Error'}`; }
+      }
     }
     await disconnect().catch(() => {});
     console.log('| ID | Check | Result | Evidence |');
     console.log('|---|---|---|---|');
     for (const item of rows) console.log(`| ${item.id} | ${item.check} | ${item.status} | ${item.evidence} |`);
     const totals = rows.reduce((counts, item) => (counts[item.status] = (counts[item.status] || 0) + 1, counts), {});
-    console.log(`TOTALS ${JSON.stringify(totals)}; test database dropped=${testDbDropped}`);
+    console.log(`TOTALS ${JSON.stringify(totals)}; test database dropped=${testDbDropped}; reason=${dropReason}`);
   }
 }
 main();
