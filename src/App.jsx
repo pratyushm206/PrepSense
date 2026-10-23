@@ -1,8 +1,9 @@
+import { lazy, Suspense } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import Shell from './components/Shell.jsx';
 import Dashboard from './pages/Dashboard.jsx';
-import AdminRoute from './components/AdminRoute.jsx';
+const AdminRoute = lazy(() => import('./components/AdminRoute.jsx'));
 import History from './pages/History.jsx';
 import HistoryDetail from './pages/HistoryDetail.jsx';
 import Interview from './pages/Interview.jsx';
@@ -11,14 +12,15 @@ import Landing from './pages/Landing.jsx';
 import Leaderboard from './pages/Leaderboard.jsx';
 import Login from './pages/Login.jsx';
 import Profile from './pages/Profile.jsx';
-import PublicReport from './pages/PublicReport.jsx';
+const PublicReport = lazy(() => import('./pages/PublicReport.jsx'));
 import Recommendations from './pages/Recommendations.jsx';
-import ResumeAnalyzer from './pages/ResumeAnalyzer.jsx';
+const ResumeAnalyzer = lazy(() => import('./pages/ResumeAnalyzer.jsx'));
 import Register from './pages/Register.jsx';
 import Summary from './pages/Summary.jsx';
 
 export default function App() {
   return (
+    <Suspense fallback={<main className="page-stack" role="status">Loading page…</main>}>
     <Routes>
       <Route path="/" element={<Landing />} />
       <Route path="/login" element={<Login />} />
@@ -41,5 +43,6 @@ export default function App() {
       </Route>
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
+    </Suspense>
   );
 }
