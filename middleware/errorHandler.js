@@ -6,7 +6,7 @@ const errorHandler = (err, req, res, next) => {
   const statusCode = err.name === 'CastError'
     ? 400
     : err.statusCode || err.status || 500;
-  const message = statusCode >= 500 && process.env.NODE_ENV === 'production' && err.code !== 'AI_BUSY'
+  const message = statusCode >= 500 && process.env.NODE_ENV === 'production'
     ? 'Something went wrong. Please try again later.'
     : err.message || 'Server Error';
 
