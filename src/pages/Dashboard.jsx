@@ -36,15 +36,17 @@ export default function Dashboard() {
   if (error) return <ErrorState message={error} />;
 
   const hasData = overview.topicBreakdown?.length > 0;
-  const firstName = (user?.name || 'there').split(' ')[0];
+  const firstName = (user?.name || user?.email?.split('@')[0] || 'there').trim().split(/\s+/)[0];
+  const hasEvaluatedSessions = (overview.evaluatedSessionCount || 0) > 0;
 
   return (
     <section className="page-stack dashboard-stage">
       <GaugeHero
-        score={overview.readinessScore}
+        score={hasEvaluatedSessions ? overview.readinessScore : null}
         firstName={firstName}
         sessionCount={overview.evaluatedSessionCount || 0}
         topicCount={overview.topicBreakdown?.length || 0}
+        hasEvaluatedSessions={hasEvaluatedSessions}
       />
 
       {!hasData ? (
@@ -131,7 +133,7 @@ function formatChartDate(value) {
   return new Intl.DateTimeFormat(undefined, { day: 'numeric', month: 'short' }).format(new Date(value));
 }
 
-function GaugeHero({ score, firstName, sessionCount, topicCount }) {
+function GaugeHero({ score, firstName, sessionCount, topicCount, hasEvaluatedSessions }) {
   const cardRef = useRef(null);
   const prefersReduced = typeof window !== 'undefined'
     && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -169,7 +171,7 @@ function GaugeHero({ score, firstName, sessionCount, topicCount }) {
               className="gauge-fill"
               d="M 30 130 A 90 90 0 0 1 210 130"
               style={{
-                '--score': score,
+                '--score': score ?? 0,
                 '--score-color': getScoreColor(score)
               }}
             />
@@ -177,12 +179,12 @@ function GaugeHero({ score, firstName, sessionCount, topicCount }) {
           </svg>
           <div
             className="dial-needle"
-            style={{ transform: `rotate(${-90 + (score / 100) * 180}deg)` }}
+            style={{ transform: `rotate(${-90 + ((score ?? 0) / 100) * 180}deg)` }}
             aria-hidden="true"
           />
           <div className="gauge-readout">
-            <div className="gauge-num">{score}</div>
-            <div className="gauge-unit">Readiness / 100</div>
+            <div className="gauge-num">{hasEvaluatedSessions ? score : '-'}</div>
+            <div className="gauge-unit">{hasEvaluatedSessions ? 'Readiness / 100' : 'No score yet'}</div>
           </div>
         </div>
         <div className="gauge-zones">
@@ -192,9 +194,9 @@ function GaugeHero({ score, firstName, sessionCount, topicCount }) {
         </div>
       </div>
       <div className="gauge-side">
-        <p className="eyebrow">System status</p>
-        <h1 className="gauge-title">{getStatusTitle(score, firstName)}</h1>
-        <p className="gauge-desc">Built from your latest evaluated practice sessions.</p>
+        <p className="eyebrow">{hasEvaluatedSessions ? 'System status' : 'Welcome'}</p>
+        <h1 className="gauge-title">{hasEvaluatedSessions ? getStatusTitle(score, firstName) : 'Welcome, start your first round'}</h1>
+        <p className="gauge-desc">{hasEvaluatedSessions ? 'Built from your latest evaluated practice sessions.' : 'Start a practice round to build your interview readiness profile.'}</p>
         <div className="dash-metrics">
           <div>
             <span>Sessions</span>
@@ -205,7 +207,7 @@ function GaugeHero({ score, firstName, sessionCount, topicCount }) {
             <strong>{topicCount}</strong>
           </div>
         </div>
-        <Link className="button primary cta" to="/interview/new">Start practice {'->'}</Link>
+        <Link className="button primary cta" to="/interview/new">{hasEvaluatedSessions ? 'Start practice' : 'Start your first round'} {'->'}</Link>
       </div>
     </div>
   );
