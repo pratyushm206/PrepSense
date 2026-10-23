@@ -1,4 +1,6 @@
 require('dotenv').config();
+const { validateEnv } = require('./config/validateEnv');
+validateEnv();
 
 const dns = require('dns');
 if (process.env.DNS_OVERRIDE === '1') {
@@ -12,11 +14,6 @@ const errorHandler = require('./middleware/errorHandler');
 const path = require('path');
 const helmet = require('helmet');
 const cors = require('cors');
-for (const key of ['MONGO_URI', 'JWT_SECRET', 'GEMINI_API_KEY']) {
-  if (!process.env[key]) {
-    throw new Error(`Missing required environment variable: ${key}`);
-  }
-}
 app.set('trust proxy', 1);
 app.use(helmet({
   contentSecurityPolicy: {
