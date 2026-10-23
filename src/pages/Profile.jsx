@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { apiRequest } from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -6,6 +6,7 @@ import ThemeToggle from '../components/ThemeToggle.jsx';
 
 export default function Profile() {
   const { user, token, updateProfile, logout } = useAuth();
+  const navigate = useNavigate();
   const [name, setName] = useState(user?.name || '');
   const [companies, setCompanies] = useState(user?.targetCompanies || []);
   const [companyDraft, setCompanyDraft] = useState('');
@@ -15,6 +16,10 @@ export default function Profile() {
   const [changingPassword, setChangingPassword] = useState(false);
   const [deactivating, setDeactivating] = useState(false);
   const [confirmDeactivate, setConfirmDeactivate] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deletePassword, setDeletePassword] = useState('');
+  const [deleteConfirmation, setDeleteConfirmation] = useState('');
+  const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState('');
   const [passwordMessage, setPasswordMessage] = useState('');
   const [saved, setSaved] = useState(false);
@@ -127,6 +132,23 @@ export default function Profile() {
     } catch (err) {
       setError(err.message);
       setDeactivating(false);
+    }
+  }
+
+  async function handleDeleteAccount() {
+    try {
+      setError('');
+      setDeleting(true);
+      await apiRequest('/api/auth/me/delete', {
+        method: 'POST',
+        token,
+        body: { password: deletePassword, confirm: deleteConfirmation }
+      });
+      logout();
+      navigate('/', { replace: true });
+    } catch (err) {
+      setError(err.message);
+      setDeleting(false);
     }
   }
 
@@ -251,6 +273,33 @@ export default function Profile() {
           Deactivate account
         </button>
       </section>
+
+      <section className="panel danger-zone">
+        <div>
+          <h2>Delete account permanently</h2>
+          <p>Your account and practice sessions will be permanently deleted.</p>
+        </div>
+        <button className="button danger" type="button" onClick={() => setConfirmDelete(true)}>
+          Delete account
+        </button>
+      </section>
+
+      {confirmDelete && (
+        <div className="modal-backdrop" role="presentation">
+          <div className="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="delete-title">
+            <h2 id="delete-title">Delete account permanently?</h2>
+            <p>This removes your account and practice history. Enter your password and type DELETE to continue.</p>
+            <label>Password<input type="password" autoComplete="current-password" value={deletePassword} onChange={event => setDeletePassword(event.target.value)} /></label>
+            <label>Type DELETE<input value={deleteConfirmation} onChange={event => setDeleteConfirmation(event.target.value)} /></label>
+            <div className="action-row">
+              <button className="button danger" type="button" onClick={handleDeleteAccount} disabled={deleting || !deletePassword || deleteConfirmation !== 'DELETE'}>
+                {deleting ? 'Deleting...' : 'Permanently delete'}
+              </button>
+              <button className="button ghost" type="button" onClick={() => setConfirmDelete(false)} disabled={deleting}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {confirmDeactivate && (
         <div className="modal-backdrop" role="presentation">

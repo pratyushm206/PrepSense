@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const Session = require('../models/Session');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator');
@@ -186,4 +187,36 @@ const deactivateMe = async (req, res, next) => {
   }
 };
 
-module.exports = { registerUser, loginUser, getMe, updateMe, updatePassword, deactivateMe };
+const deleteMe = async (req, res, next) => {
+  try {
+    const { password, confirm } = req.body || {};
+    if (typeof password !== 'string' || confirm !== 'DELETE') {
+      return res.status(400).json({ success: false, message: 'Password and confirmation DELETE are required' });
+    }
+
+    const user = await User.findById(req.user.userId);
+    if (!user) {
+      return res.status(401).json({ success: false, message: 'Account no longer exists' });
+    }
+    if (!await bcrypt.compare(password, user.password)) {
+      return res.status(401).json({ success: false, message: 'Password is incorrect' });
+    }
+
+    if (user.isAdmin) {
+      const adminCount = await User.countDocuments({ isAdmin: true });
+      if (adminCount <= 1) {
+        return res.status(409).json({ success: false, message: 'The last remaining admin account cannot be deleted' });
+      }
+    }
+
+    // Idempotent ordering lets a retry finish if session deletion succeeds but user deletion fails.
+    await Session.deleteMany({ userId: user._id });
+    await User.deleteOne({ _id: user._id });
+
+    return res.status(200).json({ success: true, data: { message: 'Account permanently deleted' } });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { registerUser, loginUser, getMe, updateMe, updatePassword, deactivateMe, deleteMe };

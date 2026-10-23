@@ -7,7 +7,8 @@ const {
   getMe,
   updateMe,
   updatePassword,
-  deactivateMe
+  deactivateMe,
+  deleteMe
 } = require('../controllers/authController');
 const protect = require('../middleware/auth');
 const { authLimiter } = require('../middleware/rateLimiter');
@@ -38,5 +39,6 @@ router.put('/me', protect, updateMe);
 router.patch('/me', protect, updateMe);
 router.put('/me/password', protect, updatePassword);
 router.put('/me/deactivate', protect, deactivateMe);
+router.post('/me/delete', authLimiter, protect, deleteMe);
 
 module.exports = router;
