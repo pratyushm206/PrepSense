@@ -174,6 +174,8 @@ h2 {
   justify-content: center;
 }
 
+.nav-menu-toggle { display: none; }
+
 .nav-links a {
   position: relative;
   min-height: auto;
@@ -2204,23 +2206,23 @@ a.topic-row {
   }
 }
 
-@media (max-width: 860px) {
+@media (max-width: 1099px) {
   .topbar {
-    grid-template-columns: 1fr;
-    padding: 1rem;
+    grid-template-columns: 1fr auto auto;
+    padding: 0.75rem 1rem;
   }
 
+  .nav-menu-toggle { display: inline-flex; min-height: 44px; min-width: 64px; align-items: center; justify-content: center; }
   .nav-links {
-    display: flex;
-    width: 100%;
+    display: none;
+    grid-column: 1 / -1;
+    flex-wrap: wrap;
     justify-content: flex-start;
-    gap: 0.2rem;
-    overflow-x: auto;
-    scrollbar-width: thin;
   }
+  .nav-links.is-open { display: flex; width: 100%; gap: 0.2rem; }
 
   .nav-links a {
-    flex: 0 0 auto;
+    flex: 1 1 150px;
     min-height: 44px;
     padding-inline: 0.65rem;
   }
@@ -2239,6 +2241,8 @@ a.topic-row {
     width: min(100% - 24px, 1180px);
     padding-top: 1.2rem;
   }
+
+  .topbar .user-actions .button { min-height: 44px; }
 
   .gauge-panel,
   .resume-analyzer-hero,
