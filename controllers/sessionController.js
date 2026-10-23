@@ -81,6 +81,7 @@ const getSessions = async (req, res, next) => {
         questionCount: session.questions?.length || 0,
         answerCount: latestAnswers.size,
         failedEvaluation: [...latestAnswers.values()].some(answer => answer.evaluationStatus === 'failed'),
+        fullyFailed: (session.answers || []).length > 0 && session.answers.every(answer => answer.evaluationStatus === 'failed'),
         completed: session.questions?.length > 0 && [...latestAnswers.values()].filter(answer => answer.evaluationStatus === 'success').length >= session.questions.length,
         difficulty: session.questions?.[0]?.difficulty || 'medium',
         topics: [...new Set(questions.map(question => question.topic).filter(Boolean))],

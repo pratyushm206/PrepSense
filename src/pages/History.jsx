@@ -68,7 +68,7 @@ export default function History() {
   }
 
   async function clearFailedSessions() {
-    if (!window.confirm('Permanently delete all sessions with failed evaluations?')) return;
+    if (!window.confirm('Permanently delete all fully failed sessions? Sessions with any successful answer are kept.')) return;
     try {
       setDeleting(true);
       await apiRequest('/api/sessions/failed', { method: 'DELETE', token });
@@ -135,9 +135,9 @@ export default function History() {
           >
             Needs attention ({sessions.filter(hasFailedEvaluation).length})
           </button>
-          {statusFilter === 'needs-attention' && sessions.some(hasFailedEvaluation) && (
+          {statusFilter === 'needs-attention' && sessions.some(session => session.fullyFailed) && (
             <button className="button danger" type="button" onClick={clearFailedSessions} disabled={deleting}>
-              Clear failed sessions
+              Clear {sessions.filter(session => session.fullyFailed).length} fully failed sessions
             </button>
           )}
         </div>
