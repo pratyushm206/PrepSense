@@ -505,6 +505,101 @@ h2 {
   transition: transform 0.18s ease;
 }
 
+.resume-feature {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 190px;
+  align-items: center;
+  gap: 2rem;
+  overflow: hidden;
+  border-color: color-mix(in srgb, var(--cat-behavioral) 32%, var(--border));
+  background: linear-gradient(115deg, color-mix(in srgb, var(--cat-behavioral) 8%, var(--bg-card)), var(--bg-card) 58%);
+}
+
+.resume-feature-copy {
+  min-width: 0;
+}
+
+.resume-feature-copy h2 {
+  max-width: 35ch;
+  margin: 0 0 0.65rem;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(1.25rem, 2.4vw, 1.75rem);
+}
+
+.resume-feature-copy > p:not(.eyebrow) {
+  max-width: 68ch;
+  margin: 0.25rem 0;
+  color: var(--text-dim);
+  line-height: 1.55;
+}
+
+.resume-feature-chips,
+.resume-feature-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem;
+  margin-top: 1rem;
+}
+
+.resume-feature-chips .tag {
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text-dim);
+}
+
+.resume-feature-actions > span {
+  max-width: 45ch;
+  color: var(--text-faint);
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+.resume-gauge-motif {
+  display: grid;
+  justify-items: center;
+  align-self: stretch;
+  align-content: center;
+  color: var(--cat-behavioral);
+}
+
+.resume-gauge-motif svg {
+  display: block;
+  width: min(100%, 170px);
+  overflow: visible;
+  fill: none;
+  stroke-linecap: round;
+}
+
+.resume-gauge-track {
+  stroke: var(--border2);
+  stroke-width: 9;
+}
+
+.resume-gauge-value {
+  stroke: currentColor;
+  stroke-width: 9;
+}
+
+.resume-gauge-needle {
+  stroke: var(--text);
+  stroke-width: 3;
+}
+
+.resume-gauge-hub {
+  fill: var(--text);
+  stroke: none;
+}
+
+.resume-gauge-motif span {
+  margin-top: -0.15rem;
+  color: var(--text-faint);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 .gauge-panel::before {
   content: '';
   position: absolute;
@@ -2124,6 +2219,19 @@ a.topic-row {
 }
 
 @media (max-width: 760px) {
+  .resume-feature {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.75rem;
+  }
+
+  .resume-gauge-motif {
+    justify-self: end;
+  }
+
+  .resume-gauge-motif svg {
+    width: 120px;
+  }
+
   .session {
     grid-template-columns: auto 1fr;
     grid-template-rows: auto auto;

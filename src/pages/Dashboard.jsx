@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { apiRequest } from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { EmptyState, ErrorState, LoadingState } from '../components/Status.jsx';
+import ResumeAnalyzerCard from '../components/ResumeAnalyzerCard.jsx';
 
 export default function Dashboard() {
   const { token, user } = useAuth();
@@ -48,6 +49,8 @@ export default function Dashboard() {
         topicCount={overview.topicBreakdown?.length || 0}
         hasEvaluatedSessions={hasEvaluatedSessions}
       />
+
+      <ResumeAnalyzerCard />
 
       {!hasData ? (
         <EmptyState
