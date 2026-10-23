@@ -65,7 +65,9 @@ const retryLimiter = rateLimit({
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 10,
+  max: 30,
+  // College users often share one NAT IP, so successful auth should not consume the shared failure budget.
+  skipSuccessfulRequests: true,
   handler: (req, res) => res.status(429).json({
     success: false,
     message: 'Too many login or registration attempts. Please try again in 15 minutes.'
