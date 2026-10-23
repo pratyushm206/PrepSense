@@ -2,11 +2,11 @@ import { Link } from 'react-router-dom';
 import { RESUME_ANALYZER_URL } from '../config/links.js';
 
 const signals = [
-  ['Semantic relevance', 'How the resume’s meaning relates to the job description.'],
-  ['Skill match', 'Skills detected in both the resume and the job description.'],
-  ['Keyword coverage', 'Prominent job-description terms found in the resume.'],
-  ['Experience match', 'The experience requirements compared with the resume.'],
-  ['Section relevance', 'How relevant resume sections align with the role.']
+  ['Semantic relevance · 30%', 'How the resume’s meaning relates to the job description.'],
+  ['Skill match · 30%', 'Skills detected in both the resume and the job description.'],
+  ['Keyword coverage · 15%', 'Prominent job-description terms found in the resume.'],
+  ['Experience match · 15%', 'The experience requirements compared with the resume.'],
+  ['Section strength · 10%', 'Resume section relevance, named section_relevance in the score breakdown.']
 ];
 
 export default function ResumeAnalyzer() {
@@ -38,15 +38,16 @@ export default function ResumeAnalyzer() {
           <p className="eyebrow">Why use it</p>
           <h2>Get a clearer view before you apply.</h2>
           <p>Recruiters and ATS filters can screen resumes before a person sees them. Use an explainable score and feedback connected to the specific job description.</p>
+          <p>The numeric score is a deterministic weighted calculation from these five signals. Gemini writes the explanatory prose; it does not set the score.</p>
         </article>
         <article className="panel resume-info-card">
           <p className="eyebrow">How it works</p>
           <ol>
-            <li>Upload a text-based resume PDF.</li>
-            <li>Paste the full job description or upload it as a PDF.</li>
+            <li>Upload a text-based resume PDF (up to 10 MB).</li>
+            <li>Paste the full job description or upload a text-based PDF (up to 10 MB).</li>
             <li>Review the score, signals, and written feedback.</li>
-            <li>Run the optional ATS format-only check.</li>
-            <li>Export the generated materials.</li>
+            <li>Run the optional ATS format-only check, which is separate from the job match score.</li>
+            <li>Download the analysis report as PDF. Generated cover letters and tailored resumes can be exported as TXT, PDF, or DOCX.</li>
           </ol>
         </article>
       </section>
@@ -74,6 +75,7 @@ export default function ResumeAnalyzer() {
           <li>Include the role’s seniority and experience requirements in the job description.</li>
         </ul>
         <p className="resume-note">Free. PDF up to 10 MB. The first load can take ~30 s if the app is asleep.</p>
+        <p className="resume-note">The inspected code does not confirm privacy or data-retention behavior.</p>
         <div className="resume-feature-actions">
           <a className="button primary" href={RESUME_ANALYZER_URL} target="_blank" rel="noopener noreferrer">Analyze my resume</a>
           <Link className="button secondary" to="/interview/new">Back to Practice</Link>
