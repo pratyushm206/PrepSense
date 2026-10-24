@@ -48,7 +48,7 @@ export default function Leaderboard() {
 
   if (!company) {
     return (
-      <div className="leaderboard-empty"><EmptyState
+      <div className="leaderboard-empty"><LeaderboardEmptyArt /><EmptyState
         title="Pick a target company first"
         message="Add target companies to your profile, then compare readiness scores across practice sessions."
         action={<Link className="button primary" to="/profile">Update profile</Link>}
@@ -81,7 +81,7 @@ export default function Leaderboard() {
       {error && <ErrorState message={error} />}
       {loading && <LoadingState message="Loading leaderboard..." />}
       {!loading && !error && leaderboard.length === 0 && (
-        <div className="leaderboard-empty"><EmptyState
+        <div className="leaderboard-empty"><LeaderboardEmptyArt /><EmptyState
           title="No scores yet"
           message="Completed sessions with scored answers will appear here."
           action={<Link className="button primary" to="/interview/new">Practice now</Link>}
@@ -102,6 +102,16 @@ export default function Leaderboard() {
         </div>
       )}
     </section>
+  );
+}
+
+function LeaderboardEmptyArt() {
+  return (
+    <svg className="leaderboard-empty-art" viewBox="0 0 120 88" aria-hidden="true" focusable="false">
+      <path d="M20 68h80M31 68V49h18v19M51 68V31h18v37M71 68V42h18v26" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="m31 27 17-10 17 5 18-12" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="31" cy="27" r="3" fill="currentColor" /><circle cx="48" cy="17" r="3" fill="currentColor" /><circle cx="65" cy="22" r="3" fill="currentColor" /><circle cx="83" cy="10" r="3" fill="currentColor" />
+    </svg>
   );
 }
 
