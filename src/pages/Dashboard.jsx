@@ -53,7 +53,7 @@ export default function Dashboard() {
           <p className="eyebrow">Your practice overview</p>
           <h1>{headline}</h1>
         </div>
-        <Link className="button secondary dashboard-heading-action" to="/interview/new">Start a mock interview</Link>
+        <Link className="dashboard-heading-link" to="/interview/new">Start a mock interview <span aria-hidden="true">→</span></Link>
       </header>
 
       <section className="dashboard-readiness signature-card" aria-labelledby="dashboard-readiness-title">
@@ -155,10 +155,15 @@ function NextPracticeCard({ topic }) {
 }
 
 function TopicsPanel({ topics }) {
+  const allTopicsNew = topics.length > 0 && topics.every(topic => topic.totalAttempted < 2);
+
   return (
     <section className="panel dashboard-topics-panel" aria-labelledby="dashboard-topics-title">
       <div className="dashboard-section-heading">
-        <div><p className="eyebrow">Coverage</p><h2 id="dashboard-topics-title">Your topics, weakest first</h2></div>
+        <div className="dashboard-section-heading-group">
+          <span className="icon-tile dashboard-section-icon"><Icon name="grid" /></span>
+          <div><p className="eyebrow">Coverage</p><h2 id="dashboard-topics-title">Your topics, weakest first</h2></div>
+        </div>
         <div className="dashboard-topic-legend" aria-label="Score bands">
           <span><i className="danger-dot" />Under 60 weak</span>
           <span><i className="warning-dot" />60–79 solid</span>
@@ -174,6 +179,7 @@ function TopicsPanel({ topics }) {
       ) : (
         <div className="dashboard-topic-list">
           {topics.map(topic => <TopicRow key={topic.topic} topic={topic} />)}
+          {allTopicsNew && <p className="dashboard-trend-caption">Trends appear after 2 attempts per topic.</p>}
         </div>
       )}
     </section>
@@ -184,16 +190,16 @@ function TopicRow({ topic }) {
   const score = topic.avgScore;
   const band = score == null ? 'neutral' : score < 60 ? 'danger' : score < 80 ? 'warning' : 'success';
   const bandLabel = score == null ? '-' : score < 60 ? 'Weak' : score < 80 ? 'Solid' : 'Strong';
-  const trend = topic.totalAttempted < 2 ? 'New' : capitalizeTrend(topic.trend);
+  const hasTrend = topic.totalAttempted >= 2;
   const width = score == null ? 0 : Math.max(0, Math.min(100, score));
 
   return (
     <Link className="dashboard-topic-row" to={`/history?topic=${encodeURIComponent(topic.topic)}`}>
       <span className="dashboard-topic-name">{topic.topic}</span>
-      <span className="dashboard-topic-bar" aria-hidden="true"><i className={band} style={{ width: `${width}%` }} /></span>
+      <span className={`dashboard-topic-bar${score === 0 ? ' is-zero' : ''}`} aria-hidden="true"><i className={band} style={{ width: `${width}%` }} /></span>
       <strong className="dashboard-topic-score">{score == null ? '-' : score}</strong>
       <span className={`dashboard-topic-chip ${band}`}>{bandLabel}</span>
-      <span className={`dashboard-trend-chip ${trend.toLowerCase()}`}>{trend}</span>
+      {hasTrend && <span className={`dashboard-trend-chip ${topic.trend}`}>{capitalizeTrend(topic.trend)}</span>}
       <span className="dashboard-topic-arrow" aria-hidden="true">↗</span>
     </Link>
   );
@@ -210,11 +216,14 @@ function PerformanceHistory({ points }) {
     return (
       <section className="panel dashboard-performance" aria-labelledby="dashboard-performance-title">
         <div className="dashboard-section-heading">
-          <div><p className="eyebrow">Momentum</p><h2 id="dashboard-performance-title">Progress over time</h2></div>
+          <div className="dashboard-section-heading-group">
+            <span className="icon-tile dashboard-section-icon"><Icon name="chart" /></span>
+            <div><p className="eyebrow">Momentum</p><h2 id="dashboard-performance-title">Progress over time</h2></div>
+          </div>
           <span className="dashboard-session-count">{points.length} {points.length === 1 ? 'recent session' : 'recent sessions'}</span>
         </div>
         <div className="dashboard-trend-empty">
-          <span className="dashboard-trend-icon"><Icon name="sparkline" viewBox="0 0 64 48" /></span>
+          <span className="dashboard-trend-icon"><Icon name="sparkline" viewBox="0 0 64 48" className="dashboard-sparkline" /></span>
           <div><strong>Your trend appears after your second session</strong><p>Complete one more evaluated mock interview to see how your scores are changing.</p></div>
         </div>
       </section>
@@ -236,12 +245,18 @@ function PerformanceHistory({ points }) {
   return (
     <section className="panel dashboard-performance" aria-labelledby="dashboard-performance-title">
       <div className="dashboard-section-heading">
-        <div><p className="eyebrow">Momentum</p><h2 id="dashboard-performance-title">Progress over time</h2></div>
+        <div className="dashboard-section-heading-group">
+          <span className="icon-tile dashboard-section-icon"><Icon name="chart" /></span>
+          <div><p className="eyebrow">Momentum</p><h2 id="dashboard-performance-title">Progress over time</h2></div>
+        </div>
         <span className="dashboard-session-count">{points.length} recent sessions</span>
       </div>
       <div className="performance-chart-wrap dashboard-chart-wrap">
         <svg className="performance-chart dashboard-chart" viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Session scores over time, from 0 to 100">
-          <defs><linearGradient id="dashboard-chart-fill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" className="dashboard-chart-stop" /><stop offset="100%" className="dashboard-chart-stop-end" /></linearGradient></defs>
+          <defs>
+            <linearGradient id="dashboard-chart-fill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" className="dashboard-chart-stop" /><stop offset="100%" className="dashboard-chart-stop-end" /></linearGradient>
+            <linearGradient id="dashboard-chart-stroke" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" className="dashboard-chart-line-start" /><stop offset="100%" className="dashboard-chart-line-end" /></linearGradient>
+          </defs>
           {[0, 50, 100].map(value => {
             const y = padding.top + ((100 - value) / 100) * plotHeight;
             return <g key={value}><line x1={padding.left} x2={width - padding.right} y1={y} y2={y} /><text x="4" y={y + 4}>{value}</text></g>;

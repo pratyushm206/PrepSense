@@ -3766,3 +3766,110 @@ a.topic-row {
     scroll-behavior: auto !important;
   }
 }
+
+/* Dashboard lower sections use the shared glass surface and icon system. */
+.dashboard-heading-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  padding: 0 var(--space-2);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  text-underline-offset: 4px;
+  transition: color var(--transition-fast), text-decoration-color var(--transition-fast);
+}
+.dashboard-heading-link:hover { color: var(--accent-text); text-decoration-color: currentColor; }
+
+.dashboard-next-card {
+  background:
+    linear-gradient(100deg, color-mix(in srgb, var(--accent) 18%, var(--bg-raised)), transparent 74%),
+    var(--surface-glass);
+  box-shadow: var(--shadow-card);
+  animation: dashboard-enter 250ms ease both;
+  animation-delay: 60ms;
+}
+.dashboard-next-card:hover { transform: translateY(-2px); border-color: var(--border-strong); box-shadow: var(--shadow-card); }
+.dashboard-next-action span { display: inline-block; transition: transform var(--transition-fast); }
+.dashboard-next-action:hover span { transform: translateX(3px); }
+
+.dashboard-section-heading-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+.dashboard-section-icon { width: 40px; height: 40px; }
+.dashboard-topics-panel { animation: dashboard-enter 250ms ease both; animation-delay: 120ms; }
+.dashboard-performance { animation: dashboard-enter 250ms ease both; animation-delay: 180ms; }
+.dashboard-resume-card {
+  background:
+    linear-gradient(115deg, color-mix(in srgb, var(--glow-indigo) 35%, transparent), transparent 74%),
+    var(--surface-glass);
+  animation: dashboard-enter 250ms ease both;
+  animation-delay: 240ms;
+}
+
+.dashboard-topic-row { min-height: 64px; }
+.dashboard-topic-bar {
+  position: relative;
+  height: 8px;
+  background: var(--bar-track);
+  box-shadow: none;
+}
+.dashboard-topic-bar.is-zero::before {
+  content: '';
+  position: absolute;
+  inset: -2px auto -2px 0;
+  width: 3px;
+  border-radius: 99px;
+  background: var(--danger);
+}
+.dashboard-topic-bar i.danger { background: var(--grad-bar-weak); }
+.dashboard-topic-bar i.warning { background: var(--grad-bar-solid); }
+.dashboard-topic-bar i.success { background: var(--grad-bar-strong); }
+.dashboard-trend-caption {
+  margin: 0;
+  padding: var(--space-3) var(--space-1) 0;
+  border-top: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+}
+.dashboard-topic-arrow { transition: color var(--transition-fast), transform var(--transition-fast); }
+.dashboard-topic-row:hover .dashboard-topic-arrow { transform: translate(3px, -3px); }
+
+.dashboard-trend-icon {
+  width: 80px;
+  height: 56px;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-md);
+  background: transparent;
+}
+.dashboard-trend-icon .dashboard-sparkline { width: 68px; height: 48px; color: var(--accent-text); }
+.dashboard-sparkline .icon-sparkline-art {
+  stroke: url(#dashboard-empty-sparkline-stroke);
+  stroke-dasharray: 4 4;
+  opacity: .38;
+}
+.dashboard-chart .dashboard-chart-line-start { stop-color: var(--success); }
+.dashboard-chart .dashboard-chart-line-end { stop-color: var(--accent-text); }
+.dashboard-chart .performance-line { stroke: url(#dashboard-chart-stroke); }
+.dashboard-chart circle { fill: var(--bg-raised); stroke: var(--success); stroke-width: 3; }
+
+@media (max-width: 700px) {
+  .dashboard-heading-link { align-self: flex-start; }
+  .dashboard-section-heading-group { align-items: flex-start; }
+  .dashboard-section-icon { flex-basis: 40px; }
+  .dashboard-trend-icon { flex-basis: 80px; }
+  .dashboard-topic-row { min-height: 72px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-next-card,
+  .dashboard-topics-panel,
+  .dashboard-performance,
+  .dashboard-resume-card { animation: none !important; }
+}

@@ -2,7 +2,7 @@ import { lazy, Suspense } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import Shell from './components/Shell.jsx';
-import Dashboard from './pages/Dashboard.jsx';
+const Dashboard = lazy(() => import('./pages/Dashboard.jsx'));
 const AdminRoute = lazy(() => import('./components/AdminRoute.jsx'));
 import History from './pages/History.jsx';
 import HistoryDetail from './pages/HistoryDetail.jsx';

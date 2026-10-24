@@ -55,6 +55,7 @@
   --grad-bar-strong: linear-gradient(90deg, var(--success), color-mix(in srgb, var(--success) 72%, white));
   --grad-bar-solid: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 65%, var(--accent-text)));
   --grad-bar-weak: linear-gradient(90deg, var(--danger), color-mix(in srgb, var(--danger) 55%, var(--accent)));
+  --bar-track: rgba(255, 255, 255, .06);
   --gradient-primary: linear-gradient(135deg, var(--accent-text), var(--accent));
   --icon-tile-gradient: linear-gradient(135deg, rgba(110, 120, 230, .28), rgba(199, 125, 46, .28));
   --icon-tile-border: rgba(255, 255, 255, .10);
@@ -139,6 +140,7 @@
   --grad-bar-strong: linear-gradient(90deg, var(--success), color-mix(in srgb, var(--success) 72%, white));
   --grad-bar-solid: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 65%, var(--accent-text)));
   --grad-bar-weak: linear-gradient(90deg, var(--danger), color-mix(in srgb, var(--danger) 55%, var(--accent)));
+  --bar-track: rgba(28, 23, 19, .06);
   --gradient-primary: linear-gradient(135deg, var(--accent-text), var(--accent));
   --icon-tile-gradient: linear-gradient(135deg, rgba(55, 68, 155, .92), rgba(138, 79, 20, .90));
   --icon-tile-border: rgba(255, 255, 255, .22);

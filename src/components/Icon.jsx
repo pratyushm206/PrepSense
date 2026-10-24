@@ -32,7 +32,15 @@ export default function Icon({ name, className = '', title, viewBox = '0 0 24 24
       {...(title ? { 'aria-label': title } : {})}
       {...props}
     >
-      {iconPaths[name]}
+      {name === 'sparkline' && (
+        <defs>
+          <linearGradient id="dashboard-empty-sparkline-stroke" x1="0" x2="1" y1="0" y2="0">
+            <stop offset="0%" stopColor="var(--glow-indigo)" />
+            <stop offset="100%" stopColor="var(--accent-text)" />
+          </linearGradient>
+        </defs>
+      )}
+      <g className={name === 'sparkline' ? 'icon-sparkline-art' : undefined}>{iconPaths[name]}</g>
     </svg>
   );
 }
