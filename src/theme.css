@@ -44,6 +44,9 @@
   --shadow-1: 0 1px 2px rgba(0,0,0,.4);
   --focus-ring: 0 0 0 3px color-mix(in srgb, var(--accent) 48%, transparent);
   --transition-fast: 150ms ease;
+  --gradient-signature: linear-gradient(135deg, #1E2A78 0%, #4B3A6B 52%, #8A4F14 100%);
+  --on-signature: #fff;
+  --on-signature-muted: rgba(255,255,255,.9);
 
   /* Existing app variables, mapped to semantic design tokens */
   --bg: var(--bg-base);
@@ -111,6 +114,9 @@
   --shadow-1: 0 1px 2px rgba(28,23,19,.08);
   --focus-ring: 0 0 0 3px color-mix(in srgb, var(--accent) 48%, transparent);
   --transition-fast: 150ms ease;
+  --gradient-signature: linear-gradient(135deg, #1E2A78 0%, #4B3A6B 52%, #8A4F14 100%);
+  --on-signature: #fff;
+  --on-signature-muted: rgba(255,255,255,.9);
 
   --bg: var(--bg-base);
   --gradient-start: #2f4fd4;
