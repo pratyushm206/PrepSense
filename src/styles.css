@@ -3848,7 +3848,7 @@ a.topic-row {
 .dashboard-sparkline .icon-sparkline-art {
   stroke: url(#dashboard-empty-sparkline-stroke);
   stroke-dasharray: 4 4;
-  opacity: .6;
+  opacity: .7;
 }
 .dashboard-readiness .readiness-chip.danger,
 .dashboard-readiness .readiness-chip.warning,
