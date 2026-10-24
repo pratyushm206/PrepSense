@@ -3893,6 +3893,23 @@ a.topic-row {
   border-radius: var(--radius-md);
   background: var(--bg-raised);
 }
+.auth-layout {
+  background:
+    radial-gradient(850px 460px at 24% 12%, var(--glow-indigo), transparent 70%),
+    radial-gradient(780px 440px at 78% 88%, var(--glow-bronze), transparent 72%),
+    var(--bg-base);
+}
+.auth-panel {
+  background: var(--surface-glass);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-card);
+}
+.auth-panel h1 { font-size: clamp(var(--text-2xl), 5vw, var(--text-3xl)); }
+.auth-panel .button.primary { width: 100%; }
+@media (max-width: 480px) {
+  .auth-layout { padding: var(--space-4); }
+  .auth-panel { padding: var(--space-5) var(--space-4) var(--space-4); }
+}
 @media (max-width: 600px) {
   .history-page .page-head { padding: var(--space-4); }
   .history-page .session-main-link { align-items: flex-start; }
