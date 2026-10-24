@@ -3912,6 +3912,47 @@ a.topic-row {
   background: var(--surface-glass);
   box-shadow: var(--shadow-card);
 }
+.interview-panel {
+  padding: var(--space-6);
+  background: var(--surface-glass);
+}
+.interview-panel > h2 {
+  margin: 0;
+  padding: var(--space-5);
+  border: 1px solid var(--border-subtle);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius-md);
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  font-size: clamp(var(--text-xl), 3vw, var(--text-2xl));
+  line-height: 1.4;
+}
+.interview-panel .question-meta > span:first-child {
+  margin-right: auto;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+}
+.interview-panel .tag { min-height: 32px; }
+.interview-panel .result-panel {
+  padding: var(--space-4);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--bg-raised);
+}
+.interview-panel .evaluation-score .score-badge {
+  width: 64px;
+  height: 64px;
+  border-width: 3px;
+  font: 700 var(--text-lg)/1 var(--font-mono);
+}
+.interview-panel .feedback-list { border-left-width: 3px; }
+.interview-panel .feedback-list.success { border-left-color: var(--success); }
+.interview-panel .feedback-list.warning { border-left-color: var(--warning); }
+.interview-panel .feedback-list.danger { border-left-color: var(--danger); }
+@media (max-width: 600px) {
+  .interview-panel { padding: var(--space-4); }
+  .interview-panel > h2 { padding: var(--space-4); }
+}
 @media (max-width: 600px) {
   .practice-hero { padding: var(--space-4); }
 }
