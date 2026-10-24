@@ -115,28 +115,31 @@ export default function History() {
         </div>
         <div className="filter-row" aria-label="Session filters">
           <button
-            className={`filter-chip ${statusFilter === 'all' ? 'active' : ''}`}
+            className={`filter-chip chip ${statusFilter === 'all' ? 'selected' : ''}`}
+            aria-pressed={statusFilter === 'all'}
             onClick={() => updateQuery('status', '')}
             type="button"
           >
             All ({sessions.length})
           </button>
           <button
-            className={`filter-chip ${statusFilter === 'completed' ? 'active' : ''}`}
+            className={`filter-chip chip ${statusFilter === 'completed' ? 'selected' : ''}`}
+            aria-pressed={statusFilter === 'completed'}
             onClick={() => updateQuery('status', 'completed')}
             type="button"
           >
             Completed ({sessions.filter(isCompletedSession).length})
           </button>
           <button
-            className={`filter-chip ${statusFilter === 'needs-attention' ? 'active' : ''}`}
+            className={`filter-chip chip ${statusFilter === 'needs-attention' ? 'selected' : ''}`}
+            aria-pressed={statusFilter === 'needs-attention'}
             onClick={() => updateQuery('status', 'needs-attention')}
             type="button"
           >
             Needs attention ({sessions.filter(hasFailedEvaluation).length})
           </button>
           {statusFilter === 'needs-attention' && sessions.some(session => session.fullyFailed) && (
-            <button className="button danger" type="button" onClick={clearFailedSessions} disabled={deleting}>
+            <button className="button danger-ghost" type="button" onClick={clearFailedSessions} disabled={deleting}>
               Clear {sessions.filter(session => session.fullyFailed).length} fully failed sessions
             </button>
           )}
@@ -176,7 +179,7 @@ export default function History() {
               {session.matchingQuestions.map(question => <p key={question.id}>{question.question}</p>)}
             </div>
           )}
-          <button className="button danger session-delete" type="button" onClick={() => setConfirmDelete(session)}>Delete</button>
+          <button className="button danger-ghost session-delete" type="button" onClick={() => setConfirmDelete(session)}>Delete</button>
           </div>
           ))}
         </div>
@@ -207,8 +210,8 @@ export default function History() {
 
 function getScoreClass(score) {
   if (score === null || score === undefined) return 'score-zero';
-  if (score >= 70) return 'score-good';
-  if (score >= 40) return 'score-warn';
+  if (score >= 80) return 'score-good';
+  if (score >= 60) return 'score-warn';
   return 'score-bad';
 }
 
