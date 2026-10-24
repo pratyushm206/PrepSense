@@ -177,30 +177,32 @@ export default function Profile() {
 
   return (
     <section className="page-stack profile-page">
-      <div className="profile-hero">
-        <div className="profile-avatar-lg" aria-hidden="true">{initial}</div>
-        <div>
-          <p className="eyebrow">Account</p>
-          <h1>{user?.name || 'Your profile'}</h1>
-          <p className="lead">{user?.email}</p>
+      <section className="signature-card profile-banner">
+        <div className="profile-hero">
+          <div className="profile-avatar-lg" aria-hidden="true">{initial}</div>
+          <div>
+            <p className="eyebrow">Account</p>
+            <h1>{user?.name || 'Your profile'}</h1>
+            <p className="lead">{user?.email}</p>
+          </div>
+          <ThemeToggle className="profile-theme-toggle" />
         </div>
-        <ThemeToggle className="profile-theme-toggle" />
-      </div>
 
-      <div className="grid three profile-stats">
-        <article className="stat-orb">
-          <span>Average score</span>
-          <strong>{overview ? `${overview.averageScore}%` : '—'}</strong>
-        </article>
-        <article className="stat-orb">
-          <span>Best topic</span>
-          <strong>{overview?.bestTopic || '—'}</strong>
-        </article>
-        <article className="stat-orb">
-          <span>Answers evaluated</span>
-          <strong>{overview?.answersEvaluated ?? '—'}</strong>
-        </article>
-      </div>
+        <div className="grid three profile-stats">
+          <article className="stat-orb">
+            <span>Average score</span>
+            <strong>{overview ? `${overview.averageScore}%` : '—'}</strong>
+          </article>
+          <article className="stat-orb">
+            <span>Best topic</span>
+            <strong>{overview?.bestTopic || '—'}</strong>
+          </article>
+          <article className="stat-orb">
+            <span>{overview?.answersEvaluated === 1 ? 'Answer evaluated' : 'Answers evaluated'}</span>
+            <strong>{overview?.answersEvaluated ?? '—'}</strong>
+          </article>
+        </div>
+      </section>
 
       {error && <div className="field-error form-error">{error}</div>}
 
@@ -259,13 +261,11 @@ export default function Profile() {
           </div>
           <span className="helper-text">Used for recommendations and company leaderboard filters.</span>
         </div>
-        <div className="action-row">
+        <div className="action-row profile-actions">
           <button className="button primary" type="submit" disabled={saving}>
             {saving ? 'Saving...' : 'Save profile'}
           </button>
           <Link className="button ghost" to="/dashboard">Back to dashboard</Link>
-        </div>
-        <div className="action-row">
           <button className="button secondary" type="button" onClick={handleExport} disabled={exporting}>
             {exporting ? 'Preparing export...' : 'Export my data (JSON)'}
           </button>
@@ -308,24 +308,27 @@ export default function Profile() {
         </div>
       </form>
 
-      <section className="panel danger-zone">
-        <div>
-          <h2>Deactivate account</h2>
-          <p>Your practice history is kept, you just can't log back in.</p>
-        </div>
-        <button className="button danger" type="button" onClick={() => setConfirmDeactivate(true)}>
-          Deactivate account
-        </button>
-      </section>
+      <section className="profile-danger-zone">
+        <h2>Danger zone</h2>
+        <section className="panel danger-zone">
+          <div>
+            <h3>Deactivate account</h3>
+            <p>Your practice history is kept, you just can't log back in.</p>
+          </div>
+          <button className="button danger-ghost" type="button" onClick={() => setConfirmDeactivate(true)}>
+            Deactivate account
+          </button>
+        </section>
 
-      <section className="panel danger-zone">
-        <div>
-          <h2>Delete account permanently</h2>
-          <p>Your account and practice sessions will be permanently deleted.</p>
-        </div>
-        <button className="button danger" type="button" onClick={() => setConfirmDelete(true)}>
-          Delete account
-        </button>
+        <section className="panel danger-zone">
+          <div>
+            <h3>Delete account permanently</h3>
+            <p>Your account and practice sessions will be permanently deleted.</p>
+          </div>
+          <button className="button danger-ghost" type="button" onClick={() => setConfirmDelete(true)}>
+            Delete account
+          </button>
+        </section>
       </section>
 
       {confirmDelete && (

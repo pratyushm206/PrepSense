@@ -84,25 +84,28 @@ export default function History() {
   if (loading) return <LoadingState message="Loading session history..." />;
   if (error) return <ErrorState message={error} />;
 
-  if (sessions.length === 0 && !topicFilter && !companyFilter && statusFilter === 'all') {
-    return (
-      <EmptyState
-        title="No sessions yet"
-        message="Practice sessions you create will appear here with company, role, score, and full Q&A history."
-        action={<Link className="button primary" to="/interview/new">Start a session</Link>}
-      />
-    );
-  }
-
   const filteredSessions = sessions;
+  const bestScore = sessions.reduce((best, session) => (
+    typeof session.overallScore === 'number'
+      ? Math.max(best ?? session.overallScore, session.overallScore)
+      : best
+  ), null);
+  const isUnfilteredEmpty = sessions.length === 0 && !topicFilter && !companyFilter && statusFilter === 'all';
 
   return (
-    <section className="page-stack">
-      <div className="page-head">
-        <div>
+    <section className="page-stack history-page">
+      <div className="signature-card history-hero">
+        <div className="history-hero-title">
           <p className="eyebrow">Archive</p>
           <h1>Your practice log.</h1>
         </div>
+        <div className="history-hero-stats">
+          <div className="history-hero-stat"><span>Sessions</span><strong>{sessions.length}</strong></div>
+          <div className="history-hero-stat"><span>Best score</span><strong>{bestScore ?? '-'}</strong></div>
+        </div>
+      </div>
+
+      <div className="history-filter-bar">
         <div className="history-query-filters">
           <label className="field">
             <span>Topic</span>
@@ -115,38 +118,43 @@ export default function History() {
         </div>
         <div className="filter-row" aria-label="Session filters">
           <button
-            className={`filter-chip ${statusFilter === 'all' ? 'active' : ''}`}
+            className={`filter-chip chip ${statusFilter === 'all' ? 'selected' : ''}`}
+            aria-pressed={statusFilter === 'all'}
             onClick={() => updateQuery('status', '')}
             type="button"
           >
             All ({sessions.length})
           </button>
           <button
-            className={`filter-chip ${statusFilter === 'completed' ? 'active' : ''}`}
+            className={`filter-chip chip ${statusFilter === 'completed' ? 'selected' : ''}`}
+            aria-pressed={statusFilter === 'completed'}
             onClick={() => updateQuery('status', 'completed')}
             type="button"
           >
             Completed ({sessions.filter(isCompletedSession).length})
           </button>
           <button
-            className={`filter-chip ${statusFilter === 'needs-attention' ? 'active' : ''}`}
+            className={`filter-chip chip ${statusFilter === 'needs-attention' ? 'selected' : ''}`}
+            aria-pressed={statusFilter === 'needs-attention'}
             onClick={() => updateQuery('status', 'needs-attention')}
             type="button"
           >
             Needs attention ({sessions.filter(hasFailedEvaluation).length})
           </button>
           {statusFilter === 'needs-attention' && sessions.some(session => session.fullyFailed) && (
-            <button className="button danger" type="button" onClick={clearFailedSessions} disabled={deleting}>
-              Clear {sessions.filter(session => session.fullyFailed).length} fully failed sessions
+            <button className="button danger-ghost" type="button" onClick={clearFailedSessions} disabled={deleting}>
+              Clear {sessions.filter(session => session.fullyFailed).length} fully failed {sessions.filter(session => session.fullyFailed).length === 1 ? 'session' : 'sessions'}
             </button>
           )}
         </div>
       </div>
 
-      {filteredSessions.length === 0 ? (
+      {isUnfilteredEmpty || filteredSessions.length === 0 ? (
         <EmptyState
-          title="No matching sessions"
-          message="Try a different filter or start a fresh practice session."
+          title={isUnfilteredEmpty ? 'No sessions yet' : 'No matching sessions'}
+          message={isUnfilteredEmpty
+            ? 'Practice sessions you create will appear here with company, role, score, and full Q&A history.'
+            : 'Try a different filter or start a fresh practice session.'}
           action={<Link className="button primary" to="/interview/new">Start a session</Link>}
         />
       ) : (
@@ -176,7 +184,7 @@ export default function History() {
               {session.matchingQuestions.map(question => <p key={question.id}>{question.question}</p>)}
             </div>
           )}
-          <button className="button danger session-delete" type="button" onClick={() => setConfirmDelete(session)}>Delete</button>
+          <button className="button danger-ghost session-delete" type="button" onClick={() => setConfirmDelete(session)}>Delete</button>
           </div>
           ))}
         </div>
@@ -207,8 +215,8 @@ export default function History() {
 
 function getScoreClass(score) {
   if (score === null || score === undefined) return 'score-zero';
-  if (score >= 70) return 'score-good';
-  if (score >= 40) return 'score-warn';
+  if (score >= 80) return 'score-good';
+  if (score >= 60) return 'score-warn';
   return 'score-bad';
 }
 

@@ -1,66 +1,10 @@
 import { Link, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import ThemeToggle from '../components/ThemeToggle.jsx';
+import Icon from '../components/Icon.jsx';
 import { RESUME_ANALYZER_URL } from '../config/links.js';
 
 const GITHUB_REPO = 'https://github.com/pratyushm206/PrepSense';
-
-function iconProps(title) {
-  return {
-    className: 'landing-icon',
-    viewBox: '0 0 24 24',
-    fill: 'none',
-    stroke: 'currentColor',
-    strokeWidth: '1.8',
-    strokeLinecap: 'round',
-    strokeLinejoin: 'round',
-    'aria-hidden': title ? undefined : true,
-    role: title ? 'img' : undefined
-  };
-}
-
-function IconMail() {
-  return (
-    <svg {...iconProps()}>
-      <rect x="3.5" y="5.5" width="17" height="13" rx="1.5" />
-      <path d="M4 7.5 12 13l8-5.5" />
-    </svg>
-  );
-}
-
-function IconGithub() {
-  return (
-    <svg {...iconProps()} fill="currentColor" stroke="none">
-      <path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.04 1.53 1.04.9 1.53 2.36 1.09 2.94.83.09-.65.35-1.09.64-1.34-2.22-.25-4.56-1.11-4.56-4.95 0-1.1.39-1.99 1.03-2.69-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.02A9.56 9.56 0 0 1 12 6.8a9.5 9.5 0 0 1 2.5.34c1.91-1.29 2.75-1.02 2.75-1.02.55 1.38.2 2.4.1 2.65.64.7 1.03 1.59 1.03 2.69 0 3.85-2.34 4.7-4.57 4.95.36.31.68.92.68 1.86v2.76c0 .26.18.58.69.48A10 10 0 0 0 12 2Z" />
-    </svg>
-  );
-}
-
-function IconLinkedIn() {
-  return (
-    <svg {...iconProps()}>
-      <rect x="3.5" y="3.5" width="17" height="17" rx="2" />
-      <path d="M8 10.5V16.5M8 7.5v.02M12 16.5v-3.6c0-1.2.9-2 2-2s2 .8 2 2v3.6" />
-    </svg>
-  );
-}
-
-function IconCode() {
-  return (
-    <svg {...iconProps()}>
-      <path d="M7 4.5h7.5L19 9v10.5H7z" />
-      <path d="M14.5 4.5V9H19M9.5 13h5M9.5 16h3.5" />
-    </svg>
-  );
-}
-
-function IconX() {
-  return (
-    <svg {...iconProps()}>
-      <path d="M5 5 19 19M19 5 5 19" />
-    </svg>
-  );
-}
 
 export default function Landing() {
   const { authLoading, isAuthenticated } = useAuth();
@@ -99,7 +43,7 @@ export default function Landing() {
       </header>
 
       <main>
-        <section className="landing-hero" id="top">
+        <section className="landing-hero signature-card" id="top">
           <div className="landing-hero-copy">
             <p className="eyebrow">Placement readiness</p>
             <h1>Practice like the interview already started.</h1>
@@ -298,31 +242,31 @@ export default function Landing() {
             <ul className="landing-connect">
               <li>
                 <a href="mailto:pratyushm206@gmail.com">
-                  <IconMail />
+                  <Icon name="mail" className="landing-icon" />
                   pratyushm206@gmail.com
                 </a>
               </li>
               <li>
                 <a href="https://github.com/pratyushm206" target="_blank" rel="noopener noreferrer">
-                  <IconGithub />
+                  <Icon name="github" className="landing-icon" />
                   github.com/pratyushm206
                 </a>
               </li>
               <li>
                 <a href="https://www.linkedin.com/in/pratyushm206" target="_blank" rel="noopener noreferrer">
-                  <IconLinkedIn />
+                  <Icon name="linkedin" className="landing-icon" />
                   LinkedIn
                 </a>
               </li>
               <li>
                 <a href={GITHUB_REPO} target="_blank" rel="noopener noreferrer">
-                  <IconCode />
+                  <Icon name="code" className="landing-icon" />
                   View source
                 </a>
               </li>
               <li>
                 <a href="https://x.com/Pratyus35569136" target="_blank" rel="noopener noreferrer">
-                  <IconX />
+                  <Icon name="xBrand" className="landing-icon" />
                   x.com/Pratyus35569136
                 </a>
               </li>

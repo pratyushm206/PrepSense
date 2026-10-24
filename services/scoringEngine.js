@@ -1,5 +1,3 @@
-const { DIFFICULTIES } = require('../config/constants');
-
 const DIFFICULTY_MULTIPLIERS = { easy: 0.8, medium: 1.0, hard: 1.3 };
 
 function normalizeScore(rawScore, questionDifficulty) {

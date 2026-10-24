@@ -76,9 +76,9 @@ export default function Summary() {
       <div className="summary-hero">
         <div>
           <p className="eyebrow">{session.company} interview summary</p>
-          <h1>{formatScore(session.overallScore)}</h1>
+          <h1 className={`score-badge large-score ${getScoreClass(session.overallScore)}`}>{formatScore(session.overallScore)}</h1>
           <p className="muted">Difficulty-adjusted overall score</p>
-          <p>{session.role} - {latestAnswers.length} answered questions</p>
+          <p>{session.role} - {latestAnswers.length} answered {latestAnswers.length === 1 ? 'question' : 'questions'}</p>
         </div>
         <div className="action-row">
           <button className="button secondary" type="button" onClick={handleShare} disabled={sharing}>
@@ -113,10 +113,10 @@ export default function Summary() {
               {answer ? (
                 <>
                   <p>{answer.text}</p>
-                  <div className="grid three">
-                    <Feedback title="Strengths" items={answer.strengths} />
-                    <Feedback title="Improvements" items={answer.improvements} />
-                    <Feedback title="Missed points" items={answer.missedPoints} />
+                  <div className="grid two feedback-grid">
+                    <Feedback title="Strengths" tone="success" items={answer.strengths} />
+                    <Feedback title="Improvements" tone="warning" items={answer.improvements} />
+                    <Feedback title="Missed points" tone="danger" items={answer.missedPoints} />
                   </div>
                 </>
               ) : (
@@ -144,10 +144,17 @@ function formatScore(score) {
   return score === null || score === undefined ? '-' : score;
 }
 
-function Feedback({ title, items = [] }) {
+function getScoreClass(score) {
+  if (score === null || score === undefined) return 'score-zero';
+  if (score >= 80) return 'score-good';
+  if (score >= 60) return 'score-warn';
+  return 'score-bad';
+}
+
+function Feedback({ title, tone, items = [] }) {
   if (items.length === 0) return null;
   return (
-    <div className="feedback-list compact">
+    <div className={`feedback-list compact ${tone}`}>
       <h3>{title}</h3>
       <ul>
         {items.map((item, index) => <li key={`${title}-${index}`}>{item}</li>)}

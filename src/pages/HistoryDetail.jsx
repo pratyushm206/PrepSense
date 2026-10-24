@@ -28,7 +28,7 @@ export default function HistoryDetail() {
     <section className="page-stack">
       <Link className="button ghost fit" to="/history">Back to history</Link>
       {error && <p role="alert" className="field-error">{error}</p>}
-      <button className="button danger fit" type="button" onClick={() => setConfirmDelete(true)}>Delete session</button>
+      <button className="button danger-ghost fit" type="button" onClick={() => setConfirmDelete(true)}>Delete session</button>
       <Summary key={sessionId} />
       {confirmDelete && (
         <div className="modal-backdrop" role="presentation">

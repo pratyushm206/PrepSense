@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-unused-vars
 const errorHandler = (err, req, res, next) => {
   if (process.env.NODE_ENV !== 'production' || (err.statusCode || err.status || 500) >= 500) {
     console.error(err.stack);

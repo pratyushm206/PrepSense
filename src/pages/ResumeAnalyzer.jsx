@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { RESUME_ANALYZER_URL } from '../config/links.js';
+import Icon from '../components/Icon.jsx';
 
 const signals = [
   ['Semantic relevance · 30%', 'How the resume’s meaning relates to the job description.'],
@@ -12,7 +13,7 @@ const signals = [
 export default function ResumeAnalyzer() {
   return (
     <section className="page-stack resume-analyzer-page">
-      <header className="panel resume-analyzer-hero">
+      <header className="panel resume-analyzer-hero signature-card">
         <div>
           <p className="eyebrow">Resume toolkit</p>
           <h1>Make your resume relevant to the role.</h1>
@@ -22,15 +23,11 @@ export default function ResumeAnalyzer() {
             <Link className="button secondary" to="/interview/new">Back to Practice</Link>
           </div>
         </div>
-        <div className="resume-gauge-motif" aria-hidden="true">
-          <svg viewBox="0 0 140 88" focusable="false">
-            <path className="resume-gauge-track" d="M 14 76 A 56 56 0 0 1 126 76" />
-            <path className="resume-gauge-value" d="M 14 76 A 56 56 0 0 1 100 24" />
-            <line className="resume-gauge-needle" x1="70" y1="76" x2="96" y2="40" />
-            <circle className="resume-gauge-hub" cx="70" cy="76" r="5" />
+          <svg className="resume-hero-art" viewBox="0 0 220 180" aria-hidden="true" focusable="false">
+            <path d="M58 17h75l34 34v108a9 9 0 0 1-9 9H58a9 9 0 0 1-9-9V26a9 9 0 0 1 9-9Z" fill="color-mix(in srgb, var(--on-signature) 10%, transparent)" stroke="var(--border-glass)" strokeWidth="2" />
+            <path d="M133 18v34h33M74 72h68M74 91h44M74 110h38" fill="none" stroke="var(--on-signature-muted)" strokeWidth="4" strokeLinecap="round" />
+            <path d="m75 137 6 6 12-13m16 7 6 6 12-13m16 7 6 6 12-13" fill="none" stroke="var(--success)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
-          <span>Resume match</span>
-        </div>
       </header>
 
       <section className="grid two">
@@ -70,10 +67,10 @@ export default function ResumeAnalyzer() {
       <section className="panel resume-info-card">
         <p className="eyebrow">Before you start</p>
         <h2>Tips for a useful comparison.</h2>
-        <ul>
-          <li>Use a text-based PDF so resume content can be extracted.</li>
-          <li>Paste the full job description, including responsibilities and qualifications.</li>
-          <li>Include the role’s seniority and experience requirements in the job description.</li>
+        <ul className="resume-tip-list">
+          <li><Icon name="check" className="resume-tip-check" />Use a text-based PDF so resume content can be extracted.</li>
+          <li><Icon name="check" className="resume-tip-check" />Paste the full job description, including responsibilities and qualifications.</li>
+          <li><Icon name="check" className="resume-tip-check" />Include the role’s seniority and experience requirements in the job description.</li>
         </ul>
         <p className="resume-note">Free. PDF up to 10 MB. The first load can take ~30 s if the app is asleep.</p>
         <p className="resume-note">The inspected code does not confirm privacy or data-retention behavior.</p>
