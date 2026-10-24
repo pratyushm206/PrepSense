@@ -4069,6 +4069,10 @@ a.topic-row {
 }
 .admin-stats-page .topic-row:hover,
 .public-report .topic-row:hover { background: var(--bg-elevated); transform: none; }
+.interview-panel .result-panel { display: flex; flex-wrap: wrap; align-items: stretch; }
+.interview-panel .result-panel > * { flex: 1 1 220px; }
+.qa-card .feedback-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr)); }
+.profile-form:has(input[type="password"]) > label:last-of-type { grid-column: 1 / -1; }
 
 @media (max-width: 600px) {
   .history-page .history-query-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -4076,6 +4080,9 @@ a.topic-row {
   .history-page .history-filter-bar .filter-row { justify-content: flex-start; }
   .history-page .history-filter-bar .filter-chip { white-space: normal; }
   .history-page .history-hero { min-height: 0; }
+}
+@media (max-width: 640px) {
+  .qa-card .feedback-grid { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 390px) {
   .history-page .history-hero-stats { gap: var(--space-2); }
