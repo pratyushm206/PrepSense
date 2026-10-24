@@ -3821,6 +3821,33 @@ a.topic-row {
   .recommendation-meta { grid-column: 1 / -1; }
   .recommendation-meta .button { width: 100%; }
 }
+.profile-banner {
+  padding: var(--space-6);
+  box-shadow: var(--shadow-card);
+}
+.profile-stats .stat-orb {
+  min-height: 96px;
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--on-signature) 9%, transparent);
+}
+.profile-form,
+.profile-page > .panel { background: var(--surface-glass); }
+.profile-form .chip-editor { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
+.profile-form .removable-chip { min-height: 44px; border-radius: 999px; }
+.profile-actions { justify-content: flex-start; }
+.profile-danger-zone {
+  padding: var(--space-5);
+  border: 1px solid color-mix(in srgb, var(--danger) 34%, var(--border-subtle));
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--danger-tint) 32%, var(--bg-raised));
+}
+.profile-danger-zone > h2 { color: var(--danger); }
+.profile-danger-zone .danger-zone { border-color: color-mix(in srgb, var(--danger) 30%, var(--border-subtle)); }
+@media (max-width: 600px) {
+  .profile-banner { padding: var(--space-4); }
+  .profile-danger-zone { padding: var(--space-4); }
+}
 @media (max-width: 600px) {
   .history-page .page-head { padding: var(--space-4); }
   .history-page .session-main-link { align-items: flex-start; }
