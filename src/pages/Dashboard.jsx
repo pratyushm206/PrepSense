@@ -157,7 +157,7 @@ function NextPracticeCard({ topic }) {
         <h2>{topic ? `Practice ${topic} next` : 'Start your first mock interview'}</h2>
         <p>{topic ? 'Focus on your lowest-scoring topic to build a more balanced readiness profile.' : 'Complete a mock interview to start building your readiness profile.'}</p>
       </div>
-      <Link className="button primary dashboard-next-action" to="/interview/new">{topic ? `Practice ${topic}` : 'Start a mock interview'}<span aria-hidden="true">→</span></Link>
+      <Link className="button primary dashboard-next-action" to="/interview/new">{topic ? `Practice ${topic}` : 'Start your first mock interview'}<span aria-hidden="true">→</span></Link>
     </section>
   );
 }
@@ -177,7 +177,7 @@ function TopicsPanel({ topics }) {
         <div className="dashboard-topics-empty">
           <span className="dashboard-empty-icon" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="24" cy="24" r="17"/><path d="M24 14v11l7 4M9 8l5 3m25-3-5 3" /></svg></span>
           <div><strong>Your topic scores will appear here</strong><p>Complete an evaluated mock interview to start tracking topic performance.</p></div>
-          <Link className="button secondary" to="/interview/new">Start a mock interview</Link>
+          <Link className="button secondary" to="/interview/new">Start your first mock interview</Link>
         </div>
       ) : (
         <div className="dashboard-topic-list">
