@@ -97,7 +97,7 @@ export default function History() {
   const filteredSessions = sessions;
 
   return (
-    <section className="page-stack">
+    <section className="page-stack history-page">
       <div className="page-head">
         <div>
           <p className="eyebrow">Archive</p>
