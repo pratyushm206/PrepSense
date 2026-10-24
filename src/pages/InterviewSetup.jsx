@@ -137,7 +137,7 @@ export default function InterviewSetup() {
   return (
     <section className="practice-layout">
       <div className="practice-copy">
-        <div>
+        <div className="practice-hero signature-card">
           <p className="eyebrow">New round</p>
           <h1>Set the conditions,<br />then <span>go in cold.</span></h1>
           <p className="lead">

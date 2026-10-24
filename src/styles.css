@@ -3883,6 +3883,38 @@ a.topic-row {
   color: var(--text-primary);
   background: var(--bg-elevated);
 }
+
+.practice-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding: var(--space-6);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-lg);
+  color: var(--on-signature);
+  background: var(--gradient-signature);
+  box-shadow: var(--shadow-card);
+}
+.practice-hero > * { position: relative; z-index: 1; }
+.practice-hero .eyebrow,
+.practice-hero h1,
+.practice-hero h1 span,
+.practice-hero .lead { color: var(--on-signature); }
+.practice-hero .lead { margin-bottom: 0; }
+.practice-layout .button.primary {
+  border-color: transparent;
+  color: var(--on-signature);
+  background: var(--gradient-signature);
+}
+.practice-layout .button.primary:hover { box-shadow: var(--shadow-card); }
+.practice-layout .setup-panel { background: var(--surface-glass); }
+.practice-layout .readout {
+  background: var(--surface-glass);
+  box-shadow: var(--shadow-card);
+}
+@media (max-width: 600px) {
+  .practice-hero { padding: var(--space-4); }
+}
 .dashboard-chart .dashboard-chart-line-start { stop-color: var(--success); }
 .dashboard-chart .dashboard-chart-line-end { stop-color: var(--accent-text); }
 .dashboard-chart .performance-line { stroke: url(#dashboard-chart-stroke); }
