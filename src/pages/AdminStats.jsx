@@ -25,8 +25,8 @@ export default function AdminStats() {
         <div><p className="eyebrow">Administration</p><h1>Platform stats.</h1></div>
       </div>
       <div className="grid three admin-stat-grid">
-        <article className="stat-orb"><span>Total users</span><strong>{stats.totalUsers}</strong></article>
-        <article className="stat-orb"><span>Practice sessions</span><strong>{stats.totalSessions}</strong></article>
+        <article className="stat-orb"><span>{stats.totalUsers === 1 ? 'Total user' : 'Total users'}</span><strong>{stats.totalUsers}</strong></article>
+        <article className="stat-orb"><span>{stats.totalSessions === 1 ? 'Practice session' : 'Practice sessions'}</span><strong>{stats.totalSessions}</strong></article>
         <article className="stat-orb"><span>Average readiness</span><strong>{stats.avgReadinessScore}</strong></article>
       </div>
       <section className="panel">
