@@ -46,6 +46,11 @@
   --focus-ring: 0 0 0 3px color-mix(in srgb, var(--accent) 48%, transparent);
   --transition-fast: 150ms ease;
   --gradient-signature: linear-gradient(135deg, #1E2A78 0%, #4B3A6B 52%, #8A4F14 100%);
+  --glow-indigo: rgba(112, 129, 255, .22);
+  --glow-bronze: rgba(228, 154, 69, .18);
+  --gradient-score-line: linear-gradient(90deg, var(--danger), var(--warning) 60%, var(--success));
+  --surface-glass: rgba(12, 13, 31, .42);
+  --border-glass: rgba(255, 255, 255, .18);
   --on-signature: #fff;
   --on-signature-muted: rgba(255,255,255,.9);
 
@@ -117,6 +122,11 @@
   --focus-ring: 0 0 0 3px color-mix(in srgb, var(--accent) 48%, transparent);
   --transition-fast: 150ms ease;
   --gradient-signature: linear-gradient(135deg, #1E2A78 0%, #4B3A6B 52%, #8A4F14 100%);
+  --glow-indigo: rgba(112, 129, 255, .22);
+  --glow-bronze: rgba(228, 154, 69, .18);
+  --gradient-score-line: linear-gradient(90deg, var(--danger), var(--warning) 60%, var(--success));
+  --surface-glass: rgba(12, 13, 31, .42);
+  --border-glass: rgba(255, 255, 255, .18);
   --on-signature: #fff;
   --on-signature-muted: rgba(255,255,255,.9);
 
