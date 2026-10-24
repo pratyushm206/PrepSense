@@ -20,7 +20,7 @@ export default function AdminStats() {
   if (!stats) return <LoadingState message="Loading platform stats..." />;
 
   return (
-    <section className="page-stack">
+    <section className="page-stack admin-stats-page">
       <div className="page-head admin-hero signature-card">
         <div><p className="eyebrow">Administration</p><h1>Platform stats.</h1></div>
       </div>
