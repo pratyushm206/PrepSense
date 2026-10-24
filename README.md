@@ -73,3 +73,7 @@ Create a Node web service using the repository's `render.yaml`. The build comman
 ## Security notes
 
 Passwords are stored as bcrypt hashes. Authenticated routes use JWTs; production startup validates required environment variables and JWT secret length. The API uses request validation, rate limits, and Helmet. Public shared reports expose a sanitized report and can be revoked. Use a dedicated MongoDB database user and restrict network access. Do not commit `.env` or publish secrets.
+
+## Design system
+
+The interface uses Space Grotesk and Manrope, with design tokens in `src/theme.css`. It supports dark and light themes and uses a signature gradient hero pattern for key summaries.
