@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import Shell from './components/Shell.jsx';
+import { LoadingState } from './components/Status.jsx';
 const Dashboard = lazy(() => import('./pages/Dashboard.jsx'));
 const AdminRoute = lazy(() => import('./components/AdminRoute.jsx'));
 import History from './pages/History.jsx';
@@ -20,7 +21,7 @@ import Summary from './pages/Summary.jsx';
 
 export default function App() {
   return (
-    <Suspense fallback={<main className="page-stack" role="status">Loading page…</main>}>
+    <Suspense fallback={<main className="page" role="status"><LoadingState message="Loading page…" /></main>}>
     <Routes>
       <Route path="/" element={<Landing />} />
       <Route path="/login" element={<Login />} />

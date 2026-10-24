@@ -62,6 +62,10 @@
   --border-glass: rgba(255, 255, 255, .18);
   --on-signature: #fff;
   --on-signature-muted: rgba(255,255,255,.9);
+  --signature-ink: #1E2A78;
+  --dashboard-chip-danger: color-mix(in srgb, var(--signature-ink) 82%, var(--danger));
+  --dashboard-chip-warning: color-mix(in srgb, var(--signature-ink) 82%, var(--warning));
+  --dashboard-chip-success: color-mix(in srgb, var(--signature-ink) 82%, var(--success));
 
   /* Existing app variables, mapped to semantic design tokens */
   --bg: var(--bg-base);
@@ -147,6 +151,10 @@
   --border-glass: rgba(75, 90, 200, .16);
   --on-signature: #fff;
   --on-signature-muted: rgba(255,255,255,.9);
+  --signature-ink: #1E2A78;
+  --dashboard-chip-danger: color-mix(in srgb, var(--signature-ink) 82%, var(--danger));
+  --dashboard-chip-warning: color-mix(in srgb, var(--signature-ink) 82%, var(--warning));
+  --dashboard-chip-success: color-mix(in srgb, var(--signature-ink) 82%, var(--success));
 
   --bg: var(--bg-base);
   --gradient-start: #2f4fd4;

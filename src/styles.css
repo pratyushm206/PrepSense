@@ -144,8 +144,8 @@ h2 {
   inset: 0 0 auto;
   height: 700px;
   background:
-    radial-gradient(900px 500px at 4% 0%, var(--glow-indigo), transparent 72%),
-    radial-gradient(800px 480px at 100% 0%, var(--glow-bronze), transparent 72%),
+    radial-gradient(900px 500px at 25% 0%, var(--glow-indigo), transparent 72%),
+    radial-gradient(800px 480px at 75% 0%, var(--glow-bronze), transparent 72%),
     linear-gradient(180deg, color-mix(in srgb, var(--bg-base) 72%, transparent), var(--bg-base));
   pointer-events: none;
 }
@@ -3655,7 +3655,7 @@ a.topic-row {
 .dashboard-trend-chip.declining { color: var(--danger); background: var(--danger-tint); border-color: color-mix(in srgb, var(--danger) 36%, transparent); }
 .dashboard-trend-chip.stable,
 .dashboard-trend-chip.new { color: var(--text-secondary); background: var(--bg-elevated); border-color: var(--border-subtle); }
-.dashboard-topic-arrow { color: var(--text-muted); text-align: right; transition: color var(--transition-fast), transform var(--transition-fast); }
+.dashboard-topic-arrow { color: var(--text-secondary); text-align: right; transition: color var(--transition-fast), transform var(--transition-fast); }
 .dashboard-topic-row:hover .dashboard-topic-arrow { color: var(--accent-text); transform: translate(2px, -2px); }
 
 .dashboard-topics-empty,
@@ -3839,7 +3839,11 @@ a.topic-row {
   font-size: var(--text-xs);
 }
 .dashboard-topic-arrow { transition: color var(--transition-fast), transform var(--transition-fast); }
-.dashboard-topic-row:hover .dashboard-topic-arrow { transform: translate(3px, -3px); }
+.dashboard-topic-row:hover .dashboard-topic-arrow,
+.dashboard-topic-row:focus-visible .dashboard-topic-arrow {
+  color: var(--text-secondary);
+  transform: translate(3px, -3px);
+}
 
 .dashboard-trend-icon {
   width: 80px;
@@ -3852,8 +3856,17 @@ a.topic-row {
 .dashboard-sparkline .icon-sparkline-art {
   stroke: url(#dashboard-empty-sparkline-stroke);
   stroke-dasharray: 4 4;
-  opacity: .38;
+  opacity: .6;
 }
+.dashboard-readiness .readiness-chip.danger,
+.dashboard-readiness .readiness-chip.warning,
+.dashboard-readiness .readiness-chip.success {
+  color: var(--on-signature);
+  border-color: color-mix(in srgb, var(--on-signature) 24%, transparent);
+}
+.dashboard-readiness .readiness-chip.danger { background: var(--dashboard-chip-danger); }
+.dashboard-readiness .readiness-chip.warning { background: var(--dashboard-chip-warning); }
+.dashboard-readiness .readiness-chip.success { background: var(--dashboard-chip-success); }
 .dashboard-chart .dashboard-chart-line-start { stop-color: var(--success); }
 .dashboard-chart .dashboard-chart-line-end { stop-color: var(--accent-text); }
 .dashboard-chart .performance-line { stroke: url(#dashboard-chart-stroke); }
