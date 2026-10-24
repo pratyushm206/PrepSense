@@ -320,15 +320,24 @@ h2 {
 }
 
 .auth-layout {
-  background:
-    radial-gradient(900px 420px at 85% -10%, color-mix(in srgb, var(--gradient-start) 12%, transparent) 0%, transparent 55%),
-    var(--bg);
+  background: var(--bg-base);
 }
 
 .auth-panel {
+  position: relative;
+  overflow: hidden;
   width: min(460px, 100%);
-  padding: clamp(22px, 5vw, 38px);
-  box-shadow: var(--shadow);
+  padding: var(--space-6) var(--space-5) var(--space-5);
+  border-color: var(--border-subtle);
+  box-shadow: var(--shadow-1);
+}
+
+.auth-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  background: var(--gradient-signature);
 }
 
 .auth-panel.wide {
