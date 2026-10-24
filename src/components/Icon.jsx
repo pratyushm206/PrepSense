@@ -12,10 +12,29 @@ const iconPaths = {
   github: <path fill="currentColor" stroke="none" d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.04 1.53 1.04.9 1.53 2.36 1.09 2.94.83.09-.65.35-1.09.64-1.34-2.22-.25-4.56-1.11-4.56-4.95 0-1.1.39-1.99 1.03-2.69-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.02A9.56 9.56 0 0 1 12 6.8a9.5 9.5 0 0 1 2.5.34c1.91-1.29 2.75-1.02 2.75-1.02.55 1.38.2 2.4.1 2.65.64.7 1.03 1.59 1.03 2.69 0 3.85-2.34 4.7-4.57 4.95.36.31.68.92.68 1.86v2.76c0 .26.18.58.69.48A10 10 0 0 0 12 2Z" />,
   linkedin: <><rect x="3.5" y="3.5" width="17" height="17" rx="2" /><path d="M8 10.5V16.5M8 7.5v.02M12 16.5v-3.6c0-1.2.9-2 2-2s2 .8 2 2v3.6" /></>,
   code: <><path d="M7 4.5h7.5L19 9v10.5H7z" /><path d="M14.5 4.5V9H19M9.5 13h5M9.5 16h3.5" /></>,
+  logout: <><path d="M10 17l5-5-5-5M15 12H3" /><path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6" /></>,
   xBrand: <path d="M5 5 19 19M19 5 5 19" />,
   sun: <><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" /></>,
   moon: <path d="M20.5 15.2A8.5 8.5 0 0 1 8.8 3.5 8.5 8.5 0 1 0 20.5 15.2Z" />
 };
+
+export function MenuIcon({ className = '' }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true" focusable="false">
+      <path className="menu-icon-line menu-icon-line-top" d="M4 6h16" />
+      <path className="menu-icon-line menu-icon-line-middle" d="M4 12h16" />
+      <path className="menu-icon-line menu-icon-line-bottom" d="M4 18h16" />
+    </svg>
+  );
+}
+
+export function CloseIcon({ className = '' }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true" focusable="false">
+      <path d="m6 6 12 12M18 6 6 18" />
+    </svg>
+  );
+}
 
 export default function Icon({ name, className = '', title, viewBox = '0 0 24 24', ...props }) {
   return (

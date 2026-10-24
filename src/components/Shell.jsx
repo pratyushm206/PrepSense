@@ -1,12 +1,56 @@
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
+import Icon, { CloseIcon, MenuIcon } from './Icon.jsx';
 
 export default function Shell() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isMobileNav, setIsMobileNav] = useState(() => window.matchMedia('(max-width: 1099px)').matches);
+  const menuToggleRef = useRef(null);
+  const menuPanelRef = useRef(null);
   const initial = (user?.name || user?.email || 'P').trim().charAt(0).toUpperCase();
+
+  useEffect(() => {
+    const media = window.matchMedia('(max-width: 1099px)');
+    const updateMobileNav = event => {
+      setIsMobileNav(event.matches);
+      if (!event.matches) setMenuOpen(false);
+    };
+    setIsMobileNav(media.matches);
+    media.addEventListener('change', updateMobileNav);
+    return () => media.removeEventListener('change', updateMobileNav);
+  }, []);
+
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [location.pathname, location.search, location.hash]);
+
+  useEffect(() => {
+    if (!menuOpen || !isMobileNav) return undefined;
+
+    function handlePointerDown(event) {
+      const clickedPanel = menuPanelRef.current?.contains(event.target);
+      const clickedToggle = menuToggleRef.current?.contains(event.target);
+      if (!clickedPanel && !clickedToggle) setMenuOpen(false);
+    }
+
+    function handleKeyDown(event) {
+      if (event.key === 'Escape') {
+        setMenuOpen(false);
+        menuToggleRef.current?.focus();
+      }
+    }
+
+    document.addEventListener('pointerdown', handlePointerDown);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [menuOpen, isMobileNav]);
 
   function handleLogout() {
     logout();
@@ -20,17 +64,39 @@ export default function Shell() {
           <span className="brand-mark">P</span>
           <span className="brand-name">PrepSense</span>
         </NavLink>
-        <button className="nav-menu-toggle" type="button" aria-expanded={menuOpen} aria-controls="primary-navigation" onClick={() => setMenuOpen(open => !open)}>
-          {menuOpen ? 'Close menu' : 'Menu'}
+        <button
+          ref={menuToggleRef}
+          className="nav-menu-toggle"
+          type="button"
+          aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+          aria-expanded={menuOpen}
+          aria-controls="primary-navigation"
+          onClick={() => setMenuOpen(open => !open)}
+        >
+          <span className="nav-toggle-icon" aria-hidden="true">
+            <MenuIcon className={`nav-toggle-glyph${menuOpen ? ' is-hidden' : ''}`} />
+            <CloseIcon className={`nav-toggle-glyph nav-toggle-close${menuOpen ? ' is-visible' : ''}`} />
+          </span>
         </button>
-        <nav id="primary-navigation" className={`nav-links${menuOpen ? ' is-open' : ''}`} aria-label="Primary navigation">
-          <NavLink end onClick={() => setMenuOpen(false)} to="/dashboard">Dashboard</NavLink>
-          <NavLink end onClick={() => setMenuOpen(false)} to="/interview/new">Practice</NavLink>
-          <NavLink end onClick={() => setMenuOpen(false)} to="/history">History</NavLink>
-          <NavLink end onClick={() => setMenuOpen(false)} to="/leaderboard">Leaderboard</NavLink>
-          <NavLink end onClick={() => setMenuOpen(false)} to="/recommendations">Recommendations</NavLink>
-          <NavLink end onClick={() => setMenuOpen(false)} to="/resume-analyzer">Resume</NavLink>
-          {user?.isAdmin && <NavLink end onClick={() => setMenuOpen(false)} to="/admin">Admin</NavLink>}
+        <nav
+          ref={menuPanelRef}
+          id="primary-navigation"
+          className={`nav-links${menuOpen ? ' is-open' : ''}`}
+          aria-label="Primary navigation"
+          aria-hidden={isMobileNav && !menuOpen}
+          inert={isMobileNav && !menuOpen ? '' : undefined}
+        >
+          <NavigationLink icon="grid" to="/dashboard" onClick={() => setMenuOpen(false)}>Dashboard</NavigationLink>
+          <NavigationLink icon="calendar" to="/interview/new" onClick={() => setMenuOpen(false)}>Practice</NavigationLink>
+          <NavigationLink icon="clock" to="/history" onClick={() => setMenuOpen(false)}>History</NavigationLink>
+          <NavigationLink icon="chart" to="/leaderboard" onClick={() => setMenuOpen(false)}>Leaderboard</NavigationLink>
+          <NavigationLink icon="bulb" to="/recommendations" onClick={() => setMenuOpen(false)}>Recommendations</NavigationLink>
+          <NavigationLink icon="document" to="/resume-analyzer" onClick={() => setMenuOpen(false)}>Resume</NavigationLink>
+          {user?.isAdmin && <NavigationLink icon="target" to="/admin" onClick={() => setMenuOpen(false)}>Admin</NavigationLink>}
+          <button type="button" className="nav-mobile-logout button danger-ghost" onClick={handleLogout}>
+            <Icon name="logout" />
+            <span>Log out</span>
+          </button>
         </nav>
         <div className="user-actions">
           <NavLink
@@ -48,5 +114,14 @@ export default function Shell() {
         <Outlet />
       </main>
     </div>
+  );
+}
+
+function NavigationLink({ icon, to, onClick, children }) {
+  return (
+    <NavLink end onClick={onClick} to={to}>
+      <Icon name={icon} />
+      <span>{children}</span>
+    </NavLink>
   );
 }
