@@ -1196,6 +1196,10 @@ h2 {
   display: grid;
 }
 
+.question-breakdown {
+  gap: var(--space-4);
+}
+
 .mini-item,
 .topic-row,
 .history-row {
@@ -1953,6 +1957,30 @@ a.topic-row {
   color: var(--on-signature);
 }
 
+.large-score.score-badge {
+  width: clamp(88px, 14vw, 128px);
+  height: clamp(88px, 14vw, 128px);
+  margin: 0 0 var(--space-3);
+  font-size: var(--text-3xl);
+}
+
+.summary-hero .large-score.score-badge,
+.summary-hero .large-score.score-badge.score-good,
+.summary-hero .large-score.score-badge.score-warn,
+.summary-hero .large-score.score-badge.score-bad,
+.public-report-hero .large-score.score-badge,
+.public-report-hero .large-score.score-badge.score-good,
+.public-report-hero .large-score.score-badge.score-warn,
+.public-report-hero .large-score.score-badge.score-bad {
+  color: var(--on-signature);
+  border-color: var(--on-signature);
+  background: color-mix(in srgb, var(--on-signature) 12%, transparent);
+}
+
+.summary-hero .action-row {
+  justify-content: flex-end;
+}
+
 .interview-layout {
   display: grid;
   grid-template-columns: 280px 1fr;
@@ -2250,7 +2278,24 @@ a.topic-row {
 
 .qa-card {
   display: grid;
-  gap: 12px;
+  gap: var(--space-3);
+}
+
+.qa-card .feedback-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.feedback-list.success {
+  border-left: 3px solid var(--success);
+}
+
+.feedback-list.warning {
+  border-left: 3px solid var(--warning);
+}
+
+.feedback-list.danger {
+  border-left: 3px solid var(--danger);
 }
 
 @keyframes spin {
@@ -2362,6 +2407,20 @@ a.topic-row {
 }
 
 @media (max-width: 760px) {
+  .summary-hero {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .summary-hero .action-row {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .qa-card .feedback-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .resume-analyzer-hero {
     grid-template-columns: minmax(0, 1fr);
   }

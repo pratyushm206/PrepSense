@@ -38,7 +38,7 @@ export default function PublicReport() {
         <div className="summary-hero public-report-hero">
           <div>
             <p className="eyebrow">{report.company} readiness report</p>
-            <h1>{formatScore(report.score)}</h1>
+            <h1 className={`score-badge large-score ${getScoreClass(report.score)}`}>{formatScore(report.score)}</h1>
             <p>{report.role} - {report.questionCount} questions - {formatDate(report.completedAt)}</p>
           </div>
           <Link className="button secondary" to="/">PrepSense</Link>
@@ -86,6 +86,13 @@ function getScoreColor(score = 0) {
 function getScorePercent(score) {
   if (score === null || score === undefined) return 0;
   return Math.max(0, Math.min(100, score));
+}
+
+function getScoreClass(score) {
+  if (score === null || score === undefined) return 'score-zero';
+  if (score >= 80) return 'score-good';
+  if (score >= 60) return 'score-warn';
+  return 'score-bad';
 }
 
 function formatScore(score) {
