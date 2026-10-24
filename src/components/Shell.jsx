@@ -24,13 +24,13 @@ export default function Shell() {
           {menuOpen ? 'Close menu' : 'Menu'}
         </button>
         <nav id="primary-navigation" className={`nav-links${menuOpen ? ' is-open' : ''}`} aria-label="Primary navigation">
-          <NavLink onClick={() => setMenuOpen(false)} to="/dashboard">Dashboard</NavLink>
-          <NavLink onClick={() => setMenuOpen(false)} to="/interview/new">Practice</NavLink>
-          <NavLink onClick={() => setMenuOpen(false)} to="/history">History</NavLink>
-          <NavLink onClick={() => setMenuOpen(false)} to="/leaderboard">Leaderboard</NavLink>
-          <NavLink onClick={() => setMenuOpen(false)} to="/recommendations">Recommendations</NavLink>
-          <NavLink onClick={() => setMenuOpen(false)} to="/resume-analyzer">Resume</NavLink>
-          {user?.isAdmin && <NavLink onClick={() => setMenuOpen(false)} to="/admin">Admin</NavLink>}
+          <NavLink end onClick={() => setMenuOpen(false)} to="/dashboard">Dashboard</NavLink>
+          <NavLink end onClick={() => setMenuOpen(false)} to="/interview/new">Practice</NavLink>
+          <NavLink end onClick={() => setMenuOpen(false)} to="/history">History</NavLink>
+          <NavLink end onClick={() => setMenuOpen(false)} to="/leaderboard">Leaderboard</NavLink>
+          <NavLink end onClick={() => setMenuOpen(false)} to="/recommendations">Recommendations</NavLink>
+          <NavLink end onClick={() => setMenuOpen(false)} to="/resume-analyzer">Resume</NavLink>
+          {user?.isAdmin && <NavLink end onClick={() => setMenuOpen(false)} to="/admin">Admin</NavLink>}
         </nav>
         <div className="user-actions">
           <NavLink

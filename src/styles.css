@@ -141,19 +141,18 @@ h2 {
   z-index: 50;
   display: grid;
   grid-template-columns: auto 1fr auto;
-  gap: 18px;
+  gap: var(--space-3);
   align-items: center;
   min-height: 72px;
-  padding: 1.1rem 2.5rem;
-  background: color-mix(in srgb, var(--bg-card) 92%, transparent);
-  border-bottom: 1px solid var(--border);
-  backdrop-filter: blur(10px);
+  padding: var(--space-3) var(--space-5);
+  background: var(--bg-raised);
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .brand {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-2);
 }
 
 .brand-mark {
@@ -162,23 +161,23 @@ h2 {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 7px;
-  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-  color: var(--bg-card);
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 0.85rem;
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  color: var(--on-accent);
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
   font-weight: 700;
 }
 
 .brand-name {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 1.05rem;
+  font-family: var(--font-display);
+  font-size: var(--text-md);
   font-weight: 700;
 }
 
 .nav-links {
   display: flex;
-  gap: 0.4rem;
+  gap: var(--space-1);
   justify-content: center;
 }
 
@@ -186,17 +185,16 @@ h2 {
 
 .nav-links a {
   position: relative;
-  min-height: auto;
+  min-height: 44px;
   display: inline-flex;
   align-items: center;
-  border-radius: 8px;
-  padding: 0.5rem 0.9rem;
-  color: var(--text-dim);
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.76rem;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  transition: all 0.15s;
+  border-radius: var(--radius-sm);
+  padding: 0 var(--space-3);
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  transition: color var(--transition-fast), background-color var(--transition-fast);
 }
 
 .nav-links a::after {
@@ -206,25 +204,29 @@ h2 {
   right: 0.9rem;
   bottom: 0.28rem;
   height: 2px;
-  background: var(--cat-behavioral);
+  background: var(--accent);
   transform: scaleX(0);
   transform-origin: left;
-  transition: transform 0.15s ease;
+  transition: none;
 }
 
 .nav-links a:hover {
-  color: var(--text);
+  color: var(--text-secondary);
   background: transparent;
 }
 
-.nav-links a:hover::after,
 .nav-links a.active::after {
   transform: scaleX(1);
 }
 
 .nav-links a.active {
-  color: var(--text);
-  background: color-mix(in srgb, var(--cat-behavioral) 8%, transparent);
+  color: var(--accent-text);
+  background: var(--accent-tint);
+}
+
+.nav-links a.active:hover {
+  color: var(--accent-text);
+  background: var(--accent-tint);
 }
 
 .user-actions {
@@ -236,29 +238,22 @@ h2 {
 }
 
 .user-avatar {
-  width: 38px;
-  height: 38px;
+  width: 44px;
+  height: 44px;
   display: grid;
   place-items: center;
   border-radius: 50%;
-  background:
-    radial-gradient(circle at 30% 25%, color-mix(in srgb, var(--gradient-end) 45%, white) 0%, var(--accent) 42%, color-mix(in srgb, var(--accent) 78%, black) 100%);
-  color: var(--bg-card);
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 0.95rem;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-family: var(--font-display);
+  font-size: var(--text-md);
   font-weight: 700;
-  box-shadow:
-    inset 0 1px 2px rgba(255, 255, 255, 0.45),
-    0 8px 18px -10px color-mix(in srgb, var(--accent) 65%, transparent);
-  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  transition: background-color var(--transition-fast), opacity var(--transition-fast);
 }
 
 .user-avatar:hover,
 .user-avatar.active {
-  transform: translateY(-1px) scale(1.04);
-  box-shadow:
-    inset 0 1px 2px rgba(255, 255, 255, 0.5),
-    0 12px 22px -10px color-mix(in srgb, var(--accent) 75%, transparent);
+  opacity: 0.88;
 }
 
 .page {
@@ -852,7 +847,7 @@ h2 {
 
 .dash-metrics {
   display: flex;
-  gap: 1rem;
+  gap: var(--space-3);
   margin: 0 0 1.4rem;
 }
 
@@ -1012,7 +1007,7 @@ h2 {
 
 .project-link-card span {
   color: var(--text-dim);
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
 }
 
 .chip-editor {
@@ -2230,7 +2225,7 @@ a.topic-row {
 @media (max-width: 1099px) {
   .topbar {
     grid-template-columns: 1fr auto auto;
-    padding: 0.75rem 1rem;
+    padding: var(--space-2) var(--space-3);
   }
 
   .nav-menu-toggle { display: inline-flex; min-height: 44px; min-width: 64px; align-items: center; justify-content: center; }
@@ -2245,7 +2240,7 @@ a.topic-row {
   .nav-links a {
     flex: 1 1 150px;
     min-height: 44px;
-    padding-inline: 0.65rem;
+    padding-inline: var(--space-3);
   }
 
   .user-actions {
