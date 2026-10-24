@@ -63,6 +63,7 @@
   --on-signature: #fff;
   --on-signature-muted: rgba(255,255,255,.9);
   --signature-ink: #1E2A78;
+  --signature-scrim: rgba(10, 9, 8, .38);
   --dashboard-chip-danger: color-mix(in srgb, var(--signature-ink) 82%, var(--danger));
   --dashboard-chip-warning: color-mix(in srgb, var(--signature-ink) 82%, var(--warning));
   --dashboard-chip-success: color-mix(in srgb, var(--signature-ink) 82%, var(--success));
@@ -152,6 +153,7 @@
   --on-signature: #fff;
   --on-signature-muted: rgba(255,255,255,.9);
   --signature-ink: #1E2A78;
+  --signature-scrim: rgba(10, 9, 8, .38);
   --dashboard-chip-danger: color-mix(in srgb, var(--signature-ink) 82%, var(--danger));
   --dashboard-chip-warning: color-mix(in srgb, var(--signature-ink) 82%, var(--warning));
   --dashboard-chip-success: color-mix(in srgb, var(--signature-ink) 82%, var(--success));

@@ -2150,7 +2150,7 @@ a.topic-row {
   content: '';
   position: absolute;
   inset: 0;
-  background: color-mix(in srgb, var(--bg-base) 42%, transparent);
+  background: var(--signature-scrim);
   pointer-events: none;
 }
 
@@ -3308,7 +3308,7 @@ a.topic-row {
   content: '';
   position: absolute;
   inset: 0;
-  background: color-mix(in srgb, var(--bg-base) 34%, transparent);
+  background: var(--signature-scrim);
   pointer-events: none;
 }
 .landing-hero > * { position: relative; z-index: 1; }
