@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;800&family=Space+Grotesk:wght@500;700&display=swap');
 @import './theme.css';
 
 :root {
@@ -24,7 +24,7 @@
   --category-selected-behavioral: color-mix(in srgb, var(--cat-behavioral) 12%, var(--bg-card));
   --radius: 14px;
   --shadow: 0 18px 50px color-mix(in srgb, var(--cat-behavioral) 8%, transparent);
-  font-family: 'Manrope', sans-serif;
+  font-family: var(--font-body);
 }
 
 :root[data-theme='light'] {
@@ -42,7 +42,7 @@ body {
     radial-gradient(1200px 500px at 15% -10%, color-mix(in srgb, var(--gradient-end) 14%, transparent) 0%, transparent 60%),
     var(--bg);
   color: var(--text);
-  font-family: 'Manrope', sans-serif;
+  font-family: var(--font-body);
 }
 
 a {
@@ -2461,7 +2461,7 @@ a.topic-row {
 
 .landing-nav a {
   position: relative;
-  font-family: 'Manrope', sans-serif;
+  font-family: var(--font-body);
   font-size: 0.88rem;
   font-weight: 500;
   color: var(--ink2);
@@ -2538,7 +2538,7 @@ a.topic-row {
 }
 
 .landing-text-link {
-  font-family: 'Manrope', sans-serif;
+  font-family: var(--font-body);
   font-size: 0.88rem;
   font-weight: 500;
   color: var(--ink2);
@@ -2775,7 +2775,7 @@ a.topic-row {
 .landing-footer-blurb {
   max-width: 36ch;
   margin: 0;
-  font-family: 'Manrope', sans-serif;
+  font-family: var(--font-body);
   font-size: 0.875rem;
   line-height: 1.6;
   color: var(--ink2);
@@ -2833,7 +2833,7 @@ a.topic-row {
   display: flex;
   align-items: center;
   gap: 0.65rem;
-  font-family: 'Manrope', sans-serif;
+  font-family: var(--font-body);
   font-size: 0.9rem;
   color: var(--ink2);
   transition: color 0.15s ease;
