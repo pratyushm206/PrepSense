@@ -3867,6 +3867,22 @@ a.topic-row {
 .dashboard-readiness .readiness-chip.danger { background: var(--dashboard-chip-danger); }
 .dashboard-readiness .readiness-chip.warning { background: var(--dashboard-chip-warning); }
 .dashboard-readiness .readiness-chip.success { background: var(--dashboard-chip-success); }
+
+/* Shared navigation finish */
+.topbar {
+  background: color-mix(in srgb, var(--bg-raised) 92%, transparent);
+  border-bottom-color: color-mix(in srgb, var(--border-subtle) 82%, transparent);
+  box-shadow: var(--shadow-1);
+}
+.nav-links a.active {
+  color: var(--text-primary);
+  background: color-mix(in srgb, var(--accent-tint) 72%, transparent);
+}
+.nav-links a:hover:not(.active),
+.nav-links a:focus-visible:not(.active) {
+  color: var(--text-primary);
+  background: var(--bg-elevated);
+}
 .dashboard-chart .dashboard-chart-line-start { stop-color: var(--success); }
 .dashboard-chart .dashboard-chart-line-end { stop-color: var(--accent-text); }
 .dashboard-chart .performance-line { stroke: url(#dashboard-chart-stroke); }
