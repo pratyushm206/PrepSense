@@ -1830,6 +1830,40 @@ a.topic-row {
   gap: var(--space-5);
 }
 
+.admin-hero {
+  align-items: center;
+  min-height: 160px;
+  color: var(--on-signature);
+  background: var(--gradient-signature);
+}
+
+.admin-hero .eyebrow,
+.admin-hero h1 {
+  color: var(--on-signature);
+}
+
+.admin-stat-grid .stat-orb {
+  min-width: 0;
+  padding: var(--space-4);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--bg-raised);
+}
+
+.admin-stat-grid .stat-orb span {
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-transform: none;
+}
+
+.admin-stat-grid .stat-orb strong {
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
 .leaderboard-hero .eyebrow {
   color: var(--on-signature);
 }

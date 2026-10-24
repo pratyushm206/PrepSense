@@ -21,10 +21,10 @@ export default function AdminStats() {
 
   return (
     <section className="page-stack">
-      <div className="page-head">
+      <div className="page-head admin-hero signature-card">
         <div><p className="eyebrow">Administration</p><h1>Platform stats.</h1></div>
       </div>
-      <div className="grid three">
+      <div className="grid three admin-stat-grid">
         <article className="stat-orb"><span>Total users</span><strong>{stats.totalUsers}</strong></article>
         <article className="stat-orb"><span>Practice sessions</span><strong>{stats.totalSessions}</strong></article>
         <article className="stat-orb"><span>Average readiness</span><strong>{stats.avgReadinessScore}</strong></article>
