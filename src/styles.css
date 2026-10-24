@@ -425,8 +425,8 @@ h2 {
 }
 
 .theme-toggle {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   display: inline-grid;
   place-items: center;
   flex-shrink: 0;
@@ -911,52 +911,68 @@ h2 {
 .profile-hero {
   display: flex;
   align-items: center;
-  gap: 1.4rem;
+  gap: var(--space-4);
+}
+
+.profile-banner {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.profile-banner .eyebrow,
+.profile-banner h1,
+.profile-banner .lead {
+  color: var(--on-signature);
+}
+
+.profile-banner .theme-toggle {
+  color: var(--on-signature);
+  border-color: color-mix(in srgb, var(--on-signature) 55%, transparent);
+  background: color-mix(in srgb, var(--on-signature) 10%, transparent);
 }
 
 .profile-avatar-lg {
-  width: 88px;
-  height: 88px;
+  width: 72px;
+  height: 72px;
   display: grid;
   place-items: center;
   border-radius: 50%;
-  background:
-    radial-gradient(circle at 32% 28%, color-mix(in srgb, var(--gradient-end) 45%, white) 0%, var(--accent) 40%, color-mix(in srgb, var(--accent) 78%, black) 100%);
-  color: var(--bg-card);
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 2.1rem;
+  background: var(--on-signature);
+  color: var(--accent);
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
   font-weight: 700;
-  box-shadow:
-    inset 0 2px 4px rgba(255, 255, 255, 0.45),
-    0 18px 30px -16px color-mix(in srgb, var(--accent) 62%, transparent);
+  border: 1px solid var(--border-strong);
 }
 
 .profile-hero h1 {
   font-size: clamp(1.8rem, 4vw, 2.6rem);
-  margin-bottom: 0.2rem;
+  margin-bottom: var(--space-1);
 }
 
 .profile-stats .stat-orb {
-  padding: 1.15rem 1.2rem;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  box-shadow: 0 16px 28px -22px rgba(16, 24, 40, 0.18);
+  min-width: 0;
+  padding: var(--space-3);
+  background: var(--bg-raised);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
 }
 
 .stat-orb span {
   display: block;
-  color: var(--text-faint);
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.68rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  margin-bottom: 0.4rem;
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  margin-bottom: var(--space-1);
 }
 
 .stat-orb strong {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 1.6rem;
+  display: block;
+  overflow-wrap: anywhere;
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
 }
 
 .stat-orb .stat-date {
@@ -965,8 +981,8 @@ h2 {
 
 .profile-form {
   display: grid;
-  gap: 1.1rem;
-  padding: 1.5rem 1.6rem;
+  gap: var(--space-4);
+  padding: var(--space-5);
 }
 
 .profile-form .section-heading {
@@ -1011,8 +1027,10 @@ h2 {
 }
 
 .chip-editor {
-  display: grid;
-  gap: 0.8rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
 }
 
 .removable-chip {
@@ -1022,13 +1040,21 @@ h2 {
 .chip-add {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: 0.7rem;
+  gap: var(--space-2);
+  flex: 1 1 240px;
+  min-width: min(100%, 240px);
 }
 
 .button.danger {
-  background: var(--red-dim);
-  border-color: var(--red);
-  color: var(--red);
+  background: transparent;
+  border-color: transparent;
+  color: var(--danger);
+}
+
+.confirm-modal .button.danger {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: var(--on-danger);
 }
 
 .danger-zone {
@@ -1041,6 +1067,24 @@ h2 {
 .danger-zone p {
   color: var(--text-dim);
   margin-bottom: 0;
+}
+
+.profile-danger-zone {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  border: 1px solid var(--danger);
+  border-radius: var(--radius-lg);
+  background: var(--danger-tint);
+}
+
+.profile-danger-zone > h2 {
+  margin: 0;
+  color: var(--danger);
+}
+
+.profile-danger-zone .danger-zone {
+  box-shadow: none;
 }
 
 .modal-backdrop {
@@ -2537,9 +2581,30 @@ a.topic-row {
     flex: 1 1 100%;
   }
 
+  .danger-zone {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
   .dsa-details dl div {
     grid-template-columns: 1fr;
     gap: 2px;
+  }
+}
+
+@media (min-width: 768px) {
+  .profile-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .profile-form > .section-heading,
+  .profile-form > .field:has(.chip-editor),
+  .profile-form > .action-row {
+    grid-column: 1 / -1;
+  }
+
+  .grid.three.profile-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
