@@ -22,6 +22,11 @@ export default function ResumeAnalyzer() {
             <Link className="button secondary" to="/interview/new">Back to Practice</Link>
           </div>
         </div>
+          <svg className="resume-hero-art" viewBox="0 0 220 180" aria-hidden="true" focusable="false">
+            <path d="M58 17h75l34 34v108a9 9 0 0 1-9 9H58a9 9 0 0 1-9-9V26a9 9 0 0 1 9-9Z" fill="color-mix(in srgb, var(--on-signature) 10%, transparent)" stroke="var(--border-glass)" strokeWidth="2" />
+            <path d="M133 18v34h33M74 72h68M74 91h44M74 110h38" fill="none" stroke="var(--on-signature-muted)" strokeWidth="4" strokeLinecap="round" />
+            <path d="m75 137 6 6 12-13m16 7 6 6 12-13m16 7 6 6 12-13" fill="none" stroke="var(--success)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
       </header>
 
       <section className="grid two">
@@ -62,9 +67,9 @@ export default function ResumeAnalyzer() {
         <p className="eyebrow">Before you start</p>
         <h2>Tips for a useful comparison.</h2>
         <ul className="resume-tip-list">
-          <li className="callout info">Use a text-based PDF so resume content can be extracted.</li>
-          <li className="callout info">Paste the full job description, including responsibilities and qualifications.</li>
-          <li className="callout info">Include the role’s seniority and experience requirements in the job description.</li>
+          <li>Use a text-based PDF so resume content can be extracted.</li>
+          <li>Paste the full job description, including responsibilities and qualifications.</li>
+          <li>Include the role’s seniority and experience requirements in the job description.</li>
         </ul>
         <p className="resume-note">Free. PDF up to 10 MB. The first load can take ~30 s if the app is asleep.</p>
         <p className="resume-note">The inspected code does not confirm privacy or data-retention behavior.</p>
