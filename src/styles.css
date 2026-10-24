@@ -603,11 +603,25 @@ h2 {
 
 .resume-analyzer-hero {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 220px;
-  gap: 2rem;
-  align-items: center;
-  padding: clamp(1.4rem, 4vw, 3rem);
-  background: linear-gradient(115deg, color-mix(in srgb, var(--cat-behavioral) 9%, var(--bg-card)), var(--bg-card) 62%);
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+  align-items: start;
+  padding: var(--space-5);
+  border-color: var(--border-strong);
+  color: var(--on-signature);
+  background: var(--gradient-signature);
+}
+
+.resume-analyzer-hero .eyebrow,
+.resume-analyzer-hero h1,
+.resume-analyzer-hero .lead {
+  color: var(--on-signature);
+}
+
+.resume-analyzer-hero .button.secondary {
+  color: var(--on-signature);
+  border-color: color-mix(in srgb, var(--on-signature) 65%, transparent);
+  background: color-mix(in srgb, var(--on-signature) 8%, transparent);
 }
 
 .resume-analyzer-hero h1 {
@@ -623,7 +637,7 @@ h2 {
 .resume-info-card {
   display: grid;
   align-content: start;
-  gap: 0.7rem;
+  gap: var(--space-3);
 }
 
 .resume-info-card h2 {
@@ -640,26 +654,39 @@ h2 {
 
 .resume-info-card ol,
 .resume-info-card ul {
-  padding-left: 1.3rem;
+  padding-left: var(--space-4);
 }
 
 .resume-info-card li + li {
-  margin-top: 0.35rem;
+  margin-top: var(--space-2);
+}
+
+.resume-info-card .resume-tip-list {
+  display: grid;
+  gap: var(--space-3);
+  padding-left: 0;
+  list-style: none;
+}
+
+.resume-info-card .resume-tip-list li + li {
+  margin-top: 0;
 }
 
 .resume-signal-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.8rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+  gap: var(--space-3);
 }
 
 .resume-signal {
   display: grid;
-  gap: 0.4rem;
-  padding: 1rem;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  background: var(--surface2);
+  align-content: start;
+  gap: var(--space-2);
+  min-width: 0;
+  padding: var(--space-4);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--bg-elevated);
 }
 
 .resume-signal strong {
@@ -674,9 +701,10 @@ h2 {
 }
 
 .resume-info-card .resume-note {
-  padding: 0.75rem 0.9rem;
-  border-left: 3px solid var(--cat-behavioral);
-  background: color-mix(in srgb, var(--cat-behavioral) 7%, var(--bg-card));
+  padding: var(--space-3) var(--space-4);
+  border-left: 3px solid var(--warning);
+  border-radius: var(--radius-md);
+  background: var(--warning-tint);
 }
 
 .gauge-panel::before {

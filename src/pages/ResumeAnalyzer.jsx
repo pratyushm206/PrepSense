@@ -12,7 +12,7 @@ const signals = [
 export default function ResumeAnalyzer() {
   return (
     <section className="page-stack resume-analyzer-page">
-      <header className="panel resume-analyzer-hero">
+      <header className="panel resume-analyzer-hero signature-card">
         <div>
           <p className="eyebrow">Resume toolkit</p>
           <h1>Make your resume relevant to the role.</h1>
@@ -21,15 +21,6 @@ export default function ResumeAnalyzer() {
             <a className="button primary" href={RESUME_ANALYZER_URL} target="_blank" rel="noopener noreferrer">Analyze my resume</a>
             <Link className="button secondary" to="/interview/new">Back to Practice</Link>
           </div>
-        </div>
-        <div className="resume-gauge-motif" aria-hidden="true">
-          <svg viewBox="0 0 140 88" focusable="false">
-            <path className="resume-gauge-track" d="M 14 76 A 56 56 0 0 1 126 76" />
-            <path className="resume-gauge-value" d="M 14 76 A 56 56 0 0 1 100 24" />
-            <line className="resume-gauge-needle" x1="70" y1="76" x2="96" y2="40" />
-            <circle className="resume-gauge-hub" cx="70" cy="76" r="5" />
-          </svg>
-          <span>Resume match</span>
         </div>
       </header>
 
@@ -70,10 +61,10 @@ export default function ResumeAnalyzer() {
       <section className="panel resume-info-card">
         <p className="eyebrow">Before you start</p>
         <h2>Tips for a useful comparison.</h2>
-        <ul>
-          <li>Use a text-based PDF so resume content can be extracted.</li>
-          <li>Paste the full job description, including responsibilities and qualifications.</li>
-          <li>Include the role’s seniority and experience requirements in the job description.</li>
+        <ul className="resume-tip-list">
+          <li className="callout info">Use a text-based PDF so resume content can be extracted.</li>
+          <li className="callout info">Paste the full job description, including responsibilities and qualifications.</li>
+          <li className="callout info">Include the role’s seniority and experience requirements in the job description.</li>
         </ul>
         <p className="resume-note">Free. PDF up to 10 MB. The first load can take ~30 s if the app is asleep.</p>
         <p className="resume-note">The inspected code does not confirm privacy or data-retention behavior.</p>
