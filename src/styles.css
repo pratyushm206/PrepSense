@@ -3880,14 +3880,16 @@ a.topic-row {
 .leaderboard-hero { box-shadow: var(--shadow-card); }
 .leaderboard-hero .chip { border-color: color-mix(in srgb, var(--on-signature) 44%, transparent); color: var(--on-signature-muted); }
 .leaderboard-empty {
+  min-height: 210px;
   padding: var(--space-5);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
   background: var(--surface-glass);
   box-shadow: var(--shadow-card);
 }
-.leaderboard-empty .state-panel { width: min(560px, 100%); border: 0; box-shadow: none; background: transparent; }
-.leaderboard-empty-art { width: 120px; height: 88px; margin-bottom: var(--space-3); color: var(--accent-text); }
+.leaderboard-empty .state-panel { width: min(560px, 100%); min-height: 0; padding: 0; border: 0; box-shadow: none; background: transparent; }
+.leaderboard-empty .state-panel::after { display: none; }
+.leaderboard-empty-art { width: 120px; height: 88px; margin-bottom: var(--space-3); border-radius: 50%; color: var(--accent-text); background: radial-gradient(ellipse, var(--accent-tint), transparent 72%); }
 .leaderboard-row { background: var(--surface-glass); box-shadow: var(--shadow-card); }
 .leaderboard-row:nth-child(2) .leaderboard-rank { color: var(--text-primary); border: 1px solid var(--border-strong); background: var(--bg-elevated); }
 .leaderboard-row:nth-child(3) .leaderboard-rank { color: var(--warning); border: 1px solid color-mix(in srgb, var(--warning) 42%, var(--border-strong)); background: var(--warning-tint); }
