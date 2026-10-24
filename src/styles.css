@@ -1936,6 +1936,24 @@ a.topic-row {
   display: grid;
   gap: var(--space-4);
 }
+.question-rail.signature-card {
+  color: var(--on-signature);
+  background: var(--gradient-signature);
+  border-color: var(--border-glass);
+  box-shadow: var(--shadow-card);
+}
+.question-rail.signature-card .eyebrow,
+.question-rail.signature-card h1 { color: var(--on-signature); }
+.question-rail.signature-card .progress-list button {
+  border-color: color-mix(in srgb, var(--on-signature) 34%, transparent);
+  color: var(--on-signature);
+  background: color-mix(in srgb, var(--on-signature) 9%, transparent);
+}
+.question-rail.signature-card .progress-list button.active {
+  border-color: var(--on-signature);
+  color: var(--signature-ink);
+  background: var(--on-signature);
+}
 
 .interview-panel textarea {
   min-height: 160px;

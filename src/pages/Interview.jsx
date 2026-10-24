@@ -137,7 +137,7 @@ export default function Interview() {
 
   return (
     <section className="interview-layout">
-      <aside className="question-rail">
+      <aside className="question-rail signature-card">
         <p className="eyebrow">{session.company}</p>
         <h1>{session.role}</h1>
         <div className="progress-list">
