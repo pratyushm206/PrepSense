@@ -5,7 +5,6 @@ const path = require('node:path');
 const base = process.env.E2E_BASE_URL || 'http://127.0.0.1:5055';
 const password = process.env.E2E_PASSWORD || 'TestOnly!Pass123';
 const emailA = process.env.E2E_A_EMAIL || 'alex@verification.invalid';
-const emailB = process.env.E2E_B_EMAIL || 'blair@verification.invalid';
 const emailAdmin = process.env.E2E_ADMIN_EMAIL || 'admin2@verification.invalid';
 const artifacts = path.join(__dirname, 'artifacts');
 const errors = [];

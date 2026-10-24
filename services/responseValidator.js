@@ -12,7 +12,7 @@ function validateQuestions(rawText, category, options = {}) {
   try {
     const cleaned = String(rawText).trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '');
     parsed = JSON.parse(cleaned);
-  } catch (err) {
+  } catch {
     throw new Error('Failed to parse Gemini response as JSON');
   }
 
@@ -113,7 +113,7 @@ function validateEvaluation(rawText) {
   let parsed;
   try {
     parsed = JSON.parse(rawText);
-  } catch (err) {
+  } catch {
     throw new Error('Failed to parse Gemini evaluation response as JSON');
   }
 
