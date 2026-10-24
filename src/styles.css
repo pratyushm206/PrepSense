@@ -2707,30 +2707,29 @@ a.topic-row {
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
-  gap: 1.5rem;
-  min-height: 68px;
-  padding: 0.7rem 2.5rem;
-  background: color-mix(in srgb, var(--bg-card) 92%, transparent);
-  border-bottom: 1px solid var(--line);
-  backdrop-filter: blur(16px);
+  gap: var(--space-4);
+  min-height: 72px;
+  padding: var(--space-3) var(--space-5);
+  background: var(--bg-raised);
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .landing-brand {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-2);
 }
 
 .landing-brand-dot {
-  width: 7px;
-  height: 7px;
+  width: var(--space-2);
+  height: var(--space-2);
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+  background: var(--accent);
 }
 
 .landing-wordmark {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 1.02rem;
+  font-family: var(--font-display);
+  font-size: var(--text-md);
   font-weight: 600;
   color: var(--ink);
   letter-spacing: -0.03em;
@@ -2739,17 +2738,20 @@ a.topic-row {
 .landing-nav {
   display: flex;
   justify-content: center;
-  gap: 2rem;
+  gap: var(--space-4);
 }
 
 .landing-nav a {
   position: relative;
   font-family: var(--font-body);
-  font-size: 0.88rem;
-  font-weight: 500;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  font-size: var(--text-sm);
+  font-weight: 600;
   color: var(--ink2);
   padding: 0.35rem 0;
-  transition: color 0.15s ease;
+  transition: color var(--transition-fast);
 }
 
 .landing-nav a::after {
@@ -2759,10 +2761,10 @@ a.topic-row {
   right: 0;
   bottom: 0;
   height: 2px;
-  background: var(--cat-behavioral);
+  background: var(--accent);
   transform: scaleX(0);
   transform-origin: left;
-  transition: transform 0.18s ease;
+  transition: transform var(--transition-fast);
 }
 
 .landing-nav a:hover {
@@ -2776,58 +2778,59 @@ a.topic-row {
 .landing-header-actions {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
+  gap: var(--space-2);
 }
 
 .landing-hero-actions {
   display: flex;
   align-items: center;
-  gap: 1.25rem;
+  gap: var(--space-3);
   flex-wrap: wrap;
 }
 
 .landing-btn {
-  min-height: 40px;
-  padding: 0 1.15rem;
+  min-height: 44px;
+  padding: 0 var(--space-4);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 0.82rem;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
   font-weight: 600;
   letter-spacing: 0.01em;
   border: 1px solid transparent;
   cursor: pointer;
   text-align: center;
-  transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+  border-radius: var(--radius-md);
+  transition: color var(--transition-fast), background-color var(--transition-fast), border-color var(--transition-fast), opacity var(--transition-fast);
 }
 
 .landing-btn-primary {
-  background: var(--cat-behavioral);
-  border-color: var(--cat-behavioral);
-  color: var(--accent-contrast);
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
 }
 
 .landing-btn-primary:hover {
-  background: color-mix(in srgb, var(--cat-behavioral) 92%, black);
-  border-color: var(--cat-behavioral);
-  transform: translateY(-1px);
-  box-shadow: 0 10px 26px -14px color-mix(in srgb, var(--cat-behavioral) 60%, transparent);
+  background: color-mix(in srgb, var(--accent) 88%, var(--text-primary));
+  border-color: var(--accent);
 }
 
 .landing-btn-lg {
   min-height: 48px;
-  padding: 0 1.4rem;
-  font-size: 0.92rem;
+  padding: 0 var(--space-5);
+  font-size: var(--text-md);
 }
 
 .landing-text-link {
   font-family: var(--font-body);
-  font-size: 0.88rem;
+  font-size: var(--text-sm);
   font-weight: 500;
   color: var(--ink2);
   border-bottom: 1px solid var(--line2);
   padding-bottom: 2px;
-  transition: color 0.15s ease, border-color 0.15s ease;
+  transition: color var(--transition-fast), border-color var(--transition-fast);
 }
 
 .landing-text-link:hover {
@@ -2844,10 +2847,12 @@ a.topic-row {
 .landing-hero {
   display: grid;
   grid-template-columns: minmax(0, 1.15fr) minmax(16rem, 0.85fr);
-  gap: 4.5rem 5rem;
-  align-items: end;
-  padding: 6.25rem 0 5rem;
-  border-bottom: 1px solid var(--line);
+  gap: var(--space-5);
+  align-items: center;
+  padding: var(--space-6);
+  border: 1px solid var(--border-strong);
+  margin-top: var(--space-5);
+  margin-bottom: var(--space-5);
 }
 
 .landing main > section {
@@ -2861,17 +2866,35 @@ a.topic-row {
   clip-path: inset(0 -100vmax);
 }
 
+.landing main > .landing-hero {
+  color: var(--on-signature);
+  background: var(--gradient-signature);
+}
+
+.landing-hero .eyebrow,
+.landing-hero h1,
+.landing-hero .landing-lead,
+.landing-hero-rail span,
+.landing-hero-rail p {
+  color: var(--on-signature);
+}
+
+.landing-hero .landing-text-link {
+  color: var(--on-signature);
+  border-color: var(--on-signature-muted);
+}
+
 .landing-hero h1 {
   max-width: 14ch;
-  color: var(--ink);
+  color: var(--on-signature);
   margin-bottom: 1.15rem;
 }
 
 .landing-lead {
   max-width: 46ch;
-  font-size: 1.05rem;
+  font-size: var(--text-md);
   line-height: 1.7;
-  color: var(--ink2);
+  color: var(--on-signature-muted);
   margin-bottom: 2rem;
 }
 
@@ -2891,7 +2914,7 @@ a.topic-row {
 .landing-hero-rail span {
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.72rem;
-  color: var(--accent);
+  color: var(--on-signature);
   padding-top: 0.15rem;
 }
 
@@ -2899,17 +2922,17 @@ a.topic-row {
   margin: 0;
   font-size: 0.9rem;
   line-height: 1.55;
-  color: var(--ink2);
+  color: var(--on-signature-muted);
 }
 
 .landing-section {
-  padding: 4.5rem 0;
-  border-bottom: 1px solid var(--line);
+  padding: var(--space-7) 0;
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .landing-section-title {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: clamp(1.5rem, 3vw, 2.15rem);
+  font-family: var(--font-display);
+  font-size: clamp(var(--text-2xl), 3vw, var(--text-3xl));
   font-weight: 600;
   letter-spacing: -0.02em;
   color: var(--ink);
@@ -2926,51 +2949,30 @@ a.topic-row {
 .landing-feature-grid,
 .landing-engine-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  border-top: 1px solid var(--line);
-  border-left: 1px solid var(--line);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: var(--space-4);
 }
 
 .landing-feature,
 .landing-engine {
-  --card-accent: var(--cat-behavioral);
-  padding: 1.4rem 1.35rem;
-  border-right: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
-  border-top: 3px solid var(--card-accent);
-  background: color-mix(in srgb, var(--card-accent) 4%, var(--panel));
-  box-shadow: 0 18px 34px -28px color-mix(in srgb, var(--card-accent) 32%, transparent);
-  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+  min-width: 0;
+  padding: var(--space-5);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--bg-raised);
+  transition: border-color var(--transition-fast), background-color var(--transition-fast);
 }
 
 .landing-feature:hover,
 .landing-engine:hover {
-  transform: translateY(-2px);
-  border-color: var(--card-accent);
-  box-shadow: 0 24px 44px -28px color-mix(in srgb, var(--card-accent) 46%, transparent);
-}
-
-.landing-feature:nth-child(1) {
-  --card-accent: var(--cat-dsa);
-}
-
-.landing-feature:nth-child(2) {
-  --card-accent: var(--cat-systemdesign);
-}
-
-.landing-feature:nth-child(3) {
-  --card-accent: var(--cat-corecs);
-}
-
-.landing-feature:nth-child(4) {
-  --card-accent: var(--cat-behavioral);
+  border-color: var(--border-strong);
 }
 
 .landing-feature h3,
 .landing-engine h3,
 .landing-steps h3 {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 1rem;
+  font-family: var(--font-display);
+  font-size: var(--text-md);
   font-weight: 600;
   color: var(--ink);
   margin-bottom: 0.45rem;
@@ -2981,7 +2983,7 @@ a.topic-row {
 .landing-steps p {
   margin: 0;
   color: var(--ink2);
-  font-size: 0.92rem;
+  font-size: var(--text-sm);
   line-height: 1.55;
 }
 
@@ -2990,48 +2992,45 @@ a.topic-row {
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 0;
-  border-top: 1px solid var(--line);
+  gap: var(--space-2);
 }
 
 .landing-steps li {
   display: grid;
-  grid-template-columns: 4.5rem 1fr;
-  gap: 1.25rem;
+  grid-template-columns: 3rem 1fr;
+  gap: var(--space-3);
   align-items: start;
-  padding: 1.35rem 0;
-  border-bottom: 1px solid var(--line);
-  transition: transform 0.15s ease, border-color 0.15s ease;
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--border-subtle);
+  transition: border-color var(--transition-fast);
 }
 
 .landing-steps li:hover {
-  transform: translateY(-2px);
-  border-bottom-color: var(--cat-behavioral);
+  border-bottom-color: var(--accent);
 }
 
 .landing-step-index {
-  width: 2.2rem;
-  height: 2.2rem;
+  width: 44px;
+  height: 44px;
   display: grid;
   place-items: center;
-  border: 1px solid var(--cat-behavioral);
+  border: 1px solid var(--accent);
   border-radius: 50%;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.78rem;
-  color: var(--cat-behavioral);
-  transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--accent-text);
+  transition: background-color var(--transition-fast), color var(--transition-fast);
 }
 
 .landing-steps li:hover .landing-step-index {
-  background: var(--cat-behavioral);
-  color: var(--accent-contrast);
-  transform: scale(1.04);
+  background: var(--accent);
+  color: var(--on-accent);
 }
 
 .landing-footer {
-  background: color-mix(in srgb, var(--gradient-start) 5%, var(--bg-card));
-  border-top: 1px solid var(--line);
-  padding: 4rem 0 0;
+  background: var(--bg-elevated);
+  border-top: 1px solid var(--border-subtle);
+  padding: var(--space-7) 0 0;
 }
 
 .landing-footer-inner,
@@ -3043,13 +3042,13 @@ a.topic-row {
 .landing-footer-inner {
   display: grid;
   grid-template-columns: minmax(16rem, 1.35fr) minmax(14rem, 1fr) minmax(13rem, 0.95fr);
-  gap: 3rem 4.5rem;
-  padding-bottom: 3rem;
+  gap: var(--space-5);
+  padding-bottom: var(--space-6);
 }
 
 .landing-footer-brand {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 1.15rem;
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
   font-weight: 600;
   color: var(--ink);
   margin-bottom: 0.75rem;
@@ -3059,19 +3058,19 @@ a.topic-row {
   max-width: 36ch;
   margin: 0;
   font-family: var(--font-body);
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   line-height: 1.6;
   color: var(--ink2);
 }
 
 .landing-projects {
   display: grid;
-  gap: 1.4rem;
+  gap: var(--space-4);
 }
 
 .landing-project-link {
   display: inline-block;
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: var(--font-display);
   font-weight: 600;
   color: var(--ink);
   transition: color 0.15s ease;
@@ -3092,8 +3091,8 @@ a.topic-row {
 .landing-repo-link {
   display: inline-block;
   margin-top: 0.4rem;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.72rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
   color: var(--ink3);
   border-bottom: 1px solid var(--line);
   transition: color 0.15s ease, border-color 0.15s ease;
@@ -3109,15 +3108,15 @@ a.topic-row {
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 0.7rem;
+  gap: var(--space-2);
 }
 
 .landing-connect a {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
+  gap: var(--space-2);
   font-family: var(--font-body);
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
   color: var(--ink2);
   transition: color 0.15s ease;
 }
@@ -3133,19 +3132,19 @@ a.topic-row {
 }
 
 .landing-footer-bar-wrap {
-  background: color-mix(in srgb, var(--gradient-end) 5%, var(--bg));
-  border-top: 1px solid var(--border);
+  background: var(--bg-base);
+  border-top: 1px solid var(--border-subtle);
 }
 
 .landing-footer-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 1rem;
+  gap: var(--space-3);
   flex-wrap: wrap;
-  padding: 1.25rem 0 1.5rem;
+  padding: var(--space-3) 0 var(--space-4);
   color: var(--ink3);
-  font-size: 0.8rem;
+  font-size: var(--text-xs);
 }
 
 .landing-footer-bar p {

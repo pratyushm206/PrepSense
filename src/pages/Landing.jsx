@@ -99,7 +99,7 @@ export default function Landing() {
       </header>
 
       <main>
-        <section className="landing-hero" id="top">
+        <section className="landing-hero signature-card" id="top">
           <div className="landing-hero-copy">
             <p className="eyebrow">Placement readiness</p>
             <h1>Practice like the interview already started.</h1>
