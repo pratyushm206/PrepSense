@@ -3695,17 +3695,14 @@ a.topic-row {
   background: transparent;
   color: var(--text-secondary);
 }
-.resume-info-card .resume-tip-list li::before {
-  content: '✓';
-  display: grid;
+.resume-tip-check {
   flex: 0 0 24px;
-  place-items: center;
   width: 24px;
   height: 24px;
+  padding: 4px;
   border-radius: 50%;
   color: var(--success);
   background: var(--success-tint);
-  font-weight: 800;
 }
 .resume-hero-art { filter: none; }
 @media (max-width: 900px) {

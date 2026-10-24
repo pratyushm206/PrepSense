@@ -1,4 +1,5 @@
 const iconPaths = {
+  check: <path d="m5 12 4.5 4.5L19 7" />,
   calendar: <><rect x="3" y="4" width="18" height="17" rx="3" /><path d="M8 2v4m8-4v4M3 9h18M8 14h3m-3 3h7" /></>,
   grid: <><circle cx="7" cy="7" r="3" /><circle cx="17" cy="7" r="3" /><circle cx="7" cy="17" r="3" /><circle cx="17" cy="17" r="3" /></>,
   target: <><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="4" /><path d="m12 12 6-6" /></>,

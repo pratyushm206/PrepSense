@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { RESUME_ANALYZER_URL } from '../config/links.js';
+import Icon from '../components/Icon.jsx';
 
 const signals = [
   ['Semantic relevance · 30%', 'How the resume’s meaning relates to the job description.'],
@@ -67,9 +68,9 @@ export default function ResumeAnalyzer() {
         <p className="eyebrow">Before you start</p>
         <h2>Tips for a useful comparison.</h2>
         <ul className="resume-tip-list">
-          <li>Use a text-based PDF so resume content can be extracted.</li>
-          <li>Paste the full job description, including responsibilities and qualifications.</li>
-          <li>Include the role’s seniority and experience requirements in the job description.</li>
+          <li><Icon name="check" className="resume-tip-check" />Use a text-based PDF so resume content can be extracted.</li>
+          <li><Icon name="check" className="resume-tip-check" />Paste the full job description, including responsibilities and qualifications.</li>
+          <li><Icon name="check" className="resume-tip-check" />Include the role’s seniority and experience requirements in the job description.</li>
         </ul>
         <p className="resume-note">Free. PDF up to 10 MB. The first load can take ~30 s if the app is asleep.</p>
         <p className="resume-note">The inspected code does not confirm privacy or data-retention behavior.</p>
