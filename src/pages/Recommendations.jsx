@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { apiRequest } from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { EmptyState, ErrorState, LoadingState } from '../components/Status.jsx';
+import Icon from '../components/Icon.jsx';
 
 export default function Recommendations() {
   const { token } = useAuth();
@@ -71,6 +72,7 @@ export default function Recommendations() {
           <div className="mini-list recommendations-list">
             {recommendations.map(recommendation => (
               <div className="mini-item recommendation-item" key={recommendation.topic}>
+                <Icon name="target" className="recommendation-icon icon-tile" />
                 <div className="recommendation-main">
                   <strong className="chip recommendation-topic">{recommendation.topic}</strong>
                   <span>{recommendation.reason}</span>

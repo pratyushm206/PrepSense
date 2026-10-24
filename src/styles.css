@@ -3800,6 +3800,27 @@ a.topic-row {
   .leaderboard-hero { align-items: flex-start; flex-direction: column; }
   .leaderboard-hero .chip-row { width: 100%; }
 }
+.recommendations-list { gap: var(--space-4); }
+.recommendations-list .recommendation-item {
+  grid-template-columns: 40px minmax(0, 1fr);
+  gap: var(--space-4);
+  padding: var(--space-4);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--surface-glass);
+  box-shadow: var(--shadow-card);
+}
+.recommendation-icon { align-self: start; }
+.recommendation-main { min-width: 0; }
+.recommendation-main .recommendation-topic { width: fit-content; }
+.recommendation-meta { grid-column: 2; align-items: center; gap: var(--space-3); }
+.recommendation-meta .button { min-height: 44px; }
+.recommendations-list .priority-chip { border-radius: 999px; }
+@media (max-width: 600px) {
+  .recommendations-list .recommendation-item { grid-template-columns: 40px minmax(0, 1fr); }
+  .recommendation-meta { grid-column: 1 / -1; }
+  .recommendation-meta .button { width: 100%; }
+}
 @media (max-width: 600px) {
   .history-page .page-head { padding: var(--space-4); }
   .history-page .session-main-link { align-items: flex-start; }
