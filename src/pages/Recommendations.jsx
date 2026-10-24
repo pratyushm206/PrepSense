@@ -46,7 +46,7 @@ export default function Recommendations() {
           <p className="lead">Built from your weak topics and patterns in PrepSense practice data.</p>
         </div>
         {data?.targetCompany && (
-          <span className="filter-chip active">{data.targetCompany}</span>
+          <span className="chip selected recommendation-company">{data.targetCompany}</span>
         )}
       </div>
 
@@ -68,11 +68,11 @@ export default function Recommendations() {
             <h2>Recommendations</h2>
             <span>{recommendations.length} recommendations</span>
           </div>
-          <div className="mini-list">
+          <div className="mini-list recommendations-list">
             {recommendations.map(recommendation => (
               <div className="mini-item recommendation-item" key={recommendation.topic}>
                 <div className="recommendation-main">
-                  <strong>{recommendation.topic}</strong>
+                  <strong className="chip recommendation-topic">{recommendation.topic}</strong>
                   <span>{recommendation.reason}</span>
                 </div>
                 <div className="recommendation-meta">
@@ -95,7 +95,7 @@ export default function Recommendations() {
                   {typeof recommendation.companyQuestionCount === 'number' && (
                     <span className="recommendation-count">{recommendation.companyQuestionCount} company qs</span>
                   )}
-                  <span className={`status-label priority-${recommendation.priority}`}>
+                  <span className={`chip priority-chip priority-${recommendation.priority}`}>
                     {recommendation.priority}
                   </span>
                   <Link className="button primary" to={`/interview/new?company=${encodeURIComponent(data?.targetCompany || '')}&category=${categoryForTopic(recommendation.topic)}`}>
@@ -187,7 +187,7 @@ function CompanyTopicPanel({ topics, targetCompany }) {
 }
 
 function getScoreColor(score) {
-  if (score >= 70) return 'var(--teal)';
-  if (score >= 40) return 'var(--amber)';
-  return 'var(--red)';
+  if (score >= 80) return 'var(--success)';
+  if (score >= 60) return 'var(--warning)';
+  return 'var(--danger)';
 }

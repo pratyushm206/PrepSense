@@ -1324,6 +1324,29 @@ a.topic-row {
 
 .recommendation-item {
   grid-template-columns: minmax(0, 1fr) auto;
+  min-height: 0;
+  padding: var(--space-4);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--bg-raised);
+  box-shadow: none;
+  transition: border-color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.recommendations-list {
+  gap: var(--space-4);
+}
+
+.recommendation-item:hover,
+.recommendation-item:has(.score-good),
+.recommendation-item:has(.score-warn),
+.recommendation-item:has(.score-bad),
+.recommendation-item:has(.score-good):hover,
+.recommendation-item:has(.score-bad):hover {
+  transform: none;
+  border-left-color: var(--border-subtle);
+  background: var(--bg-raised);
+  box-shadow: none;
 }
 
 .recommendation-main {
@@ -1333,16 +1356,24 @@ a.topic-row {
 }
 
 .recommendation-main strong {
-  font-size: 0.95rem;
+  width: fit-content;
+  font-size: var(--text-sm);
 }
 
 .recommendation-main span,
 .recommendation-count {
-  color: var(--text-faint);
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: uppercase;
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 500;
+}
+
+.priority-chip {
+  cursor: default;
+}
+
+.priority-chip::after {
+  content: none;
 }
 
 .recommendation-meta {
