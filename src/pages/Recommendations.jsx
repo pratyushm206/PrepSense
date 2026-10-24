@@ -181,7 +181,7 @@ function CompanyTopicPanel({ topics, targetCompany }) {
           topics.map(topic => (
             <div className="mini-item" key={topic.topic}>
               <span>{topic.topic}</span>
-              <strong className="recommendation-count">{topic.count} qs</strong>
+              <strong className="recommendation-count">{topic.count} {topic.count === 1 ? 'question' : 'questions'}</strong>
             </div>
           ))
         )}

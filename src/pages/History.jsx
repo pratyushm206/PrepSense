@@ -143,7 +143,7 @@ export default function History() {
           </button>
           {statusFilter === 'needs-attention' && sessions.some(session => session.fullyFailed) && (
             <button className="button danger-ghost" type="button" onClick={clearFailedSessions} disabled={deleting}>
-              Clear {sessions.filter(session => session.fullyFailed).length} fully failed sessions
+              Clear {sessions.filter(session => session.fullyFailed).length} fully failed {sessions.filter(session => session.fullyFailed).length === 1 ? 'session' : 'sessions'}
             </button>
           )}
         </div>

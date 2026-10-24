@@ -78,7 +78,7 @@ export default function Summary() {
           <p className="eyebrow">{session.company} interview summary</p>
           <h1 className={`score-badge large-score ${getScoreClass(session.overallScore)}`}>{formatScore(session.overallScore)}</h1>
           <p className="muted">Difficulty-adjusted overall score</p>
-          <p>{session.role} - {latestAnswers.length} answered questions</p>
+          <p>{session.role} - {latestAnswers.length} answered {latestAnswers.length === 1 ? 'question' : 'questions'}</p>
         </div>
         <div className="action-row">
           <button className="button secondary" type="button" onClick={handleShare} disabled={sharing}>

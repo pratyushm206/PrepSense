@@ -148,7 +148,7 @@ export default function InterviewSetup() {
         <div className="readout-strip" aria-label={readoutError || undefined}>
           <div className="readout">
             <span className="readout-val">{readoutLoading ? '...' : readout.sessionsThisWeek}</span>
-            <span className="readout-label">Sessions this week</span>
+            <span className="readout-label">{readout.sessionsThisWeek === 1 ? 'Session this week' : 'Sessions this week'}</span>
           </div>
           <div className="readout">
             <span className="readout-val">{readoutLoading ? '...' : readout.readinessScore}</span>

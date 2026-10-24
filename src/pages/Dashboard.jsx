@@ -69,8 +69,8 @@ export default function Dashboard() {
           </div>
 
           <div className="dashboard-stat-grid">
-            <DashboardStat label="Sessions evaluated" value={evaluatedSessionCount} icon="calendar" />
-            <DashboardStat label="Topics practiced" value={topics.length} icon="grid" />
+            <DashboardStat label={evaluatedSessionCount === 1 ? 'Session evaluated' : 'Sessions evaluated'} value={evaluatedSessionCount} icon="calendar" />
+            <DashboardStat label={topics.length === 1 ? 'Topic practiced' : 'Topics practiced'} value={topics.length} icon="grid" />
             <DashboardStat label="Weakest topic" value={weakestTopic || '-'} icon="target" />
           </div>
         </div>
@@ -249,7 +249,7 @@ function PerformanceHistory({ points }) {
           <span className="icon-tile dashboard-section-icon"><Icon name="chart" /></span>
           <div><p className="eyebrow">Momentum</p><h2 id="dashboard-performance-title">Progress over time</h2></div>
         </div>
-        <span className="dashboard-session-count">{points.length} recent sessions</span>
+        <span className="dashboard-session-count">{points.length} {points.length === 1 ? 'recent session' : 'recent sessions'}</span>
       </div>
       <div className="performance-chart-wrap dashboard-chart-wrap">
         <svg className="performance-chart dashboard-chart" viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Session scores over time, from 0 to 100">

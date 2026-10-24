@@ -198,7 +198,7 @@ export default function Profile() {
             <strong>{overview?.bestTopic || '—'}</strong>
           </article>
           <article className="stat-orb">
-            <span>Answers evaluated</span>
+            <span>{overview?.answersEvaluated === 1 ? 'Answer evaluated' : 'Answers evaluated'}</span>
             <strong>{overview?.answersEvaluated ?? '—'}</strong>
           </article>
         </div>

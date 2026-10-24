@@ -39,7 +39,7 @@ export default function PublicReport() {
           <div>
             <p className="eyebrow">{report.company} readiness report</p>
             <h1 className={`score-badge large-score ${getScoreClass(report.score)}`}>{formatScore(report.score)}</h1>
-            <p>{report.role} - {report.questionCount} questions - {formatDate(report.completedAt)}</p>
+            <p>{report.role} - {report.questionCount} {report.questionCount === 1 ? 'question' : 'questions'} - {formatDate(report.completedAt)}</p>
           </div>
           <Link className="button secondary" to="/">PrepSense</Link>
         </div>
@@ -54,7 +54,7 @@ export default function PublicReport() {
               <div className="topic-row" key={topic.topic}>
                 <div>
                   <strong>{topic.topic}</strong>
-                  <span>{topic.totalAttempted || 0} answers</span>
+                  <span>{topic.totalAttempted || 0} {(topic.totalAttempted || 0) === 1 ? 'answer' : 'answers'}</span>
                 </div>
                 <div className="topic-score-wrap">
                   <span className="topic-bar">

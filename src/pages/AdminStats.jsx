@@ -37,7 +37,7 @@ export default function AdminStats() {
           <div className="topic-table">
             {stats.topCompaniesPracticed.map(item => (
               <div className="topic-row" key={item.company}>
-                <strong>{item.company}</strong><span>{item.count} evaluated sessions</span>
+                <strong>{item.company}</strong><span>{item.count} {item.count === 1 ? 'evaluated session' : 'evaluated sessions'}</span>
               </div>
             ))}
           </div>
