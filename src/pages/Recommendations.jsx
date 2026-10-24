@@ -40,7 +40,7 @@ export default function Recommendations() {
 
   return (
     <section className="page-stack">
-      <div className="page-head">
+      <div className="page-head signature-card recommendations-hero">
         <div>
           <p className="eyebrow">Study plan</p>
           <h1>What to focus on next.</h1>
@@ -64,22 +64,25 @@ export default function Recommendations() {
           message="Complete a practice session to unlock weak-topic and company-matched recommendations."
         />
       ) : (
-        <section className="panel">
+        <section className="recommendation-section">
           <div className="section-heading">
             <h2>Recommendations</h2>
-            <span>{recommendations.length} recommendations</span>
+            <span>{recommendations.length} {recommendations.length === 1 ? 'recommendation' : 'recommendations'}</span>
           </div>
           <div className="mini-list recommendations-list">
             {recommendations.map(recommendation => (
               <div className="mini-item recommendation-item" key={recommendation.topic}>
                 <Icon name="target" className="recommendation-icon icon-tile" />
                 <div className="recommendation-main">
-                  <strong className="chip recommendation-topic">{recommendation.topic}</strong>
+                  <strong className="recommendation-topic">{recommendation.topic}</strong>
                   <span>{recommendation.reason}</span>
                 </div>
-                <div className="recommendation-meta">
-                  {typeof recommendation.avgScore === 'number' && (
-                    <div className="topic-score-wrap">
+                <span className={`chip priority-chip recommendation-priority priority-${recommendation.priority}`}>
+                  {recommendation.priority}
+                </span>
+                <div className="topic-score-wrap recommendation-score">
+                  {typeof recommendation.avgScore === 'number' ? (
+                    <>
                       <div className="topic-bar">
                         <div
                           className="topic-bar-fill"
@@ -92,14 +95,12 @@ export default function Recommendations() {
                       <strong style={{ color: getScoreColor(recommendation.avgScore) }}>
                         {recommendation.avgScore}
                       </strong>
-                    </div>
+                    </>
+                  ) : (
+                    <strong className="recommendation-score-empty">-</strong>
                   )}
-                  {typeof recommendation.companyQuestionCount === 'number' && (
-                    <span className="recommendation-count">{recommendation.companyQuestionCount} company qs</span>
-                  )}
-                  <span className={`chip priority-chip priority-${recommendation.priority}`}>
-                    {recommendation.priority}
-                  </span>
+                </div>
+                <div className="recommendation-action">
                   <Link className="button primary" to={`/interview/new?company=${encodeURIComponent(data?.targetCompany || '')}&category=${categoryForTopic(recommendation.topic)}`}>
                     Practice this
                   </Link>
@@ -172,7 +173,8 @@ function CompanyTopicPanel({ topics, targetCompany }) {
       </div>
       <div className="mini-list">
         {topics.length === 0 ? (
-          <div className="mini-item">
+          <div className="mini-item company-focus-empty">
+            <Icon name="target" className="icon-tile" />
             <span>No company-matched topics yet</span>
           </div>
         ) : (
