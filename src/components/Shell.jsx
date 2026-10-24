@@ -25,8 +25,11 @@ export default function Shell() {
   }, []);
 
   useEffect(() => {
+    if (isMobileNav && menuPanelRef.current?.contains(document.activeElement)) {
+      menuToggleRef.current?.focus();
+    }
     setMenuOpen(false);
-  }, [location.pathname, location.search, location.hash]);
+  }, [location.pathname, location.search, location.hash, isMobileNav]);
 
   useEffect(() => {
     if (!menuOpen || !isMobileNav) return undefined;
@@ -57,6 +60,11 @@ export default function Shell() {
     navigate('/', { replace: true });
   }
 
+  function closeMenu() {
+    setMenuOpen(false);
+    if (isMobileNav) menuToggleRef.current?.focus();
+  }
+
   return (
     <div className="app-shell">
       <header className="topbar">
@@ -83,16 +91,15 @@ export default function Shell() {
           id="primary-navigation"
           className={`nav-links${menuOpen ? ' is-open' : ''}`}
           aria-label="Primary navigation"
-          aria-hidden={isMobileNav && !menuOpen}
-          inert={isMobileNav && !menuOpen ? '' : undefined}
+          inert={isMobileNav ? !menuOpen : undefined}
         >
-          <NavigationLink icon="grid" to="/dashboard" onClick={() => setMenuOpen(false)}>Dashboard</NavigationLink>
-          <NavigationLink icon="calendar" to="/interview/new" onClick={() => setMenuOpen(false)}>Practice</NavigationLink>
-          <NavigationLink icon="clock" to="/history" onClick={() => setMenuOpen(false)}>History</NavigationLink>
-          <NavigationLink icon="chart" to="/leaderboard" onClick={() => setMenuOpen(false)}>Leaderboard</NavigationLink>
-          <NavigationLink icon="bulb" to="/recommendations" onClick={() => setMenuOpen(false)}>Recommendations</NavigationLink>
-          <NavigationLink icon="document" to="/resume-analyzer" onClick={() => setMenuOpen(false)}>Resume</NavigationLink>
-          {user?.isAdmin && <NavigationLink icon="target" to="/admin" onClick={() => setMenuOpen(false)}>Admin</NavigationLink>}
+          <NavigationLink icon="grid" to="/dashboard" onClick={closeMenu}>Dashboard</NavigationLink>
+          <NavigationLink icon="calendar" to="/interview/new" onClick={closeMenu}>Practice</NavigationLink>
+          <NavigationLink icon="clock" to="/history" onClick={closeMenu}>History</NavigationLink>
+          <NavigationLink icon="chart" to="/leaderboard" onClick={closeMenu}>Leaderboard</NavigationLink>
+          <NavigationLink icon="bulb" to="/recommendations" onClick={closeMenu}>Recommendations</NavigationLink>
+          <NavigationLink icon="document" to="/resume-analyzer" onClick={closeMenu}>Resume</NavigationLink>
+          {user?.isAdmin && <NavigationLink icon="target" to="/admin" onClick={closeMenu}>Admin</NavigationLink>}
           <button type="button" className="nav-mobile-logout button danger-ghost" onClick={handleLogout}>
             <Icon name="logout" />
             <span>Log out</span>
