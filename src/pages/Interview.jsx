@@ -158,7 +158,7 @@ export default function Interview() {
 
       <section className="panel interview-panel">
         <div className="question-meta">
-          <span>Question {currentIndex + 1} of {session.questions.length}</span>
+          {session.questions?.length > 0 && <span>Question {currentIndex + 1} of {session.questions.length}</span>}
           <span className="tag">{question.topic}</span>
           <span className="tag">{question.difficulty}</span>
         </div>
@@ -219,16 +219,16 @@ export default function Interview() {
           </section>
         ) : result && (
           <section className="result-panel">
-            <div className="score-pill">
+            <div className="evaluation-score">
               <span>Score</span>
-              <strong>{result.score ?? '-'}</strong>
+              <strong className={`score-badge ${getScoreClass(result.score)}`}>{result.score ?? '-'}</strong>
             </div>
             <span className={`verdict ${result.verdict || 'pending'}`}>
               {result.verdict || 'Not evaluated'}
             </span>
-            <FeedbackList title="Strengths" items={result.strengths} />
-            <FeedbackList title="Improvements" items={result.improvements} />
-            <FeedbackList title="Missed points" items={result.missedPoints} />
+            <FeedbackList title="Strengths" tone="success" items={result.strengths} />
+            <FeedbackList title="Improvements" tone="warning" items={result.improvements} />
+            <FeedbackList title="Missed points" tone="danger" items={result.missedPoints} />
             {isMcq && (
               <div className="feedback-list">
                 <h3>Explanation</h3>
@@ -276,12 +276,19 @@ function DsaDetails({ question }) {
   );
 }
 
-function FeedbackList({ title, items = [] }) {
+function FeedbackList({ title, tone, items = [] }) {
   if (items.length === 0) return null;
   return (
-    <div className="feedback-list">
+    <div className={`feedback-list${tone ? ` ${tone}` : ''}`}>
       <h3>{title}</h3>
       <ul>{items.map((item, index) => <li key={`${title}-${index}`}>{item}</li>)}</ul>
     </div>
   );
+}
+
+function getScoreClass(score) {
+  if (score === null || score === undefined) return 'score-zero';
+  if (score >= 80) return 'score-good';
+  if (score >= 60) return 'score-warn';
+  return 'score-bad';
 }

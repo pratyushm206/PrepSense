@@ -1963,10 +1963,10 @@ a.topic-row {
 .question-rail {
   position: sticky;
   top: 92px;
-  padding: 22px;
-  border-radius: var(--radius);
-  background: var(--surface);
-  border: 1px solid var(--border);
+  padding: var(--space-5);
+  border-radius: var(--radius-lg);
+  background: var(--bg-raised);
+  border: 1px solid var(--border-subtle);
 }
 
 .question-rail h1 {
@@ -1992,13 +1992,19 @@ a.topic-row {
 }
 
 .progress-list button.active {
-  background: var(--teal);
-  color: var(--accent-contrast);
+  background: var(--accent);
+  color: var(--on-accent);
+  border-color: var(--accent);
 }
 
 .interview-panel {
   display: grid;
-  gap: 18px;
+  gap: var(--space-4);
+}
+
+.interview-panel textarea {
+  min-height: 160px;
+  font-family: var(--font-body);
 }
 
 .dsa-details,
@@ -2062,7 +2068,7 @@ a.topic-row {
 }
 
 .dsa-answer {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-body);
   line-height: 1.55;
 }
 
@@ -2105,6 +2111,7 @@ a.topic-row {
 }
 
 .evaluation-failed {
+  grid-template-columns: 1fr;
   border-color: var(--status-warn);
 }
 
@@ -2170,32 +2177,56 @@ a.topic-row {
 
 .result-panel {
   display: grid;
-  gap: 14px;
-  padding-top: 18px;
-  border-top: 1px solid var(--border);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: var(--space-3);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border-subtle);
 }
 
-.score-pill {
-  width: 126px;
-  min-height: 90px;
-  display: grid;
-  place-items: center;
-  border-radius: var(--radius);
-  background: var(--teal-dim);
-  color: var(--text);
+.evaluation-score {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 64px;
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-weight: 600;
 }
 
-.score-pill span {
-  font-weight: 700;
+.evaluation-score .score-badge {
+  width: 56px;
+  height: 56px;
 }
 
-.score-pill strong {
-  font-size: 2.2rem;
+.result-panel > .verdict {
+  align-self: center;
+  justify-self: start;
 }
 
 .feedback-list {
   display: grid;
-  gap: 8px;
+  align-content: start;
+  gap: var(--space-2);
+  min-width: 0;
+  padding: var(--space-3);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--bg-elevated);
+}
+
+.feedback-list.success {
+  border-color: color-mix(in srgb, var(--success) 55%, var(--border-strong));
+  background: var(--success-tint);
+}
+
+.feedback-list.warning {
+  border-color: color-mix(in srgb, var(--warning) 55%, var(--border-strong));
+  background: var(--warning-tint);
+}
+
+.feedback-list.danger {
+  border-color: color-mix(in srgb, var(--danger) 55%, var(--border-strong));
+  background: var(--danger-tint);
 }
 
 .feedback-list h3 {
@@ -2204,8 +2235,8 @@ a.topic-row {
 
 .feedback-list ul {
   margin: 0;
-  padding-left: 20px;
-  color: var(--text-dim);
+  padding-left: var(--space-4);
+  color: var(--text-secondary);
   line-height: 1.55;
 }
 
