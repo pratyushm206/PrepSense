@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { apiRequest } from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { ErrorState, LoadingState } from '../components/Status.jsx';
+import Icon from '../components/Icon.jsx';
 import { RESUME_ANALYZER_URL } from '../config/links.js';
 
 export default function Dashboard() {
@@ -68,9 +69,9 @@ export default function Dashboard() {
           </div>
 
           <div className="dashboard-stat-grid">
-            <DashboardStat label="Sessions evaluated" value={evaluatedSessionCount} icon="sessions" />
-            <DashboardStat label="Topics practiced" value={topics.length} icon="topics" />
-            <DashboardStat label="Weakest topic" value={weakestTopic || '-'} icon="focus" />
+            <DashboardStat label="Sessions evaluated" value={evaluatedSessionCount} icon="calendar" />
+            <DashboardStat label="Topics practiced" value={topics.length} icon="grid" />
+            <DashboardStat label="Weakest topic" value={weakestTopic || '-'} icon="target" />
           </div>
         </div>
 
@@ -88,20 +89,11 @@ export default function Dashboard() {
 function DashboardStat({ label, value, icon }) {
   return (
     <div className="dashboard-stat">
-      <span className="dashboard-stat-icon" aria-hidden="true"><StatIcon name={icon} /></span>
+      <span className="dashboard-stat-icon"><Icon name={icon} /></span>
       <strong>{value}</strong>
       <span>{label}</span>
     </div>
   );
-}
-
-function StatIcon({ name }) {
-  const paths = {
-    sessions: <><rect x="3" y="4" width="18" height="17" rx="3" /><path d="M8 2v4m8-4v4M3 9h18M8 14h3m-3 3h7" /></>,
-    topics: <><circle cx="7" cy="7" r="3" /><circle cx="17" cy="7" r="3" /><circle cx="7" cy="17" r="3" /><circle cx="17" cy="17" r="3" /></>,
-    focus: <><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="4" /><path d="m12 12 6-6" /></>
-  };
-  return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">{paths[name]}</svg>;
 }
 
 function ReadinessVerdict({ score }) {
@@ -135,7 +127,7 @@ function ReadinessExplainer() {
   return (
     <aside className="readiness-explainer" aria-labelledby="readiness-explainer-title">
       <div className="readiness-explainer-heading">
-        <span className="explainer-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3a7 7 0 0 0-4 12.75c.6.42 1 1.02 1 1.75h6c0-.73.4-1.33 1-1.75A7 7 0 0 0 12 3Z"/><path d="M9 21h6m-5-3v-2m4 2v-2" /></svg></span>
+        <span className="explainer-icon"><Icon name="bulb" /></span>
         <div><p className="eyebrow">The method</p><h3 id="readiness-explainer-title">What this score is based on</h3></div>
       </div>
       <ol className="readiness-factors">
@@ -151,7 +143,7 @@ function ReadinessExplainer() {
 function NextPracticeCard({ topic }) {
   return (
     <section className="panel dashboard-next-card">
-      <div className="dashboard-next-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M4 18V6m0 12h16M8 15l3-4 3 2 5-7" /><path d="M16 6h3v3" /></svg></div>
+      <div className="icon-tile dashboard-next-icon"><Icon name="chart" /></div>
       <div className="dashboard-next-copy">
         <p className="eyebrow">Best next step</p>
         <h2>{topic ? `Practice ${topic} next` : 'Start your first mock interview'}</h2>
@@ -175,7 +167,7 @@ function TopicsPanel({ topics }) {
       </div>
       {topics.length === 0 ? (
         <div className="dashboard-topics-empty">
-          <span className="dashboard-empty-icon" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="24" cy="24" r="17"/><path d="M24 14v11l7 4M9 8l5 3m25-3-5 3" /></svg></span>
+          <span className="icon-tile dashboard-empty-icon"><Icon name="clock" viewBox="0 0 48 48" /></span>
           <div><strong>Your topic scores will appear here</strong><p>Complete an evaluated mock interview to start tracking topic performance.</p></div>
           <Link className="button secondary" to="/interview/new">Start your first mock interview</Link>
         </div>
@@ -222,7 +214,7 @@ function PerformanceHistory({ points }) {
           <span className="dashboard-session-count">{points.length} {points.length === 1 ? 'recent session' : 'recent sessions'}</span>
         </div>
         <div className="dashboard-trend-empty">
-          <span className="dashboard-trend-icon" aria-hidden="true"><svg viewBox="0 0 64 48" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M5 39h54M8 34l13-12 10 7 15-18 10 8"/><circle cx="21" cy="22" r="2"/><circle cx="31" cy="29" r="2"/><circle cx="46" cy="11" r="2"/></svg></span>
+          <span className="dashboard-trend-icon"><Icon name="sparkline" viewBox="0 0 64 48" /></span>
           <div><strong>Your trend appears after your second session</strong><p>Complete one more evaluated mock interview to see how your scores are changing.</p></div>
         </div>
       </section>
@@ -275,7 +267,7 @@ function formatChartDate(value) {
 function ResumeToolCard() {
   return (
     <section className="dashboard-resume-card" aria-labelledby="dashboard-resume-title">
-      <div className="dashboard-resume-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M7 3h7l5 5v13H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/><path d="M14 3v6h5M9 14h6m-6 4h6" /></svg></div>
+      <div className="icon-tile dashboard-resume-icon"><Icon name="document" /></div>
       <div className="dashboard-resume-copy">
         <p className="eyebrow">Separate tool</p>
         <h2 id="dashboard-resume-title">Resume analyzer</h2>
