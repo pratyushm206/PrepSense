@@ -48,11 +48,16 @@ export default function Leaderboard() {
 
   if (!company) {
     return (
-      <div className="leaderboard-empty"><LeaderboardEmptyArt /><EmptyState
-        title="Pick a target company first"
-        message="Add target companies to your profile, then compare readiness scores across practice sessions."
-        action={<Link className="button primary" to="/profile">Update profile</Link>}
-      /></div>
+      <section className="page-stack">
+        <div className="signature-card leaderboard-hero leaderboard-empty-hero">
+          <p className="eyebrow">Leaderboard</p>
+        </div>
+        <div className="leaderboard-empty"><LeaderboardEmptyArt /><EmptyState
+          title="Pick a target company first"
+          message="Add target companies to your profile, then compare readiness scores across practice sessions."
+          action={<Link className="button primary" to="/profile">Update profile</Link>}
+        /></div>
+      </section>
     );
   }
 

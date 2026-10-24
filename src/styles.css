@@ -3547,6 +3547,7 @@ a.topic-row {
   text-align: center;
 }
 .leaderboard-hero { box-shadow: var(--shadow-card); }
+.leaderboard-empty-hero { min-height: 0; padding-block: var(--space-4); }
 .leaderboard-hero .chip { border-color: color-mix(in srgb, var(--on-signature) 44%, transparent); color: var(--on-signature-muted); }
 .leaderboard-empty {
   min-height: 210px;
@@ -4017,4 +4018,70 @@ a.topic-row {
   .dashboard-topics-panel,
   .dashboard-performance,
   .dashboard-resume-card { animation: none !important; }
+}
+
+/* Final cross-page surface, hierarchy, and compact-viewport audit */
+.page { padding-bottom: var(--space-4); }
+.history-page { gap: var(--space-3); }
+.history-page .history-query-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.history-page .history-filter-bar { gap: var(--space-3); }
+.admin-stats-page .admin-hero { min-height: 0; padding-block: var(--space-5); }
+
+/* Keep cards as the only outlined surfaces; use dividers or tint for their contents. */
+.dashboard-topics-empty,
+.dashboard-trend-empty {
+  border: 0;
+  background: var(--bg-elevated);
+}
+.interview-panel .result-panel {
+  border: 0;
+  border-top: 1px solid var(--border-subtle);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.interview-panel .feedback-list,
+.qa-card .feedback-list {
+  border: 0;
+  border-left: 3px solid var(--border-strong);
+  border-radius: var(--radius-md);
+}
+.interview-panel .feedback-list.success,
+.qa-card .feedback-list.success { border-left-color: var(--success); }
+.interview-panel .feedback-list.warning,
+.qa-card .feedback-list.warning { border-left-color: var(--warning); }
+.interview-panel .feedback-list.danger,
+.qa-card .feedback-list.danger { border-left-color: var(--danger); }
+.dsa-details { border: 0; background: var(--bg-elevated); }
+.profile-danger-zone .danger-zone {
+  border: 0;
+  border-top: 1px solid color-mix(in srgb, var(--danger) 28%, var(--border-subtle));
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.profile-danger-zone .danger-zone::after { display: none; }
+.admin-stats-page .topic-row,
+.public-report .topic-row {
+  border: 0;
+  border-bottom: 1px solid var(--border-subtle);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  transform: none;
+}
+.admin-stats-page .topic-row:hover,
+.public-report .topic-row:hover { background: var(--bg-elevated); transform: none; }
+
+@media (max-width: 600px) {
+  .history-page .history-query-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .history-page .history-filter-bar { padding: var(--space-3); }
+  .history-page .history-filter-bar .filter-row { justify-content: flex-start; }
+  .history-page .history-filter-bar .filter-chip { white-space: normal; }
+  .history-page .history-hero { min-height: 0; }
+}
+@media (max-width: 390px) {
+  .history-page .history-hero-stats { gap: var(--space-2); }
+  .history-page .history-hero-stat { min-width: 0; padding-inline: var(--space-3); }
+  .history-page .history-query-filters { gap: var(--space-2); }
 }
