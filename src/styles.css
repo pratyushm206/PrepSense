@@ -3848,6 +3848,36 @@ a.topic-row {
   .profile-banner { padding: var(--space-4); }
   .profile-danger-zone { padding: var(--space-4); }
 }
+.resume-analyzer-hero {
+  min-height: 300px;
+  align-content: center;
+  box-shadow: var(--shadow-card);
+}
+.resume-analyzer-hero h1 { max-width: 15ch; font-size: clamp(var(--text-2xl), 5vw, 56px); }
+.resume-info-card { background: var(--surface-glass); }
+.resume-signal-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); }
+.resume-signal {
+  min-height: 132px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--bg-raised);
+  box-shadow: var(--shadow-1);
+}
+.resume-info-card ol { counter-reset: resume-step; list-style: none; padding-left: 0; }
+.resume-info-card ol li { counter-increment: resume-step; display: grid; grid-template-columns: 32px 1fr; align-items: start; gap: var(--space-3); }
+.resume-info-card ol li::before {
+  content: counter(resume-step, decimal-leading-zero);
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border-strong);
+  border-radius: 50%;
+  color: var(--accent-text);
+  background: var(--accent-tint);
+  font: 700 var(--text-xs)/1 var(--font-mono);
+}
+.resume-tip-list .callout { border-radius: var(--radius-md); }
 @media (max-width: 600px) {
   .history-page .page-head { padding: var(--space-4); }
   .history-page .session-main-link { align-items: flex-start; }
