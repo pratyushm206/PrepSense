@@ -48,17 +48,17 @@ export default function Leaderboard() {
 
   if (!company) {
     return (
-      <EmptyState
+      <div className="leaderboard-empty"><EmptyState
         title="Pick a target company first"
         message="Add target companies to your profile, then compare readiness scores across practice sessions."
         action={<Link className="button primary" to="/profile">Update profile</Link>}
-      />
+      /></div>
     );
   }
 
   return (
     <section className="page-stack">
-      <div className="page-head">
+      <div className="signature-card leaderboard-hero">
         <div>
           <p className="eyebrow">Leaderboard</p>
           <h1>{company} readiness.</h1>
@@ -67,6 +67,7 @@ export default function Leaderboard() {
           {companyOptions.map(option => (
             <button
               className={`chip ${company === option ? 'selected' : ''}`}
+              aria-pressed={company === option}
               key={option}
               onClick={() => chooseCompany(option)}
               type="button"
@@ -80,16 +81,16 @@ export default function Leaderboard() {
       {error && <ErrorState message={error} />}
       {loading && <LoadingState message="Loading leaderboard..." />}
       {!loading && !error && leaderboard.length === 0 && (
-        <EmptyState
+        <div className="leaderboard-empty"><EmptyState
           title="No scores yet"
           message="Completed sessions with scored answers will appear here."
           action={<Link className="button primary" to="/interview/new">Practice now</Link>}
-        />
+        /></div>
       )}
       {!loading && !error && leaderboard.length > 0 && (
         <div className="leaderboard-list">
           {leaderboard.map((entry, index) => (
-            <article className="leaderboard-row" key={`${entry.username}-${index}`}>
+            <article className={`leaderboard-row${entry.isCurrentUser ? ' is-current-user' : ''}`} key={`${entry.username}-${index}`}>
               <span className="leaderboard-rank">{index + 1}</span>
               <div>
                 <strong>{entry.username || 'PrepSense user'}</strong>
@@ -106,8 +107,8 @@ export default function Leaderboard() {
 
 function getScoreClass(score) {
   if (score === null || score === undefined) return 'score-zero';
-  if (score >= 70) return 'score-good';
-  if (score >= 40) return 'score-warn';
+  if (score >= 80) return 'score-good';
+  if (score >= 60) return 'score-warn';
   return 'score-bad';
 }
 
