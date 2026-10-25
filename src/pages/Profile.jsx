@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { apiRequest } from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import ThemeToggle from '../components/ThemeToggle.jsx';
+import ConfirmDialog from '../components/ConfirmDialog.jsx';
 
 export default function Profile() {
   const { user, token, updateProfile, logout } = useAuth();
@@ -332,37 +333,41 @@ export default function Profile() {
       </section>
 
       {confirmDelete && (
-        <div className="modal-backdrop" role="presentation">
-          <div className="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="delete-title">
-            <h2 id="delete-title">Delete account permanently?</h2>
-            <p>This removes your account and practice history. Enter your password and type DELETE to continue.</p>
-            <label>Password<input type="password" autoComplete="current-password" value={deletePassword} onChange={event => setDeletePassword(event.target.value)} /></label>
-            <label>Type DELETE<input value={deleteConfirmation} onChange={event => setDeleteConfirmation(event.target.value)} /></label>
-            <div className="action-row">
-              <button className="button danger" type="button" onClick={handleDeleteAccount} disabled={deleting || !deletePassword || deleteConfirmation !== 'DELETE'}>
-                {deleting ? 'Deleting...' : 'Permanently delete'}
-              </button>
-              <button className="button ghost" type="button" onClick={() => setConfirmDelete(false)} disabled={deleting}>Cancel</button>
-            </div>
+        <ConfirmDialog
+          title="Delete account permanently?"
+          description="This removes your account and practice history. Enter your password and type DELETE to continue."
+          onClose={() => setConfirmDelete(false)}
+          closeOnEscape={!deleting}
+          closeOnBackdrop={!deleting}
+        >
+          <label>Password<input type="password" autoComplete="current-password" value={deletePassword} onChange={event => setDeletePassword(event.target.value)} /></label>
+          <label>Type DELETE<input value={deleteConfirmation} onChange={event => setDeleteConfirmation(event.target.value)} /></label>
+          <div className="action-row">
+            <button className="button danger" type="button" onClick={handleDeleteAccount} disabled={deleting || !deletePassword || deleteConfirmation !== 'DELETE'}>
+              {deleting ? 'Deleting...' : 'Permanently delete'}
+            </button>
+            <button className="button ghost" type="button" onClick={() => setConfirmDelete(false)} disabled={deleting}>Cancel</button>
           </div>
-        </div>
+        </ConfirmDialog>
       )}
 
       {confirmDeactivate && (
-        <div className="modal-backdrop" role="presentation">
-          <div className="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="deactivate-title">
-            <h2 id="deactivate-title">Deactivate account?</h2>
-            <p>Your practice history is kept, you just can't log back in.</p>
-            <div className="action-row">
-              <button className="button danger" type="button" onClick={handleDeactivate} disabled={deactivating}>
-                {deactivating ? 'Deactivating...' : 'Deactivate'}
-              </button>
-              <button className="button ghost" type="button" onClick={() => setConfirmDeactivate(false)}>
-                Cancel
-              </button>
-            </div>
+        <ConfirmDialog
+          title="Deactivate account?"
+          description="Your practice history is kept, you just can't log back in."
+          onClose={() => setConfirmDeactivate(false)}
+          closeOnEscape={!deactivating}
+          closeOnBackdrop={!deactivating}
+        >
+          <div className="action-row">
+            <button className="button danger" type="button" onClick={handleDeactivate} disabled={deactivating}>
+              {deactivating ? 'Deactivating...' : 'Deactivate'}
+            </button>
+            <button className="button ghost" type="button" onClick={() => setConfirmDeactivate(false)}>
+              Cancel
+            </button>
           </div>
-        </div>
+        </ConfirmDialog>
       )}
     </section>
   );
