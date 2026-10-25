@@ -190,6 +190,28 @@ h2 {
   font-weight: 700;
 }
 
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  vertical-align: middle;
+}
+
+.logo-mark-image {
+  display: block;
+  flex: 0 0 auto;
+  object-fit: contain;
+}
+
+.logo-wordmark {
+  color: inherit;
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
 .nav-links {
   display: flex;
   gap: var(--space-1);
@@ -2465,6 +2487,12 @@ a.topic-row {
   gap: var(--space-2);
 }
 
+.landing-brand-logo .logo-wordmark {
+  color: var(--ink);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+
 .landing-brand-dot {
   width: var(--space-2);
   height: var(--space-2);
@@ -2635,6 +2663,23 @@ a.topic-row {
   margin-bottom: 1.15rem;
 }
 
+.landing-hero-logo {
+  position: relative;
+  isolation: isolate;
+  width: fit-content;
+  margin-bottom: var(--space-3);
+}
+
+.landing-hero-logo::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 8%;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--glow-indigo), var(--glow-bronze) 60%, transparent 76%);
+  pointer-events: none;
+}
+
 .landing-lead {
   max-width: 46ch;
   font-size: var(--text-md);
@@ -2797,6 +2842,11 @@ a.topic-row {
   font-weight: 600;
   color: var(--ink);
   margin-bottom: 0.75rem;
+}
+
+.landing-footer-brand .logo-wordmark {
+  font-size: var(--text-lg);
+  font-weight: 600;
 }
 
 .landing-footer-blurb {
@@ -3027,7 +3077,12 @@ a.topic-row {
 }
 @media (max-width: 600px) {
   .landing-hero { min-height: 0; padding: var(--space-4); }
+  .landing-hero-logo .logo-mark-image { width: 64px; height: 64px; }
   .landing-section { padding-top: var(--space-5); padding-bottom: var(--space-5); }
+}
+
+@media (max-width: 390px) {
+  .landing-hero-logo .logo-mark-image { width: 56px; height: 56px; }
 }
 
 /* Dashboard: layered readiness overview and data-led follow-up cards */
@@ -3744,6 +3799,11 @@ a.topic-row {
 }
 .auth-panel h1 { font-size: clamp(var(--text-2xl), 5vw, var(--text-3xl)); }
 .auth-panel .button.primary { width: 100%; }
+.auth-logo {
+  display: flex;
+  justify-content: center;
+  margin: 0 auto var(--space-4);
+}
 @media (max-width: 480px) {
   .auth-layout { padding: var(--space-4); }
   .auth-panel { padding: var(--space-5) var(--space-4) var(--space-4); }

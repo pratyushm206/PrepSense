@@ -2,6 +2,7 @@ import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
 import Icon, { CloseIcon, MenuIcon } from './Icon.jsx';
+import Logo from './Logo.jsx';
 
 export default function Shell() {
   const { user, logout } = useAuth();
@@ -69,8 +70,7 @@ export default function Shell() {
     <div className="app-shell">
       <header className="topbar">
         <NavLink to="/dashboard" className="brand" aria-label="PrepSense dashboard">
-          <span className="brand-mark">P</span>
-          <span className="brand-name">PrepSense</span>
+          <Logo size={32} showText />
         </NavLink>
         <button
           ref={menuToggleRef}
