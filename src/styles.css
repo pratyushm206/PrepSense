@@ -2948,7 +2948,23 @@ a.topic-row {
 
 .landing-credit strong {
   font-weight: 700;
-  color: var(--ink);
+  color: var(--on-signature);
+}
+
+.landing-footer-bar .landing-credit {
+  max-width: 100%;
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--icon-tile-border);
+  border-radius: var(--radius-pill);
+  color: var(--on-signature-muted);
+  background: var(--gradient-signature);
+  box-shadow: var(--shadow-card);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 400;
+  line-height: 1.4;
+  text-align: center;
+  white-space: normal;
 }
 
 @media (max-width: 860px) {
@@ -2996,6 +3012,19 @@ a.topic-row {
 
   .landing-steps li {
     grid-template-columns: 3rem 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .landing-footer-bar {
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3);
+    text-align: center;
+  }
+
+  .landing-footer-bar .landing-credit {
+    border-radius: var(--radius-nav-panel);
   }
 }
 
