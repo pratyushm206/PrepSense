@@ -4,7 +4,7 @@
 
 PrepSense is a web app for interview practice and placement preparation.
 
-**Live URL:** (https://prepsense-mhnn.onrender.com)
+**Live URL:** https://prepsense-mhnn.onrender.com
 
 ## Technology
 
