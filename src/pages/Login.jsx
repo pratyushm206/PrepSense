@@ -1,6 +1,7 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
+import Logo from '../components/Logo.jsx';
 
 export default function Login() {
   const { login } = useAuth();
@@ -43,7 +44,7 @@ export default function Login() {
   return (
     <main className="auth-layout">
       <section className="auth-panel">
-        <p className="eyebrow">PrepSense</p>
+        <Logo size={56} showText className="auth-logo" />
         <h1>Sign in to practice smarter.</h1>
         <form className="form-stack" onSubmit={handleSubmit}>
           {formError && <div className="field-error form-error">{formError}</div>}

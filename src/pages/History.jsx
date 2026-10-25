@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { apiRequest } from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { EmptyState, ErrorState, LoadingState } from '../components/Status.jsx';
+import ConfirmDialog from '../components/ConfirmDialog.jsx';
 
 export default function History() {
   const { token } = useAuth();
@@ -16,6 +17,7 @@ export default function History() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [confirmDelete, setConfirmDelete] = useState(null);
+  const [confirmClearFailed, setConfirmClearFailed] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
@@ -68,7 +70,7 @@ export default function History() {
   }
 
   async function clearFailedSessions() {
-    if (!window.confirm('Permanently delete all fully failed sessions? Sessions with any successful answer are kept.')) return;
+    setConfirmClearFailed(false);
     try {
       setDeleting(true);
       await apiRequest('/api/sessions/failed', { method: 'DELETE', token });
@@ -142,7 +144,7 @@ export default function History() {
             Needs attention ({sessions.filter(hasFailedEvaluation).length})
           </button>
           {statusFilter === 'needs-attention' && sessions.some(session => session.fullyFailed) && (
-            <button className="button danger-ghost" type="button" onClick={clearFailedSessions} disabled={deleting}>
+            <button className="button danger-ghost" type="button" onClick={() => setConfirmClearFailed(true)} disabled={deleting}>
               Clear {sessions.filter(session => session.fullyFailed).length} fully failed {sessions.filter(session => session.fullyFailed).length === 1 ? 'session' : 'sessions'}
             </button>
           )}
@@ -198,16 +200,32 @@ export default function History() {
       )}
 
       {confirmDelete && (
-        <div className="modal-backdrop" role="presentation">
-          <div className="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="delete-session-title">
-            <h2 id="delete-session-title">Delete this session?</h2>
-            <p>This permanently deletes the {confirmDelete.company} practice session and its answers.</p>
-            <div className="action-row">
-              <button className="button danger" type="button" onClick={deleteConfirmedSession} disabled={deleting}>{deleting ? 'Deleting...' : 'Delete session'}</button>
-              <button className="button ghost" type="button" onClick={() => setConfirmDelete(null)} disabled={deleting}>Cancel</button>
-            </div>
+        <ConfirmDialog
+          title="Delete this session?"
+          description={`This permanently deletes the ${confirmDelete.company} practice session and its answers.`}
+          onClose={() => setConfirmDelete(null)}
+          closeOnEscape={!deleting}
+          closeOnBackdrop={!deleting}
+        >
+          <div className="action-row">
+            <button className="button danger" type="button" onClick={deleteConfirmedSession} disabled={deleting}>{deleting ? 'Deleting...' : 'Delete session'}</button>
+            <button className="button ghost" type="button" onClick={() => setConfirmDelete(null)} disabled={deleting}>Cancel</button>
           </div>
-        </div>
+        </ConfirmDialog>
+      )}
+
+      {confirmClearFailed && (
+        <ConfirmDialog
+          title="Permanently delete all fully failed sessions? Sessions with any successful answer are kept."
+          onClose={() => setConfirmClearFailed(false)}
+        >
+          <div className="action-row">
+            <button className="button danger" type="button" onClick={clearFailedSessions} disabled={deleting}>
+              Clear {sessions.filter(session => session.fullyFailed).length} fully failed {sessions.filter(session => session.fullyFailed).length === 1 ? 'session' : 'sessions'}
+            </button>
+            <button className="button ghost" type="button" onClick={() => setConfirmClearFailed(false)} disabled={deleting}>Cancel</button>
+          </div>
+        </ConfirmDialog>
       )}
     </section>
   );

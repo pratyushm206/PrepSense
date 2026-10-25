@@ -2,6 +2,7 @@ import { Link, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import ThemeToggle from '../components/ThemeToggle.jsx';
 import Icon from '../components/Icon.jsx';
+import Logo from '../components/Logo.jsx';
 import { RESUME_ANALYZER_URL } from '../config/links.js';
 
 const GITHUB_REPO = 'https://github.com/pratyushm206/PrepSense';
@@ -26,8 +27,7 @@ export default function Landing() {
     <div className="landing">
       <header className="landing-header">
         <a className="landing-brand" href="#top">
-          <span className="landing-brand-dot" aria-hidden="true" />
-          <span className="landing-wordmark">PrepSense</span>
+          <Logo size={28} showText className="landing-brand-logo" />
         </a>
         <nav className="landing-nav" aria-label="Page">
           <a href="#what-it-does">What it does</a>
@@ -45,6 +45,7 @@ export default function Landing() {
       <main>
         <section className="landing-hero signature-card" id="top">
           <div className="landing-hero-copy">
+            <Logo size={96} className="landing-hero-logo" />
             <p className="eyebrow">Placement readiness</p>
             <h1>Practice like the interview already started.</h1>
             <p className="landing-lead">
@@ -184,7 +185,7 @@ export default function Landing() {
       <footer className="landing-footer">
         <div className="landing-footer-inner">
           <div className="landing-footer-col">
-            <h2 className="landing-footer-brand">PrepSense</h2>
+            <h2 className="landing-footer-brand"><Logo size={28} showText /></h2>
             <p className="landing-footer-blurb">
               AI-powered mock interview and placement-readiness platform. Practice, get scored, and
               know exactly where you're weak before the real interview does.

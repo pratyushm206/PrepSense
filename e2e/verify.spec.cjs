@@ -83,7 +83,9 @@ test('F3 History filters, links, delete confirmation and failed-session cleanup'
 
 test('F4 Logout, landing and back button do not reveal protected content', async ({ page }) => {
   watch(page); await login(page);
-  await page.getByRole('button', { name: 'Log out' }).click();
+  await page.getByRole('button', { name: 'Account menu' }).click();
+  await page.locator('#account-menu-panel').getByRole('button', { name: 'Log out' }).click();
+  await page.getByRole('alertdialog').getByRole('button', { name: 'Log out' }).click();
   await expect(page).toHaveURL(`${base}/`);
   await expect(page.getByRole('link', { name: /Sign in/i })).toBeVisible();
   await page.goBack();

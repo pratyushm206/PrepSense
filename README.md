@@ -1,3 +1,5 @@
+<p align="center"><img src="public/logo-mark-256.png" width="96" alt="PrepSense logo"></p>
+
 # PrepSense
 
 PrepSense is a web app for interview practice and placement preparation.
