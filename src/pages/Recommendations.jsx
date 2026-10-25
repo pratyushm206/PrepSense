@@ -16,7 +16,7 @@ export default function Recommendations() {
 
     async function loadRecommendations() {
       try {
-        const nextData = await apiRequest('/api/recommendations', { token });
+        const nextData = normalizeRecommendationsData(await apiRequest('/api/recommendations', { token }));
         if (!cancelled) setData(nextData);
       } catch (err) {
         if (!cancelled) setError(err.message);
@@ -34,9 +34,9 @@ export default function Recommendations() {
   if (loading) return <LoadingState message="Loading recommendations..." />;
   if (error) return <ErrorState message={error} />;
 
-  const recommendations = data?.recommendations || [];
-  const weakTopics = data?.weakTopics || [];
-  const companyFocusTopics = data?.companyFocusTopics || [];
+  const recommendations = data.recommendations;
+  const weakTopics = data.weakTopics;
+  const companyFocusTopics = data.companyFocusTopics;
 
   return (
     <section className="page-stack">
@@ -128,6 +128,33 @@ function categoryForTopic(topic) {
   return 'core';
 }
 
+function normalizeRecommendationsData(value) {
+  const source = value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+  const normalizeArray = (items, normalizeItem) => (Array.isArray(items) ? items : [])
+    .filter(item => item && typeof item === 'object' && !Array.isArray(item))
+    .map(normalizeItem);
+  const normalizeScore = item => ({
+    ...item,
+    topic: typeof item.topic === 'string' ? item.topic : '',
+    avgScore: typeof item.avgScore === 'number' && Number.isFinite(item.avgScore) ? item.avgScore : null
+  });
+
+  return {
+    targetCompany: typeof source.targetCompany === 'string' && source.targetCompany ? source.targetCompany : null,
+    recommendations: normalizeArray(source.recommendations, item => ({
+      ...normalizeScore(item),
+      reason: typeof item.reason === 'string' ? item.reason : '',
+      priority: typeof item.priority === 'string' ? item.priority : 'medium'
+    })),
+    weakTopics: normalizeArray(source.weakTopics, normalizeScore),
+    companyFocusTopics: normalizeArray(source.companyFocusTopics, item => ({
+      ...item,
+      topic: typeof item.topic === 'string' ? item.topic : '',
+      count: typeof item.count === 'number' && Number.isFinite(item.count) ? item.count : null
+    }))
+  };
+}
+
 function TopicPanel({ title, topics, tone }) {
   return (
     <section className="panel">
@@ -149,12 +176,14 @@ function TopicPanel({ title, topics, tone }) {
                   <div
                     className="topic-bar-fill"
                     style={{
-                      width: `${Math.max(0, Math.min(100, topic.avgScore))}%`,
+                      width: `${Math.max(0, Math.min(100, topic.avgScore ?? 0))}%`,
                       background: getScoreColor(topic.avgScore)
                     }}
                   />
                 </div>
-                <strong style={{ color: getScoreColor(topic.avgScore) }}>{topic.avgScore}</strong>
+                <strong style={{ color: topic.avgScore == null ? 'var(--text-secondary)' : getScoreColor(topic.avgScore) }}>
+                  {topic.avgScore ?? '-'}
+                </strong>
               </div>
             </div>
           ))
@@ -181,7 +210,9 @@ function CompanyTopicPanel({ topics, targetCompany }) {
           topics.map(topic => (
             <div className="mini-item" key={topic.topic}>
               <span>{topic.topic}</span>
-              <strong className="recommendation-count">{topic.count} {topic.count === 1 ? 'question' : 'questions'}</strong>
+              <strong className="recommendation-count">
+                {topic.count ?? '-'}{topic.count == null ? '' : ` ${topic.count === 1 ? 'question' : 'questions'}`}
+              </strong>
             </div>
           ))
         )}
