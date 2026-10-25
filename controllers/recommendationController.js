@@ -6,7 +6,7 @@ const { companyMatch } = require('../services/normalization');
 
 async function getTopCompanyTopics(company) {
   if (!company) return [];
-  const [result] = await Session.aggregate([
+  const result = await Session.aggregate([
     { $match: companyMatch(company) },
     { $addFields: {
       successfulLatestAnswers: {
@@ -32,13 +32,14 @@ async function getTopCompanyTopics(company) {
     { $limit: 5 },
     { $project: { _id: 0, topic: '$_id', count: 1 } }
   ]);
-  return result || [];
+  return Array.isArray(result) ? result : [];
 }
 
 const getRecommendations = async (req, res, next) => {
   try {
     const user = await User.findById(req.user.userId).select('targetCompanies').lean();
-    const targetCompany = req.query.company || user?.targetCompanies?.[0] || null;
+    const targetCompanies = Array.isArray(user?.targetCompanies) ? user.targetCompanies : [];
+    const targetCompany = req.query.company || targetCompanies[0] || null;
 
     const [allUserSessions, allCompanySessions] = await Promise.all([
       Session.find({ userId: req.user.userId })
@@ -54,7 +55,7 @@ const getRecommendations = async (req, res, next) => {
       .sort((a, b) => a.avgScore - b.avgScore)
       .slice(0, 3);
 
-    const companyFocusTopics = allCompanySessions;
+    const companyFocusTopics = Array.isArray(allCompanySessions) ? allCompanySessions : [];
     const companyTopicSet = new Set(companyFocusTopics.map(t => t.topic));
 
     const recommendations = weakTopics.map(topicScore => ({
