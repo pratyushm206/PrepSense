@@ -132,12 +132,12 @@ test('F7 Delete throwaway account and confirm old report not found', async ({ pa
 
 test('F8 Resume CTAs open the external analyzer in a new tab', async ({ page, context }) => {
   watch(page); await login(page);
-  await page.route('https://ai-resume-analyzer-pratyushm206.streamlit.app/**', route => route.abort());
+  await page.route('https://ai-resume-analyzer-wgqu.onrender.com/**', route => route.abort());
   for (const route of ['/dashboard', '/resume-analyzer']) {
     await page.goto(route);
     const cta = page.getByRole('link', { name: 'Analyze my resume' }).first();
     const popupPromise = context.waitForEvent('page'); await cta.click(); const popup = await popupPromise;
-    await expect(popup).toHaveURL(/ai-resume-analyzer-pratyushm206\.streamlit\.app/); await popup.close();
+    await expect(popup).toHaveURL(/ai-resume-analyzer-wgqu\.onrender\.com/); await popup.close();
   }
 });
 
